@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Waddle Wings Universe</title>
+  <meta name="theme-color" content="#1b2838" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div id="game-container">
+  <canvas id="gameCanvas"></canvas>
+
+  <div id="ui-layer">
+    <div id="top-bar">
+      <div id="score-display">0</div>
+      <div id="meta-right">
+        <div id="coins-display">💰 0</div>
+        <div id="best-display">🏆 0</div>
+      </div>
+    </div>
+
+    <!-- Floating hub over live game -->
+    <div id="hub-overlay" class="visible">
+      <div class="hub-header">
+        <div class="hub-title">WADDLE WINGS 🐧 UNIVERSE</div>
+        <div class="hub-tagline">Tap to flap • Don’t choke • Spend coins badly</div>
+      </div>
+
+      <div class="hub-middle">
+        <canvas id="hub-penguin" width="120" height="120"></canvas>
+        <div id="hub-skin-name">Classic Penguin</div>
+      </div>
+
+      <div class="hub-buttons">
+        <button id="btn-play" class="pill-btn primary">PLAY</button>
+        <button id="btn-store" class="pill-btn secondary">STORE</button>
+      </div>
+
+      <div class="hub-icon-row">
+        <button class="icon-btn" id="btn-skins" title="Skins">🎨</button>
+        <button class="icon-btn" id="btn-maps" title="Maps">🗺️</button>
+        <button class="icon-btn" id="btn-modes" title="Modes">🎚️</button>
+        <button class="icon-btn" id="btn-missions" title="Missions">⭐</button>
+        <button class="icon-btn" id="btn-daily" title="Daily reward">🎁</button>
+        <button class="icon-btn" id="btn-settings" title="Settings">⚙️</button>
+      </div>
+    </div>
+
+    <!-- Generic glass panel -->
+    <div id="panel-backdrop" class="hidden">
+      <div class="panel-card">
+        <div class="panel-header">
+          <div class="panel-title" id="panel-title">Panel</div>
+          <button id="panel-close" class="panel-close">×</button>
+        </div>
+        <div class="panel-body">
+          <div id="panel-content"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game over card -->
+    <div id="game-over" class="center-card hidden">
+      <h1>OOF.</h1>
+      <p>Score: <span id="go-score">0</span></p>
+      <p>Best: <span id="go-best">0</span></p>
+      <button id="btn-restart" class="pill-btn primary">TRY AGAIN</button>
+      <button id="btn-menu" class="pill-btn ghost">BACK TO MENU</button>
+    </div>
+  </div>
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>
