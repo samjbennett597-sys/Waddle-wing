@@ -78,15 +78,15 @@
     #coins-display { font-size: 1rem; }
     #lives-display { font-size: 0.95rem; margin-top: 4px; }
 
-    /* HUB */
+    /* FLOATING HUB */
     #hub-overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(150deg, rgba(0,0,0,0.7), rgba(10,20,40,0.95));
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       pointer-events: auto;
+      background: radial-gradient(circle at 50% 0%, rgba(0,0,0,0.65), transparent 55%);
       animation: hubFadeIn 0.25s ease-out;
     }
 
@@ -96,18 +96,21 @@
     }
 
     #hub-header {
-      padding: 10px 14px 4px;
+      padding: 10px 14px 0;
       text-align: center;
+      pointer-events: none;
     }
 
     #hub-title {
-      font-size: 1.4rem;
+      font-size: 1.45rem;
       letter-spacing: 1px;
+      text-shadow: 0 3px 6px rgba(0,0,0,0.7);
     }
 
     #hub-subtitle {
       font-size: 0.8rem;
-      color: #ccc;
+      color: #ddd;
+      margin-top: 2px;
     }
 
     #hub-main {
@@ -115,37 +118,39 @@
       flex-direction: column;
       align-items: center;
       padding: 4px 8px 10px;
+      pointer-events: none;
     }
 
     #podium-wrapper {
       width: 100%;
       display: flex;
       justify-content: center;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
+      pointer-events: none;
     }
 
     #podium {
       position: relative;
-      width: 72%;
+      width: 70%;
       max-width: 260px;
-      height: 160px;
-      background: radial-gradient(circle at 50% 10%, rgba(255,255,255,0.28), transparent 60%);
+      height: 150px;
+      background: radial-gradient(circle at 50% 10%, rgba(255,255,255,0.25), transparent 65%);
       border-radius: 20px;
-      border: 2px solid rgba(255,255,255,0.16);
-      box-shadow: inset 0 0 22px rgba(0,0,0,0.6);
+      border: 2px solid rgba(255,255,255,0.18);
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.7);
       overflow: hidden;
     }
 
     #podium-platform {
       position: absolute;
-      bottom: 20px;
+      bottom: 18px;
       left: 50%;
       transform: translateX(-50%);
       width: 72%;
-      height: 28px;
+      height: 26px;
       background: linear-gradient(90deg,#374b67,#223044);
       border-radius: 999px;
-      box-shadow: 0 6px 12px rgba(0,0,0,0.7);
+      box-shadow: 0 6px 10px rgba(0,0,0,0.8);
     }
 
     #podium-label {
@@ -153,63 +158,92 @@
       bottom: 3px;
       left: 50%;
       transform: translateX(-50%);
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: #d0e6ff;
     }
 
     #podium-character {
       position: absolute;
-      bottom: 35px;
+      bottom: 34px;
       left: 50%;
       transform: translateX(-50%);
     }
 
-    #hub-buttons {
-      width: 100%;
-      max-width: 380px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 6px;
+    /* BIG PLAY / STORE */
+    #hub-big-buttons {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 8px;
+      pointer-events: auto;
     }
 
-    .hub-btn {
-      border-radius: 12px;
-      background: linear-gradient(180deg, #ff7676, #ff5252);
+    .big-text-btn {
+      border-radius: 999px;
+      padding: 10px 26px;
+      font-size: 1.05rem;
       border: none;
-      color: #fff;
-      padding: 10px 8px;
-      font-family: "Fredoka One", cursive;
-      font-size: 1rem;
-      box-shadow: 0 4px 0 #c04444;
       cursor: pointer;
+      font-family: "Fredoka One", cursive;
       text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
     }
 
-    .hub-btn.secondary {
-      background: linear-gradient(180deg,#6078ea,#364fc7);
+    #btn-play {
+      background: linear-gradient(180deg, #ff7676, #ff5252);
+      color: #fff;
+      box-shadow: 0 4px 0 #c04444;
+    }
+
+    #btn-store {
+      background: linear-gradient(180deg, #6078ea, #364fc7);
+      color: #fff;
       box-shadow: 0 4px 0 #243369;
     }
 
-    .hub-btn.ghost {
-      background: rgba(255,255,255,0.08);
-      box-shadow: none;
-      border: 1px solid rgba(255,255,255,0.25);
-      font-size: 0.9rem;
-    }
-
-    .hub-btn:active {
+    .big-text-btn:active {
       transform: translateY(3px);
       box-shadow: 0 1px 0 rgba(0,0,0,0.7);
     }
 
+    /* SMALL ICON ROW */
+    #hub-icon-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 2px;
+      pointer-events: auto;
+    }
+
+    .icon-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.4);
+      background: rgba(0,0,0,0.55);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 0.95rem;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.6);
+    }
+
+    .icon-btn span {
+      pointer-events: none;
+    }
+
+    .icon-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 rgba(0,0,0,0.8);
+    }
+
     #hub-footer {
-      padding: 6px 12px 10px;
+      padding: 4px 10px 8px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       color: #ccc;
+      pointer-events: none;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.7);
     }
 
     /* PANELS */
@@ -316,12 +350,7 @@
       box-shadow: 0 3px 0 #c04444;
       min-width: 80px;
       text-align: center;
-    }
-
-    .small-btn.off {
-      background: rgba(255,255,255,0.1);
-      box-shadow: none;
-      border: 1px solid rgba(255,255,255,0.25);
+      font-family: "Fredoka One", cursive;
     }
 
     .small-btn.equipped {
@@ -329,15 +358,15 @@
       box-shadow: 0 3px 0 #2e7d32;
     }
 
-    .small-btn:active {
-      transform: translateY(2px);
-      box-shadow: 0 1px 0 #c04444;
-    }
-
     .small-btn.disabled {
       opacity: 0.6;
       cursor: default;
       box-shadow: none;
+    }
+
+    .small-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #c04444;
     }
 
     /* CENTER CARDS */
@@ -426,76 +455,6 @@
       color: #555;
     }
 
-    /* POWERUP HUD (ACTIVE TIMERS) */
-    #powerup-hud {
-      position: absolute;
-      bottom: 6px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 6px;
-      pointer-events: none;
-    }
-
-    .powerup-icon {
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      border: 2px solid rgba(255,255,255,0.8);
-      background: rgba(0,0,0,0.4);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 0.7rem;
-      color: #fff;
-      position: relative;
-    }
-
-    .powerup-timer {
-      position: absolute;
-      bottom: -10px;
-      font-size: 0.6rem;
-    }
-
-    /* IN-GAME POWERUP BUTTONS (RIGHT SIDE) */
-    #powerup-buttons {
-      position: absolute;
-      right: 8px;
-      top: 50%;
-      transform: translateY(-50%);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      pointer-events: auto;
-    }
-
-    .powerup-btn {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      border: 2px solid rgba(255,255,255,0.8);
-      background: rgba(0,0,0,0.6);
-      color: #fff;
-      font-size: 0.75rem;
-      cursor: pointer;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.6);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
-    }
-
-    .powerup-btn.disabled {
-      opacity: 0.35;
-      cursor: default;
-      box-shadow: none;
-    }
-
-    .powerup-btn:active:not(.disabled) {
-      transform: translateY(1px);
-      box-shadow: 0 1px 2px rgba(0,0,0,0.7);
-    }
-
     .hidden { display: none !important; }
   </style>
 </head>
@@ -511,25 +470,13 @@
         <div id="lives-display">♥ 5</div>
       </div>
     </div>
-
-    <!-- Active powerup HUD (timers) -->
-    <div id="powerup-hud"></div>
-
-    <!-- In-run powerup buttons (round icons, right side) -->
-    <div id="powerup-buttons">
-      <button class="powerup-btn" data-powerup="god" title="God Mode (10s)">G</button>
-      <button class="powerup-btn" data-powerup="autopilot" title="Auto-Pilot (5s)">A</button>
-      <button class="powerup-btn" data-powerup="slow" title="Slow Motion (6s)">S</button>
-      <button class="powerup-btn" data-powerup="double" title="Double Coins (20s)">2x</button>
-      <button class="powerup-btn" data-powerup="shrink" title="Shrink Hitbox (12s)">H</button>
-    </div>
   </div>
 
-  <!-- HUB MENU -->
+  <!-- FLOATING HUB OVER GAME -->
   <div id="hub-overlay">
     <div id="hub-header">
       <div id="hub-title">WADDLE WINGS UNIVERSE</div>
-      <div id="hub-subtitle">Skins • Maps • Modes • Lives • Coins • Powerups • Premium</div>
+      <div id="hub-subtitle">Tap to flap • Don’t choke • Spend coins badly</div>
     </div>
 
     <div id="hub-main">
@@ -541,21 +488,24 @@
         </div>
       </div>
 
-      <div id="hub-buttons">
-        <button class="hub-btn" id="btn-play">PLAY</button>
-        <button class="hub-btn secondary" id="btn-modes">MODES</button>
-        <button class="hub-btn secondary" id="btn-skins">SKINS</button>
-        <button class="hub-btn secondary" id="btn-maps">MAPS</button>
-        <button class="hub-btn secondary" id="btn-store">STORE</button>
-        <button class="hub-btn ghost" id="btn-missions">MISSIONS</button>
-        <button class="hub-btn ghost" id="btn-daily">DAILY REWARD</button>
-        <button class="hub-btn ghost" id="btn-settings">SETTINGS</button>
+      <div id="hub-big-buttons">
+        <button class="big-text-btn" id="btn-play">PLAY</button>
+        <button class="big-text-btn" id="btn-store">STORE</button>
+      </div>
+
+      <div id="hub-icon-row">
+        <button class="icon-btn" id="btn-modes" title="Modes"><span>🎮</span></button>
+        <button class="icon-btn" id="btn-skins" title="Skins"><span>🎨</span></button>
+        <button class="icon-btn" id="btn-maps" title="Maps"><span>🗺️</span></button>
+        <button class="icon-btn" id="btn-missions" title="Missions"><span>⭐</span></button>
+        <button class="icon-btn" id="btn-daily" title="Daily Reward"><span>🎁</span></button>
+        <button class="icon-btn" id="btn-settings" title="Settings"><span>⚙️</span></button>
       </div>
     </div>
 
     <div id="hub-footer">
       <span id="hub-mode-label">Mode: Normal</span>
-      <span>v3.1 – Dev Build</span>
+      <span>v3.2 – Dev Build</span>
     </div>
   </div>
 
@@ -633,7 +583,7 @@
           <li class="list-item">
             <div class="list-label">
               <span>Vibration</span>
-              <span>Small haptics on hit, powerups, purchases (where supported).</span>
+              <span>Small haptics on hit (where supported).</span>
             </div>
             <button class="small-btn" id="btn-toggle-vibrate">Toggle</button>
           </li>
@@ -680,7 +630,7 @@
     </div>
   </div>
 
-  <!-- SIMPLE STORE PANEL (ONE LIST) -->
+  <!-- SIMPLE STORE PANEL -->
   <div id="panel-store" class="panel hidden">
     <div class="panel-card">
       <div class="panel-header">
@@ -690,9 +640,6 @@
       <div class="panel-body">
         <div class="section-label">Skins & Maps</div>
         <ul class="list" id="store-cosmetics"></ul>
-
-        <div class="section-label">Powerups (consumables)</div>
-        <ul class="list" id="store-powerups"></ul>
 
         <div class="section-label">Premium Upgrades</div>
         <ul class="list" id="store-premium"></ul>
@@ -814,7 +761,6 @@
   const missionsList = document.getElementById("missions-list");
 
   const storeCosmeticsList = document.getElementById("store-cosmetics");
-  const storePowerupsList = document.getElementById("store-powerups");
   const storePremiumList = document.getElementById("store-premium");
   const storeCurrencyList = document.getElementById("store-currency");
 
@@ -859,9 +805,6 @@
   const purchaseConfirmNo = document.getElementById("purchase-confirm-no");
   const purchaseSuccessOk = document.getElementById("purchase-success-ok");
 
-  const powerupHud = document.getElementById("powerup-hud");
-  const powerupButtonsEls = document.querySelectorAll(".powerup-btn");
-
   /* META STATE */
   let lives = parseInt(localStorage.getItem("ww_lives") || String(MAX_LIVES), 10);
   if (Number.isNaN(lives) || lives < 0) lives = MAX_LIVES;
@@ -880,7 +823,7 @@
 
   let removeAds = localStorage.getItem("ww_removeAds") === "true";
   let ultraLives = localStorage.getItem("ww_ultraLives") === "true";
-  let doubleCoins = localStorage.getItem("ww_doubleCoins") === "true"; // permanent upgrade
+  let doubleCoins = localStorage.getItem("ww_doubleCoins") === "true";
   let ultimatePack = localStorage.getItem("ww_ultimatePack") === "true";
 
   let lastDaily = localStorage.getItem("ww_lastDaily") || "";
@@ -892,23 +835,6 @@
   if (sfxOn === null) sfxOn = "true";
   let vibrateOn = localStorage.getItem("ww_vibrateOn");
   if (vibrateOn === null) vibrateOn = "true";
-
-  /* POWERUP TOKENS (INVENTORY) */
-  function getToken(key) {
-    const val = parseInt(localStorage.getItem(key) || "0", 10);
-    return Number.isNaN(val) ? 0 : val;
-  }
-  function setToken(key, val) {
-    localStorage.setItem(key, String(val));
-  }
-
-  const TOKENS = {
-    god: "ww_tok_god",
-    autopilot: "ww_tok_autopilot",
-    slow: "ww_tok_slow",
-    double: "ww_tok_double",
-    shrink: "ww_tok_shrink"
-  };
 
   /* COSMETICS / MODES */
   const SKINS = [
@@ -1061,11 +987,7 @@
 
   /* UI HELPERS */
   function updateLivesUI() {
-    if (ultraLives) {
-      livesEl.textContent = "♥ ∞";
-    } else {
-      livesEl.textContent = "♥ " + lives;
-    }
+    livesEl.textContent = ultraLives ? "♥ ∞" : "♥ " + lives;
   }
 
   function updateCoinsUI() {
@@ -1216,9 +1138,9 @@
 
       const right = document.createElement("div");
       const tag = document.createElement("span");
-      tag.className = "small-tag";
       tag.textContent = !state.completed ? "In progress" :
                         !state.claimed ? "Ready" : "Claimed";
+      tag.style.fontSize = "0.75rem";
       right.appendChild(tag);
 
       if (state.completed && !state.claimed) {
@@ -1399,27 +1321,19 @@
     });
   }
 
-  /* SIMPLE STORE RENDERING */
-
-  const POWERUP_DEFS = [
-    { id: "god",       name: "God Mode (10s)",     desc: "Invincible for 10 seconds.",         tokenKey: TOKENS.god,       priceCoins: 40, duration: 10 },
-    { id: "autopilot", name: "Auto-Pilot (5s)",    desc: "AI flies for a short time.",        tokenKey: TOKENS.autopilot, priceCoins: 50, duration: 5  },
-    { id: "slow",      name: "Slow Motion (6s)",   desc: "Pipes move slower.",                tokenKey: TOKENS.slow,      priceCoins: 30, duration: 6  },
-    { id: "double",    name: "Double Coins (20s)", desc: "All coins earned are doubled.",     tokenKey: TOKENS.double,    priceCoins: 35, duration: 20 },
-    { id: "shrink",    name: "Shrink (12s)",       desc: "Smaller hitbox, easier dodging.",   tokenKey: TOKENS.shrink,    priceCoins: 25, duration: 12 }
-  ];
+  /* STORE: PREMIUM + CURRENCY */
 
   const PREMIUM_ITEMS = [
-    { id: "ultraLives", name: "Unlimited Lives Forever", desc: "Never run out of lives again.",  priceLabel: "£19.99" },
-    { id: "removeAds",  name: "Remove Ads Forever",      desc: "No ads, ever.",                  priceLabel: "£4.99" },
-    { id: "doubleCoins",name: "Double Coins Forever",    desc: "All coins & rewards x2.",        priceLabel: "£4.99" },
-    { id: "ultimate",   name: "Ultimate Penguin Pack",   desc: "Unlimited Lives + Remove Ads + Double Coins + bonus cosmetics.", priceLabel: "£29.99" },
+    { id: "ultraLives", name: "Unlimited Lives Forever", desc: "Never run out of lives again.", priceLabel: "£19.99" },
+    { id: "removeAds", name: "Remove Ads Forever", desc: "No ads, ever.", priceLabel: "£4.99" },
+    { id: "doubleCoins", name: "Double Coins Forever", desc: "All coins & rewards x2.", priceLabel: "£4.99" },
+    { id: "ultimate", name: "Ultimate Penguin Pack", desc: "Unlimited Lives + Remove Ads + Double Coins + bonus cosmetics.", priceLabel: "£29.99" },
   ];
 
   const CURRENCY_PACKS = [
-    { id: "coins-small", name: "Small Coin Pack",   desc: "+100 coins.", amount: 100, priceLabel: "£0.99" },
-    { id: "coins-med",   name: "Medium Coin Pack",  desc: "+300 coins.", amount: 300, priceLabel: "£2.49" },
-    { id: "coins-big",   name: "Big Coin Pack",     desc: "+800 coins.", amount: 800, priceLabel: "£4.99" },
+    { id: "coins-small", name: "Small Coin Pack", desc: "+100 coins.", amount: 100, priceLabel: "£0.99" },
+    { id: "coins-med", name: "Medium Coin Pack", desc: "+300 coins.", amount: 300, priceLabel: "£2.49" },
+    { id: "coins-big", name: "Big Coin Pack", desc: "+800 coins.", amount: 800, priceLabel: "£4.99" },
   ];
 
   let currentPurchase = null; // { label, onComplete }
@@ -1460,7 +1374,6 @@
     closePurchaseUI();
   });
 
-  /* STORE: COSMETICS SECTION (SINGLE LIST) */
   function renderStoreCosmetics() {
     storeCosmeticsList.innerHTML = "";
 
@@ -1493,7 +1406,7 @@
           }
           coins -= skin.cost;
           ownedSkins.push(skin.id);
-          equippedSkinId = skin.id; // auto-equip
+          equippedSkinId = skin.id;
           saveMeta();
           saveCosmetics();
           updateCoinsUI();
@@ -1552,7 +1465,7 @@
           }
           coins -= map.cost;
           ownedMaps.push(map.id);
-          equippedMapId = map.id; // auto-equip
+          equippedMapId = map.id;
           saveMeta();
           saveCosmetics();
           updateCoinsUI();
@@ -1583,47 +1496,6 @@
     });
   }
 
-  /* STORE: POWERUPS (CONSUMABLES) */
-  function renderStorePowerups() {
-    storePowerupsList.innerHTML = "";
-    POWERUP_DEFS.forEach(p => {
-      const li = document.createElement("li");
-      li.className = "list-item";
-
-      const label = document.createElement("div");
-      label.className = "list-label";
-      const title = document.createElement("span");
-      const count = getToken(p.tokenKey);
-      title.textContent = `${p.name} (x${count})`;
-      const desc = document.createElement("span");
-      desc.textContent = `${p.desc} • ${p.priceCoins} coins each`;
-      label.appendChild(title);
-      label.appendChild(desc);
-
-      const btn = document.createElement("button");
-      btn.className = "small-btn";
-      btn.textContent = `Buy ${p.priceCoins}`;
-      btn.onclick = () => {
-        if (coins < p.priceCoins) {
-          alert("Not enough coins.");
-          return;
-        }
-        coins -= p.priceCoins;
-        const newCount = count + 1;
-        setToken(p.tokenKey, newCount);
-        saveMeta();
-        updateCoinsUI();
-        renderStorePowerups();
-        refreshPowerupButtons();
-      };
-
-      li.appendChild(label);
-      li.appendChild(btn);
-      storePowerupsList.appendChild(li);
-    });
-  }
-
-  /* STORE: PREMIUM */
   function renderStorePremium() {
     storePremiumList.innerHTML = "";
     PREMIUM_ITEMS.forEach(item => {
@@ -1691,7 +1563,6 @@
     });
   }
 
-  /* STORE: COINS */
   function renderStoreCurrency() {
     storeCurrencyList.innerHTML = "";
     CURRENCY_PACKS.forEach(pack => {
@@ -1786,7 +1657,7 @@
   let score = 0;
   let isRunning = false;
   let isGameOver = false;
-  let startedFlight = false; // hover until first input
+  let startedFlight = false; // hover until first tap
 
   const snowflakes = [];
   function initSnow() {
@@ -1894,7 +1765,7 @@
         const maxPos = canvas.height - minLen - mode.gap;
         const minPos = minLen;
         const topY = Math.floor(Math.random() * (maxPos - minPos + 1)) + minPos;
-        this.items.push({ x: canvas.width, y: topY, passed: false });
+        this.items.push({ x: canvas.width, y: topY, passed: false, wobblePhase: Math.random() * Math.PI * 2 });
       }
 
       for (let i = 0; i < this.items.length; i++) {
@@ -1902,11 +1773,19 @@
         const m = getSelectedMode();
         let speed = m.speed;
 
-        // Difficulty ramp & erratic behaviour
-        if (score >= 50) speed *= 1.1;
-        if (score >= 100) {
-          speed *= 1.25;
-          p.y += Math.sin(frames * 0.08 + p.x * 0.02) * 1.5;
+        // Progressive difficulty ramp
+        if (score >= 25) speed *= 1.1;
+        if (score >= 50) speed *= 1.2;
+        if (score >= 100) speed *= 1.35;
+
+        // Erratic wobble at higher scores
+        if (score >= 80) {
+          const wobble = Math.sin(frames * 0.06 + p.wobblePhase) * 1.5;
+          p.y += wobble;
+        }
+        if (score >= 140) {
+          const wobble = Math.sin(frames * 0.09 + p.wobblePhase) * 2.4;
+          p.y += wobble;
         }
 
         p.x -= speed;
@@ -1918,21 +1797,14 @@
         const pBottom = penguin.y + penguin.radius;
 
         if (pRight > p.x && pLeft < p.x + pipeWidth) {
-          const gap = m.gap;
+          const gap = m.gap - Math.min(score * 0.15, 40); // gap shrinks as score climbs
           const topLimit = p.y;
           const bottomLimit = p.y + gap;
           let hit = false;
-          let effectiveRadius = penguin.radius;
-          if (activeEffects.shrink > 0) {
-            effectiveRadius = penguin.radius * 0.6;
-          }
-          const adjTop = penguin.y - effectiveRadius;
-          const adjBottom = penguin.y + effectiveRadius;
+          if (pTop < topLimit) hit = true;
+          if (pBottom > bottomLimit) hit = true;
 
-          if (adjTop < topLimit) hit = true;
-          if (adjBottom > bottomLimit) hit = true;
-
-          if (hit && !activeEffects.god) {
+          if (hit) {
             triggerGameOver();
           }
         }
@@ -1941,10 +1813,15 @@
           p.passed = true;
           score++;
           let coinGain = 1;
-          if (doubleCoins) coinGain *= 2;       // permanent upgrade
-          if (activeEffects.double > 0) coinGain *= 2; // temporary powerup
-          scoreEl.textContent = score;
+
+          // score milestones that nudge coins up (soft pressure to store)
+          if (score >= 30 && score < 80) coinGain = 2;
+          else if (score >= 80 && score < 140) coinGain = 3;
+          else if (score >= 140) coinGain = 4;
+
+          if (doubleCoins) coinGain *= 2;
           coins += coinGain;
+          scoreEl.textContent = score;
           updateCoinsUI();
           playSfx(sfxCoin);
           saveMeta();
@@ -1963,7 +1840,9 @@
         const p = this.items[i];
         const pipeWidth = 60;
         const m = getSelectedMode();
-        const gap = m.gap;
+        const baseGap = m.gap;
+        const gapShrink = Math.min(score * 0.15, 40);
+        const gap = baseGap - gapShrink;
 
         const gradTop = ctx.createLinearGradient(p.x, 0, p.x + pipeWidth, 0);
         gradTop.addColorStop(0, map.gradient[0]);
@@ -2029,130 +1908,6 @@
     });
   }
 
-  /* POWERUPS IN-RUN (EFFECTS) */
-  const activeEffects = {
-    god: 0,
-    slow: 0,
-    double: 0,     // temporary double coins
-    shrink: 0,
-    autopilot: 0,  // >0 = active
-  };
-
-  function useToken(id) {
-    const def = POWERUP_DEFS.find(p => p.id === id);
-    if (!def) return false;
-    const key = def.tokenKey;
-    const current = getToken(key);
-    if (current <= 0) return false;
-    setToken(key, current - 1);
-    saveMeta();
-    return true;
-  }
-
-  function activatePowerup(id) {
-    const def = POWERUP_DEFS.find(p => p.id === id);
-    if (!def) return;
-
-    if (id === "god") {
-      activeEffects.god = def.duration;
-    } else if (id === "slow") {
-      activeEffects.slow = def.duration;
-    } else if (id === "double") {
-      activeEffects.double = def.duration;
-    } else if (id === "shrink") {
-      activeEffects.shrink = def.duration;
-    } else if (id === "autopilot") {
-      activeEffects.autopilot = def.duration;
-    }
-
-    tryVibrate(30);
-    updatePowerupHud();
-  }
-
-  function updatePowerupTimers(deltaSec) {
-    if (activeEffects.god > 0)       activeEffects.god       = Math.max(0, activeEffects.god - deltaSec);
-    if (activeEffects.slow > 0)      activeEffects.slow      = Math.max(0, activeEffects.slow - deltaSec);
-    if (activeEffects.double > 0)    activeEffects.double    = Math.max(0, activeEffects.double - deltaSec);
-    if (activeEffects.shrink > 0)    activeEffects.shrink    = Math.max(0, activeEffects.shrink - deltaSec);
-    if (activeEffects.autopilot > 0) activeEffects.autopilot = Math.max(0, activeEffects.autopilot - deltaSec);
-    if (isGameOver) {
-      activeEffects.autopilot = 0;
-    }
-    updatePowerupHud();
-  }
-
-  function updatePowerupHud() {
-    powerupHud.innerHTML = "";
-    function addIcon(label, remaining) {
-      const div = document.createElement("div");
-      div.className = "powerup-icon";
-      div.textContent = label;
-      const timer = document.createElement("div");
-      timer.className = "powerup-timer";
-      timer.textContent = remaining > 0 ? Math.ceil(remaining) : "";
-      div.appendChild(timer);
-      powerupHud.appendChild(div);
-    }
-    if (activeEffects.god > 0)       addIcon("G",  activeEffects.god);
-    if (activeEffects.autopilot > 0) addIcon("A",  activeEffects.autopilot);
-    if (activeEffects.slow > 0)      addIcon("S",  activeEffects.slow);
-    if (activeEffects.double > 0)    addIcon("2x", activeEffects.double);
-    if (activeEffects.shrink > 0)    addIcon("H",  activeEffects.shrink);
-  }
-
-  /* IN-RUN POWERUP BUTTONS (RIGHT SIDE) */
-  const powerupButtons = {};
-  powerupButtonsEls.forEach(btn => {
-    const id = btn.getAttribute("data-powerup");
-    powerupButtons[id] = btn;
-  });
-
-  function isPowerupActive(id) {
-    if (id === "god")       return activeEffects.god > 0;
-    if (id === "slow")      return activeEffects.slow > 0;
-    if (id === "double")    return activeEffects.double > 0;
-    if (id === "shrink")    return activeEffects.shrink > 0;
-    if (id === "autopilot") return activeEffects.autopilot > 0;
-    return false;
-  }
-
-  function refreshPowerupButtons() {
-    Object.keys(powerupButtons).forEach(id => {
-      const btn = powerupButtons[id];
-      if (!btn) return;
-      const tokenKey = TOKENS[id];
-      const ownedCount = tokenKey ? getToken(tokenKey) : 0;
-      const disabled =
-        !isRunning ||
-        isGameOver ||
-        !tokenKey ||
-        ownedCount <= 0;
-
-      if (disabled) {
-        btn.classList.add("disabled");
-      } else {
-        btn.classList.remove("disabled");
-      }
-    });
-  }
-
-  Object.keys(powerupButtons).forEach(id => {
-    const btn = powerupButtons[id];
-    btn.addEventListener("click", () => {
-      if (!isRunning || isGameOver) return;
-      const def = POWERUP_DEFS.find(p => p.id === id);
-      if (!def) return;
-      if (isPowerupActive(id) && id !== "double") {
-        // ignore spam for currently active (except stacking double is blocked too)
-        return;
-      }
-      if (!useToken(id)) return;
-      activatePowerup(id);
-      refreshPowerupButtons();
-      renderStorePowerups(); // update counts in shop
-    });
-  });
-
   let lastFrameTime = performance.now();
 
   function loop(now) {
@@ -2163,26 +1918,12 @@
     const dt = (now - lastFrameTime) / 1000 || 0;
     lastFrameTime = now;
 
-    const timeScale = activeEffects.slow > 0 ? 0.4 : 1.0;
-    const effectiveDt = dt * timeScale;
-    updatePowerupTimers(effectiveDt);
-
-    // Idle hover until first input
+    // Hover idle until first tap
     if (!startedFlight) {
       penguin.y = canvas.height / 2 + Math.sin(frames * 0.08) * 10;
       penguin.velocity = 0;
-    } else if (activeEffects.autopilot > 0 && !isGameOver) {
-      // simple autopilot: gentle sine-wave path
-      penguin.velocity = Math.sin(frames * 0.15) * -4;
-      penguin.y += penguin.velocity;
-      if (penguin.y < penguin.radius) penguin.y = penguin.radius;
-      if (penguin.y > canvas.height - penguin.radius) penguin.y = canvas.height - penguin.radius;
-      penguin.rotation = penguin.velocity * 0.1;
     } else {
       penguin.update();
-    }
-
-    if (startedFlight) {
       pipes.update();
     }
 
@@ -2191,15 +1932,6 @@
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBackground();
     pipes.draw();
-
-    if (activeEffects.god > 0) {
-      ctx.save();
-      ctx.globalAlpha = 0.25;
-      ctx.fillStyle = "#ffd600";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.restore();
-    }
-
     penguin.draw();
 
     if (!isGameOver) requestAnimationFrame(loop);
@@ -2207,7 +1939,6 @@
 
   function triggerGameOver() {
     if (isGameOver) return;
-    if (activeEffects.god > 0) return;
     isGameOver = true;
     isRunning = false;
 
@@ -2234,7 +1965,6 @@
     checkMissionsCompletion();
     saveMeta();
 
-    refreshPowerupButtons();
     gameOverScreen.classList.remove("hidden");
   }
 
@@ -2254,15 +1984,7 @@
 
     isGameOver = false;
     isRunning = true;
-    startedFlight = false; // reset hover state
-    // reset active powerups
-    activeEffects.god = 0;
-    activeEffects.slow = 0;
-    activeEffects.double = 0;
-    activeEffects.shrink = 0;
-    activeEffects.autopilot = 0;
-    updatePowerupHud();
-
+    startedFlight = false;
     score = 0;
     frames = 0;
     scoreEl.textContent = score;
@@ -2271,7 +1993,6 @@
     initSnow();
     ensureMusicPlaying();
     lastFrameTime = performance.now();
-    refreshPowerupButtons();
     requestAnimationFrame(loop);
   }
 
@@ -2288,8 +2009,6 @@
       playSfx(sfxFlap);
       return;
     }
-
-    if (activeEffects.autopilot > 0) return;
 
     penguin.flap();
     playSfx(sfxFlap);
@@ -2312,7 +2031,6 @@
   btnModes.addEventListener("click", () => { renderModesPanel(); modesPanel.classList.remove("hidden"); });
   btnStore.addEventListener("click", () => {
     renderStoreCosmetics();
-    renderStorePowerups();
     renderStorePremium();
     renderStoreCurrency();
     storePanel.classList.remove("hidden");
@@ -2347,18 +2065,12 @@
     gameOverScreen.classList.add("hidden");
     hubOverlay.classList.remove("hidden");
     stopMusic();
-    isRunning = false;
-    isGameOver = false;
-    refreshPowerupButtons();
   });
 
   backFromNoLivesBtn.addEventListener("click", () => {
     noLivesScreen.classList.add("hidden");
     hubOverlay.classList.remove("hidden");
     stopMusic();
-    isRunning = false;
-    isGameOver = false;
-    refreshPowerupButtons();
   });
 
   /* AUDIO TOGGLES */
@@ -2392,9 +2104,6 @@
       alert("Ad-free user: +1 bonus life.");
       noLivesScreen.classList.add("hidden");
       hubOverlay.classList.remove("hidden");
-      isRunning = false;
-      isGameOver = false;
-      refreshPowerupButtons();
       return;
     }
 
@@ -2425,9 +2134,6 @@
           updateLivesUI();
           alert("Thanks for watching! +1 life added.");
           hubOverlay.classList.remove("hidden");
-          isRunning = false;
-          isGameOver = false;
-          refreshPowerupButtons();
         }, 300);
       }
     }, 1000);
@@ -2440,7 +2146,6 @@
   penguin.reset();
   penguin.draw();
   updateAudioStatusUI();
-  refreshPowerupButtons();
 
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
