@@ -1,20 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Waddle Wings Universe</title>
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Waddle Wings</title>
 
-  <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#2C3E50" />
-
-  <!-- AUDIO -->
-  <audio id="bgm" src="music/background.mp3" loop preload="auto"></audio>
-  <audio id="sfx-flap" src="music/flap.wav" preload="auto"></audio>
-  <audio id="sfx-coin" src="music/coin.wav" preload="auto"></audio>
-  <audio id="sfx-hit" src="music/hit.wav" preload="auto"></audio>
-  <audio id="sfx-purchase" src="music/purchase.mp3" preload="auto"></audio>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2C3E50">
 
   <style>
     @import url("https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap");
@@ -25,2134 +18,349 @@
       margin: 0;
       padding: 0;
       background: #111;
-      color: #fff;
       font-family: "Fredoka One", cursive;
       overflow: hidden;
       touch-action: none;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      width: 100vw;
     }
 
     #game-container {
-      position: relative;
-      max-width: 100%;
-      max-height: 100%;
-      box-shadow: 0 0 25px rgba(0, 0, 0, 0.6);
-      border-radius: 16px;
+      position: absolute;
+      inset: 0;
       overflow: hidden;
-      background: #000;
     }
 
     canvas {
       display: block;
     }
 
-    #ui-layer {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-    }
-
-    #top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 12px;
-      font-size: 0.9rem;
-      color: #fff;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
-    }
-
-    #score-display {
-      font-size: 2.1rem;
-    }
-
-    #meta-right {
-      text-align: right;
-      font-size: 0.8rem;
-    }
-
-    #coins-display { font-size: 1rem; }
-    #lives-display { font-size: 0.95rem; margin-top: 4px; }
-
-    /* FLOATING HUB */
-    #hub-overlay {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      pointer-events: auto;
-      background: radial-gradient(circle at 50% 0%, rgba(0,0,0,0.65), transparent 55%);
-      animation: hubFadeIn 0.25s ease-out;
-    }
-
-    @keyframes hubFadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    #hub-header {
-      padding: 10px 14px 0;
-      text-align: center;
-      pointer-events: none;
-    }
-
-    #hub-title {
-      font-size: 1.45rem;
-      letter-spacing: 1px;
-      text-shadow: 0 3px 6px rgba(0,0,0,0.7);
-    }
-
-    #hub-subtitle {
-      font-size: 0.8rem;
-      color: #ddd;
-      margin-top: 2px;
-    }
-
-    #hub-main {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 4px 8px 10px;
-      pointer-events: none;
-    }
-
-    #podium-wrapper {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      margin-bottom: 12px;
-      pointer-events: none;
-    }
-
-    #podium {
-      position: relative;
-      width: 70%;
-      max-width: 260px;
-      height: 150px;
-      background: radial-gradient(circle at 50% 10%, rgba(255,255,255,0.25), transparent 65%);
-      border-radius: 20px;
-      border: 2px solid rgba(255,255,255,0.18);
-      box-shadow: inset 0 0 20px rgba(0,0,0,0.7);
-      overflow: hidden;
-    }
-
-    #podium-platform {
-      position: absolute;
-      bottom: 18px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 72%;
-      height: 26px;
-      background: linear-gradient(90deg,#374b67,#223044);
-      border-radius: 999px;
-      box-shadow: 0 6px 10px rgba(0,0,0,0.8);
-    }
-
-    #podium-label {
-      position: absolute;
-      bottom: 3px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 0.78rem;
-      color: #d0e6ff;
-    }
-
-    #podium-character {
-      position: absolute;
-      bottom: 34px;
-      left: 50%;
-      transform: translateX(-50%);
-    }
-
-    /* BIG PLAY / STORE */
-    #hub-big-buttons {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 8px;
-      pointer-events: auto;
-    }
-
-    .big-text-btn {
-      border-radius: 999px;
-      padding: 10px 26px;
-      font-size: 1.05rem;
-      border: none;
-      cursor: pointer;
-      font-family: "Fredoka One", cursive;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-    }
-
-    #btn-play {
-      background: linear-gradient(180deg, #ff7676, #ff5252);
-      color: #fff;
-      box-shadow: 0 4px 0 #c04444;
-    }
-
-    #btn-store {
-      background: linear-gradient(180deg, #6078ea, #364fc7);
-      color: #fff;
-      box-shadow: 0 4px 0 #243369;
-    }
-
-    .big-text-btn:active {
-      transform: translateY(3px);
-      box-shadow: 0 1px 0 rgba(0,0,0,0.7);
-    }
-
-    /* SMALL ICON ROW */
-    #hub-icon-row {
-      display: flex;
-      gap: 10px;
-      margin-top: 2px;
-      pointer-events: auto;
-    }
-
-    .icon-btn {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      border: 1px solid rgba(255,255,255,0.4);
-      background: rgba(0,0,0,0.55);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 0.95rem;
-      cursor: pointer;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.6);
-    }
-
-    .icon-btn span {
-      pointer-events: none;
-    }
-
-    .icon-btn:active {
-      transform: translateY(2px);
-      box-shadow: 0 1px 0 rgba(0,0,0,0.8);
-    }
-
-    #hub-footer {
-      padding: 4px 10px 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.75rem;
-      color: #ccc;
-      pointer-events: none;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.7);
-    }
-
-    /* PANELS */
-    .panel {
-      position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,0.7);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      pointer-events: auto;
-    }
-
-    .panel-card {
-      background: rgba(10,15,35,0.97);
-      border-radius: 18px;
-      border: 2px solid rgba(255,255,255,0.18);
-      padding: 18px;
-      width: 92%;
-      max-width: 420px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.7);
-      animation: slideUp 0.2s ease-out;
-      font-size: 0.88rem;
-    }
-
-    @keyframes slideUp {
-      from { transform: translateY(12px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-
-    .panel-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-
-    .panel-title {
-      font-size: 1.2rem;
-    }
-
-    .panel-close {
-      background: transparent;
-      border: none;
-      color: #fff;
-      font-size: 1.4rem;
-      cursor: pointer;
-    }
-
-    .panel-body {
-      max-height: 260px;
-      overflow-y: auto;
-    }
-
-    .panel-footer {
-      margin-top: 10px;
-      text-align: right;
-    }
-
-    .list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    .list-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 6px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-    }
-
-    .list-label {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .list-label span:first-child {
-      font-size: 0.95rem;
-    }
-
-    .list-label span:last-child {
-      font-size: 0.75rem;
-      color: #aaa;
-    }
-
-    .section-label {
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: #bbb;
-      margin: 8px 0 2px;
-    }
-
-    .small-btn {
-      padding: 6px 14px;
-      font-size: 0.8rem;
-      border-radius: 20px;
-      background: #ff7676;
-      border: none;
-      color: #fff;
-      cursor: pointer;
-      box-shadow: 0 3px 0 #c04444;
-      min-width: 80px;
-      text-align: center;
-      font-family: "Fredoka One", cursive;
-    }
-
-    .small-btn.equipped {
-      background: #4caf50;
-      box-shadow: 0 3px 0 #2e7d32;
-    }
-
-    .small-btn.disabled {
-      opacity: 0.6;
-      cursor: default;
-      box-shadow: none;
-    }
-
-    .small-btn:active {
-      transform: translateY(2px);
-      box-shadow: 0 1px 0 #c04444;
-    }
-
-    /* CENTER CARDS */
-    .center-card {
+    /* FLOATING MENU */
+    #menu {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
+      background: rgba(0,0,0,0.55);
+      padding: 25px 40px;
       text-align: center;
-      background: rgba(255,255,255,0.96);
-      color: #333;
-      padding: 24px;
-      border-radius: 18px;
-      border: 3px solid #2C3E50;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-      min-width: 240px;
-      pointer-events: auto;
-      font-size: 0.9rem;
+      border-radius: 20px;
+      border: 2px solid rgba(255,255,255,0.25);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      backdrop-filter: blur(5px);
+      animation: fadeIn 0.4s ease-out;
+      z-index: 50;
     }
 
-    .center-card h1 {
-      margin: 0 0 10px;
-      font-size: 1.8rem;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translate(-50%, -55%); }
+      to { opacity: 1; transform: translate(-50%, -50%); }
     }
 
-    .center-card p {
-      margin: 6px 0 10px;
-    }
-
-    button {
-      font-family: "Fredoka One", cursive;
-    }
-
-    .main-btn {
-      background: #ff6b6b;
+    #menu h1 {
+      margin: 0 0 15px;
+      font-size: 2.5rem;
       color: #fff;
-      border: none;
-      padding: 12px 28px;
-      font-size: 1rem;
-      border-radius: 30px;
-      cursor: pointer;
-      box-shadow: 0 4px 0 #c04444;
-      margin: 4px 4px;
+      text-shadow: 3px 3px 6px #000;
     }
 
-    .main-btn:active {
+    .menu-btn {
+      background: #ff6b6b;
+      border: none;
+      padding: 14px 40px;
+      margin: 10px 0;
+      color: white;
+      font-size: 1.3rem;
+      border-radius: 40px;
+      box-shadow: 0 4px 0 #c04444;
+      cursor: pointer;
+      width: 200px;
+    }
+
+    .menu-btn:active {
       transform: translateY(3px);
       box-shadow: 0 1px 0 #c04444;
     }
 
-    .secondary-btn {
-      background: #6078ea;
-      box-shadow: 0 4px 0 #243369;
+    /* ICON BAR */
+    #icon-bar {
+      position: absolute;
+      bottom: 18px;
+      right: 18px;
+      display: flex;
+      gap: 14px;
+      font-size: 1.8rem;
+      z-index: 60;
+    }
+
+    .ibtn {
       color: #fff;
-      border: none;
-      padding: 10px 22px;
-      font-size: 0.9rem;
-      border-radius: 24px;
+      opacity: 0.75;
       cursor: pointer;
-      margin: 4px 4px;
+      transition: 0.15s;
     }
 
-    .secondary-btn:active {
-      transform: translateY(2px);
-      box-shadow: 0 1px 0 #243369;
+    .ibtn:hover { opacity: 1; }
+
+    /* STORE */
+    #store {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(6px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
     }
 
-    #fake-ad-progress {
-      width: 100%;
-      height: 10px;
-      border-radius: 999px;
-      background: #eee;
-      overflow: hidden;
-      margin-top: 10px;
+    #store-card {
+      background: rgba(15,20,45,0.95);
+      padding: 25px;
+      width: 90%;
+      max-width: 360px;
+      border-radius: 20px;
+      border: 2px solid #2C3E50;
+      color: white;
+      text-align: center;
     }
 
-    #fake-ad-bar {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg,#ff6b6b,#ffd66b);
+    #store-card h2 { margin-top: 0; }
+
+    .store-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
     }
 
-    #fake-ad-timer {
-      font-size: 0.85rem;
-      margin-top: 6px;
-      color: #555;
+    .store-btn {
+      background: #6078ea;
+      border: none;
+      color: #fff;
+      padding: 6px 14px;
+      border-radius: 8px;
+      cursor: pointer;
     }
 
-    .hidden { display: none !important; }
+    #close-store {
+      margin-top: 14px;
+      background: #ff6b6b;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 12px;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    /* SCORE DISPLAY */
+    #score {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 3rem;
+      color: white;
+      text-shadow: 3px 3px 6px rgba(0,0,0,0.5);
+      z-index: 20;
+      display: none;
+    }
   </style>
 </head>
 <body>
+
 <div id="game-container">
-  <canvas id="gameCanvas"></canvas>
+  <canvas id="game"></canvas>
 
-  <div id="ui-layer">
-    <div id="top-bar">
-      <div id="score-display">0</div>
-      <div id="meta-right">
-        <div id="coins-display">💰 0</div>
-        <div id="lives-display">♥ 5</div>
+  <div id="score">0</div>
+
+  <!-- FLOATING MENU -->
+  <div id="menu">
+    <h1>WADDLE WINGS</h1>
+    <button id="playBtn" class="menu-btn">PLAY</button>
+    <button id="storeBtn" class="menu-btn">STORE</button>
+  </div>
+
+  <!-- ICONS -->
+  <div id="icon-bar">
+    <div class="ibtn" id="settingsBtn">⚙</div>
+    <div class="ibtn" id="infoBtn">ℹ</div>
+  </div>
+
+  <!-- STORE PANEL -->
+  <div id="store">
+    <div id="store-card">
+      <h2>STORE</h2>
+
+      <div class="store-item">
+        <span>Remove Ads</span>
+        <button class="store-btn">£4.99</button>
       </div>
+
+      <div class="store-item">
+        <span>Double Coins</span>
+        <button class="store-btn">£3.99</button>
+      </div>
+
+      <div class="store-item">
+        <span>Starter Pack</span>
+        <button class="store-btn">£2.49</button>
+      </div>
+
+      <button id="close-store">Close</button>
     </div>
-  </div>
-
-  <!-- FLOATING HUB OVER GAME -->
-  <div id="hub-overlay">
-    <div id="hub-header">
-      <div id="hub-title">WADDLE WINGS UNIVERSE</div>
-      <div id="hub-subtitle">Tap to flap • Don’t choke • Spend coins badly</div>
-    </div>
-
-    <div id="hub-main">
-      <div id="podium-wrapper">
-        <div id="podium">
-          <div id="podium-platform"></div>
-          <div id="podium-label">Classic Penguin</div>
-          <canvas id="podium-character" width="80" height="80"></canvas>
-        </div>
-      </div>
-
-      <div id="hub-big-buttons">
-        <button class="big-text-btn" id="btn-play">PLAY</button>
-        <button class="big-text-btn" id="btn-store">STORE</button>
-      </div>
-
-      <div id="hub-icon-row">
-        <button class="icon-btn" id="btn-modes" title="Modes"><span>🎮</span></button>
-        <button class="icon-btn" id="btn-skins" title="Skins"><span>🎨</span></button>
-        <button class="icon-btn" id="btn-maps" title="Maps"><span>🗺️</span></button>
-        <button class="icon-btn" id="btn-missions" title="Missions"><span>⭐</span></button>
-        <button class="icon-btn" id="btn-daily" title="Daily Reward"><span>🎁</span></button>
-        <button class="icon-btn" id="btn-settings" title="Settings"><span>⚙️</span></button>
-      </div>
-    </div>
-
-    <div id="hub-footer">
-      <span id="hub-mode-label">Mode: Normal</span>
-      <span>v3.2 – Dev Build</span>
-    </div>
-  </div>
-
-  <!-- PANELS -->
-  <div id="panel-skins" class="panel hidden">
-    <div class="panel-card">
-      <div class="panel-header">
-        <div class="panel-title">Skins</div>
-        <button class="panel-close" data-panel-close="panel-skins">×</button>
-      </div>
-      <div class="panel-body">
-        <ul class="list" id="skins-list"></ul>
-      </div>
-      <div class="panel-footer">
-        <button class="small-btn" data-panel-close="panel-skins">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="panel-maps" class="panel hidden">
-    <div class="panel-card">
-      <div class="panel-header">
-        <div class="panel-title">Maps</div>
-        <button class="panel-close" data-panel-close="panel-maps">×</button>
-      </div>
-      <div class="panel-body">
-        <ul class="list" id="maps-list"></ul>
-      </div>
-      <div class="panel-footer">
-        <button class="small-btn" data-panel-close="panel-maps">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="panel-modes" class="panel hidden">
-    <div class="panel-card">
-      <div class="panel-header">
-        <div class="panel-title">Modes</div>
-        <button class="panel-close" data-panel-close="panel-modes">×</button>
-      </div>
-      <div class="panel-body">
-        <ul class="list" id="modes-list"></ul>
-      </div>
-      <div class="panel-footer">
-        <button class="small-btn" data-panel-close="panel-modes">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="panel-settings" class="panel hidden">
-    <div class="panel-card">
-      <div class="panel-header">
-        <div class="panel-title">Settings</div>
-        <button class="panel-close" data-panel-close="panel-settings">×</button>
-      </div>
-      <div class="panel-body">
-        <p style="font-size:0.8rem; color:#ddd;">
-          Audio & comfort options. In a real Play Store build, purchases would go through Google Play Billing.
-        </p>
-        <ul class="list">
-          <li class="list-item">
-            <div class="list-label">
-              <span>Music</span>
-              <span>Background soundtrack during menus and runs.</span>
-            </div>
-            <button class="small-btn" id="btn-toggle-music">Toggle</button>
-          </li>
-          <li class="list-item">
-            <div class="list-label">
-              <span>Sound Effects</span>
-              <span>Flaps, coins, hits, purchases.</span>
-            </div>
-            <button class="small-btn" id="btn-toggle-sfx">Toggle</button>
-          </li>
-          <li class="list-item">
-            <div class="list-label">
-              <span>Vibration</span>
-              <span>Small haptics on hit (where supported).</span>
-            </div>
-            <button class="small-btn" id="btn-toggle-vibrate">Toggle</button>
-          </li>
-        </ul>
-        <p id="settings-audio-status" style="font-size:0.8rem; color:#ccc; margin-top:8px;"></p>
-      </div>
-      <div class="panel-footer">
-        <button class="small-btn" data-panel-close="panel-settings">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="panel-missions" class="panel hidden">
-    <div class="panel-card">
-      <div class="panel-header">
-        <div class="panel-title">Missions</div>
-        <button class="panel-close" data-panel-close="panel-missions">×</button>
-      </div>
-      <div class="panel-body">
-        <ul class="list" id="missions-list"></ul>
-      </div>
-      <div class="panel-footer">
-        <button class="small-btn" data-panel-close="panel-missions">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="panel-daily" class="panel hidden">
-    <div class="panel-card">
-      <div class="panel-header">
-        <div class="panel-title">Daily Reward</div>
-        <button class="panel-close" data-panel-close="panel-daily">×</button>
-      </div>
-      <div class="panel-body">
-        <p style="font-size:0.85rem; color:#ddd;">
-          Claim once per day for a free coin boost.
-        </p>
-        <p id="daily-status" style="font-size:0.85rem; color:#ccc;"></p>
-      </div>
-      <div class="panel-footer">
-        <button class="small-btn" id="btn-claim-daily">Claim</button>
-        <button class="small-btn" data-panel-close="panel-daily">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- SIMPLE STORE PANEL -->
-  <div id="panel-store" class="panel hidden">
-    <div class="panel-card">
-      <div class="panel-header">
-        <div class="panel-title">Store</div>
-        <button class="panel-close" data-panel-close="panel-store">×</button>
-      </div>
-      <div class="panel-body">
-        <div class="section-label">Skins & Maps</div>
-        <ul class="list" id="store-cosmetics"></ul>
-
-        <div class="section-label">Premium Upgrades</div>
-        <ul class="list" id="store-premium"></ul>
-
-        <div class="section-label">Coins</div>
-        <ul class="list" id="store-currency"></ul>
-      </div>
-      <div class="panel-footer">
-        <button class="small-btn" data-panel-close="panel-store">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- PURCHASE POPUPS -->
-  <div id="purchase-confirm" class="center-card hidden">
-    <h1>Confirm</h1>
-    <p id="purchase-confirm-text"></p>
-    <button id="purchase-confirm-yes" class="main-btn">BUY</button>
-    <button id="purchase-confirm-no" class="secondary-btn">CANCEL</button>
-  </div>
-
-  <div id="purchase-processing" class="center-card hidden">
-    <h1>Processing…</h1>
-    <p style="font-size:0.85rem;">Contacting fake Google Play Billing…</p>
-  </div>
-
-  <div id="purchase-success" class="center-card hidden">
-    <h1>Success!</h1>
-    <p id="purchase-success-text"></p>
-    <button id="purchase-success-ok" class="main-btn">OK</button>
-  </div>
-
-  <!-- GAME STATE CARDS -->
-  <div id="game-over-screen" class="center-card hidden">
-    <h1>OOF!</h1>
-    <p>Score: <span id="final-score">0</span></p>
-    <p>Best: <span id="best-score">0</span></p>
-    <p>Lives left: <span id="lives-left-label">0</span></p>
-    <button id="restart-btn" class="main-btn">PLAY AGAIN</button>
-    <button id="back-menu-btn" class="secondary-btn">BACK TO HUB</button>
-  </div>
-
-  <div id="no-lives-screen" class="center-card hidden">
-    <h1>NO LIVES</h1>
-    <p>You’re out of lives.</p>
-    <p style="font-size:0.85rem;">
-      Lives regenerate over time (1 per hour), or you can watch an ad for +1 life.
-    </p>
-    <button id="watch-ad-btn" class="main-btn">WATCH AD</button>
-    <button id="back-from-nolives-btn" class="secondary-btn">BACK TO HUB</button>
-  </div>
-
-  <div id="fake-ad-screen" class="center-card hidden">
-    <h1>Ad playing…</h1>
-    <p style="font-size:0.9rem;">Pretend this is some cheesy mobile game trailer.</p>
-    <div id="fake-ad-progress">
-      <div id="fake-ad-bar"></div>
-    </div>
-    <div id="fake-ad-timer">5s remaining</div>
   </div>
 </div>
 
 <script>
-  /* BASIC SETUP */
-  const canvas = document.getElementById("gameCanvas");
-  const ctx = canvas.getContext("2d");
+/* CANVAS SETUP */
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
 
-  function resizeCanvas() {
-    const maxWidth = 480;
-    const maxHeight = 800;
-    let w = window.innerWidth;
-    let h = window.innerHeight;
-    if (w > maxWidth) {
-      w = maxWidth;
-      h = Math.min(window.innerHeight, maxHeight);
-    }
-    canvas.width = w;
-    canvas.height = h;
-  }
-  window.addEventListener("resize", resizeCanvas);
-  resizeCanvas();
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener("resize", resize);
+resize();
 
-  /* CONSTANTS */
-  const GRAVITY = 0.25;
-  const FLAP_STRENGTH = -5.5;
-  const MAX_LIVES = 5;
-  const REGEN_TIME = 60 * 60 * 1000; // 1 hour
-  const DAILY_REWARD_COINS = 20;
+/* GAME STATE */
+let penguin = { x: 0, y: 0, vel: 0, r: 18 };
+let pipes = [];
+let score = 0;
+let running = false;
+let started = false;
 
-  /* AUDIO ELEMENTS */
-  const bgm = document.getElementById("bgm");
-  const sfxFlap = document.getElementById("sfx-flap");
-  const sfxCoin = document.getElementById("sfx-coin");
-  const sfxHit = document.getElementById("sfx-hit");
-  const sfxPurchase = document.getElementById("sfx-purchase");
+/* DIFFICULTY */
+let pipeGap = 160;
+let pipeSpeed = 3;
 
-  /* DOM REFERENCES */
-  const scoreEl = document.getElementById("score-display");
-  const coinsEl = document.getElementById("coins-display");
-  const livesEl = document.getElementById("lives-display");
+/* RESET GAME */
+function resetGame() {
+  penguin.x = canvas.width * 0.25;
+  penguin.y = canvas.height / 2;
+  penguin.vel = 0;
 
-  const hubOverlay = document.getElementById("hub-overlay");
-  const hubModeLabel = document.getElementById("hub-mode-label");
-  const podiumLabel = document.getElementById("podium-label");
-  const podiumCanvas = document.getElementById("podium-character");
-  const podiumCtx = podiumCanvas.getContext("2d");
+  pipes = [];
+  score = 0;
+  started = false;
+  pipeGap = 160;
+  pipeSpeed = 3;
 
-  const skinsPanel = document.getElementById("panel-skins");
-  const mapsPanel = document.getElementById("panel-maps");
-  const modesPanel = document.getElementById("panel-modes");
-  const missionsPanel = document.getElementById("panel-missions");
-  const dailyPanel = document.getElementById("panel-daily");
-  const settingsPanel = document.getElementById("panel-settings");
-  const storePanel = document.getElementById("panel-store");
+  document.getElementById("score").style.display = "none";
+}
 
-  const skinsList = document.getElementById("skins-list");
-  const mapsList = document.getElementById("maps-list");
-  const modesList = document.getElementById("modes-list");
-  const missionsList = document.getElementById("missions-list");
+/* START RUN */
+document.getElementById("playBtn").onclick = () => {
+  document.getElementById("menu").style.display = "none";
+  document.getElementById("score").style.display = "block";
+  running = true;
+  resetGame();
+};
 
-  const storeCosmeticsList = document.getElementById("store-cosmetics");
-  const storePremiumList = document.getElementById("store-premium");
-  const storeCurrencyList = document.getElementById("store-currency");
+/* STORE */
+document.getElementById("storeBtn").onclick = () => {
+  document.getElementById("store").style.display = "flex";
+};
+document.getElementById("close-store").onclick = () => {
+  document.getElementById("store").style.display = "none";
+};
 
-  const settingsAudioStatus = document.getElementById("settings-audio-status");
-  const dailyStatus = document.getElementById("daily-status");
-  const claimDailyBtn = document.getElementById("btn-claim-daily");
+/* GAME LOOP */
+let frame = 0;
+function loop() {
+  if (!running) return requestAnimationFrame(loop);
 
-  const gameOverScreen = document.getElementById("game-over-screen");
-  const noLivesScreen = document.getElementById("no-lives-screen");
-  const fakeAdScreen = document.getElementById("fake-ad-screen");
-  const fakeAdBar = document.getElementById("fake-ad-bar");
-  const fakeAdTimer = document.getElementById("fake-ad-timer");
+  ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  const finalScoreEl = document.getElementById("final-score");
-  const bestScoreEl = document.getElementById("best-score");
-  const livesLeftLabel = document.getElementById("lives-left-label");
+  /* BACKGROUND */
+  let grad = ctx.createLinearGradient(0,0,0,canvas.height);
+  grad.addColorStop(0, "#87CEEB");
+  grad.addColorStop(1, "#E0F7FA");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0,0,canvas.width,canvas.height);
 
-  const btnPlay = document.getElementById("btn-play");
-  const btnModes = document.getElementById("btn-modes");
-  const btnSkins = document.getElementById("btn-skins");
-  const btnMaps = document.getElementById("btn-maps");
-  const btnStore = document.getElementById("btn-store");
-  const btnMissions = document.getElementById("btn-missions");
-  const btnDaily = document.getElementById("btn-daily");
-  const btnSettings = document.getElementById("btn-settings");
-
-  const restartBtn = document.getElementById("restart-btn");
-  const backMenuBtn = document.getElementById("back-menu-btn");
-  const backFromNoLivesBtn = document.getElementById("back-from-nolives-btn");
-  const watchAdBtn = document.getElementById("watch-ad-btn");
-
-  const btnToggleMusic = document.getElementById("btn-toggle-music");
-  const btnToggleSfx = document.getElementById("btn-toggle-sfx");
-  const btnToggleVibrate = document.getElementById("btn-toggle-vibrate");
-
-  const purchaseConfirm = document.getElementById("purchase-confirm");
-  const purchaseProcessing = document.getElementById("purchase-processing");
-  const purchaseSuccess = document.getElementById("purchase-success");
-  const purchaseConfirmText = document.getElementById("purchase-confirm-text");
-  const purchaseSuccessText = document.getElementById("purchase-success-text");
-  const purchaseConfirmYes = document.getElementById("purchase-confirm-yes");
-  const purchaseConfirmNo = document.getElementById("purchase-confirm-no");
-  const purchaseSuccessOk = document.getElementById("purchase-success-ok");
-
-  /* META STATE */
-  let lives = parseInt(localStorage.getItem("ww_lives") || String(MAX_LIVES), 10);
-  if (Number.isNaN(lives) || lives < 0) lives = MAX_LIVES;
-
-  let lastLifeTimestamp = parseInt(
-    localStorage.getItem("ww_lastLife") || String(Date.now()),
-    10
-  );
-  if (Number.isNaN(lastLifeTimestamp)) lastLifeTimestamp = Date.now();
-
-  let coins = parseInt(localStorage.getItem("ww_coins") || "0", 10);
-  if (Number.isNaN(coins)) coins = 0;
-
-  let highScore = parseInt(localStorage.getItem("waddleHighScore") || "0", 10);
-  if (Number.isNaN(highScore)) highScore = 0;
-
-  let removeAds = localStorage.getItem("ww_removeAds") === "true";
-  let ultraLives = localStorage.getItem("ww_ultraLives") === "true";
-  let doubleCoins = localStorage.getItem("ww_doubleCoins") === "true";
-  let ultimatePack = localStorage.getItem("ww_ultimatePack") === "true";
-
-  let lastDaily = localStorage.getItem("ww_lastDaily") || "";
-
-  /* AUDIO SETTINGS */
-  let musicOn = localStorage.getItem("ww_musicOn");
-  if (musicOn === null) musicOn = "true";
-  let sfxOn = localStorage.getItem("ww_sfxOn");
-  if (sfxOn === null) sfxOn = "true";
-  let vibrateOn = localStorage.getItem("ww_vibrateOn");
-  if (vibrateOn === null) vibrateOn = "true";
-
-  /* COSMETICS / MODES */
-  const SKINS = [
-    {
-      id: "classic",
-      name: "Classic Penguin",
-      desc: "Standard blue & white hero.",
-      cost: 0,
-      body: "#2C3E50",
-      wing: "#34495E",
-      beak: "#FF9800",
-    },
-    {
-      id: "red",
-      name: "Red Rebel",
-      desc: "Looks faster. Is not.",
-      cost: 40,
-      body: "#C0392B",
-      wing: "#922B21",
-      beak: "#FFB74D",
-    },
-    {
-      id: "gold",
-      name: "Golden Waddle",
-      desc: "Shiny flex skin.",
-      cost: 100,
-      body: "#D4AF37",
-      wing: "#B08A2E",
-      beak: "#FFE082",
-    },
-    {
-      id: "neon",
-      name: "Neon Cyber",
-      desc: "Glowing cyber penguin.",
-      cost: 120,
-      body: "#00e5ff",
-      wing: "#00b0ff",
-      beak: "#ffeb3b",
-    }
-  ];
-
-  const MAPS = [
-    {
-      id: "day",
-      name: "Snowfield Day",
-      desc: "Bright sky and soft snow.",
-      cost: 0,
-      gradient: ["#87CEEB", "#E0F7FA"],
-    },
-    {
-      id: "night",
-      name: "Polar Night",
-      desc: "Dark arctic sky with stars.",
-      cost: 40,
-      gradient: ["#001c3d", "#00335c"],
-    },
-    {
-      id: "blizzard",
-      name: "Blizzard",
-      desc: "Stormy white-out challenge.",
-      cost: 60,
-      gradient: ["#546E7A", "#ECEFF1"],
-    },
-    {
-      id: "synth",
-      name: "Synthwave Sky",
-      desc: "Neon purple & orange horizon.",
-      cost: 80,
-      gradient: ["#4a148c", "#ff6f00"],
-    }
-  ];
-
-  const MODES = [
-    { id: "easy", name: "Easy", desc: "Slower pipes, big gaps.", speed: 2.4, gap: 190 },
-    { id: "normal", name: "Normal", desc: "Standard challenge.", speed: 3.0, gap: 160 },
-    { id: "hard", name: "Hard", desc: "Faster pipes, tighter gaps.", speed: 3.6, gap: 140 },
-    { id: "extreme", name: "Extreme", desc: "Chaos mode, no mercy.", speed: 4.4, gap: 120 },
-  ];
-
-  /* MISSIONS */
-  const MISSIONS = [
-    { id: "score10", name: "First Steps", desc: "Reach score 10.", type: "bestScoreAtLeast", target: 10, rewardCoins: 20 },
-    { id: "score25", name: "Getting Good", desc: "Reach score 25.", type: "bestScoreAtLeast", target: 25, rewardCoins: 40 },
-    { id: "runs3", name: "Committed", desc: "Play 3 runs today.", type: "runsToday", target: 3, rewardCoins: 15 },
-  ];
-  let missionState = JSON.parse(localStorage.getItem("ww_missions") || "{}");
-  let runsToday = 0;
-  let runsTodayDate = localStorage.getItem("ww_runsTodayDate") || "";
-  function todayStr() {
-    return new Date().toISOString().slice(0, 10);
-  }
-  if (runsTodayDate !== todayStr()) {
-    runsToday = 0;
-    runsTodayDate = todayStr();
-    localStorage.setItem("ww_runsTodayDate", runsTodayDate);
-    localStorage.setItem("ww_runsToday", String(runsToday));
+  /* PENGUIN HOVER BEFORE START */
+  if (!started) {
+    penguin.y = canvas.height/2 + Math.sin(frame*0.08)*10;
   } else {
-    runsToday = parseInt(localStorage.getItem("ww_runsToday") || "0", 10);
-    if (Number.isNaN(runsToday)) runsToday = 0;
-  }
+    penguin.vel += 0.25;
+    penguin.y += penguin.vel;
 
-  /* OWNERSHIP */
-  let ownedSkins = JSON.parse(localStorage.getItem("ww_ownedSkins") || '["classic"]');
-  if (!ownedSkins.includes("classic")) ownedSkins.push("classic");
-
-  let ownedMaps = JSON.parse(localStorage.getItem("ww_ownedMaps") || '["day"]');
-  if (!ownedMaps.includes("day")) ownedMaps.push("day");
-
-  let equippedSkinId = localStorage.getItem("ww_skin") || "classic";
-  let equippedMapId = localStorage.getItem("ww_map") || "day";
-  let modeId = localStorage.getItem("ww_mode") || "normal";
-
-  function saveMeta() {
-    localStorage.setItem("ww_lives", String(lives));
-    localStorage.setItem("ww_lastLife", String(lastLifeTimestamp));
-    localStorage.setItem("ww_coins", String(coins));
-    localStorage.setItem("waddleHighScore", String(highScore));
-    localStorage.setItem("ww_removeAds", String(removeAds));
-    localStorage.setItem("ww_ultraLives", String(ultraLives));
-    localStorage.setItem("ww_doubleCoins", String(doubleCoins));
-    localStorage.setItem("ww_ultimatePack", String(ultimatePack));
-    localStorage.setItem("ww_lastDaily", lastDaily);
-    localStorage.setItem("ww_missions", JSON.stringify(missionState));
-    localStorage.setItem("ww_runsToday", String(runsToday));
-    localStorage.setItem("ww_runsTodayDate", runsTodayDate);
-    localStorage.setItem("ww_musicOn", musicOn);
-    localStorage.setItem("ww_sfxOn", sfxOn);
-    localStorage.setItem("ww_vibrateOn", vibrateOn);
-  }
-
-  function saveCosmetics() {
-    localStorage.setItem("ww_ownedSkins", JSON.stringify(ownedSkins));
-    localStorage.setItem("ww_ownedMaps", JSON.stringify(ownedMaps));
-    localStorage.setItem("ww_skin", equippedSkinId);
-    localStorage.setItem("ww_map", equippedMapId);
-    localStorage.setItem("ww_mode", modeId);
-  }
-
-  function getEquippedSkin() {
-    return SKINS.find(s => s.id === equippedSkinId) || SKINS[0];
-  }
-
-  function getEquippedMap() {
-    return MAPS.find(m => m.id === equippedMapId) || MAPS[0];
-  }
-
-  function getSelectedMode() {
-    return MODES.find(m => m.id === modeId) || MODES[1];
-  }
-
-  /* UI HELPERS */
-  function updateLivesUI() {
-    livesEl.textContent = ultraLives ? "♥ ∞" : "♥ " + lives;
-  }
-
-  function updateCoinsUI() {
-    coinsEl.textContent = "💰 " + coins;
-  }
-
-  function updateAudioStatusUI() {
-    settingsAudioStatus.textContent =
-      "Music: " + (musicOn === "true" ? "ON" : "OFF") +
-      " | SFX: " + (sfxOn === "true" ? "ON" : "OFF") +
-      " | Vibrate: " + (vibrateOn === "true" ? "ON" : "OFF");
-  }
-
-  function tryVibrate(pattern) {
-    if (vibrateOn === "true" && "vibrate" in navigator) {
-      navigator.vibrate(pattern);
+    if (penguin.y + penguin.r > canvas.height) {
+      endGame();
     }
   }
 
-  function playSfx(sound) {
-    if (sfxOn !== "true") return;
-    if (!sound) return;
-    try {
-      sound.currentTime = 0;
-      sound.play().catch(() => {});
-    } catch (_) {}
+  /* DRAW PENGUIN */
+  ctx.fillStyle = "#2C3E50";
+  ctx.beginPath();
+  ctx.ellipse(penguin.x,penguin.y,20,25,0,0,Math.PI*2);
+  ctx.fill();
+
+  /* PIPES */
+  if (frame % 110 === 0 && started) {
+    let top = Math.random() * (canvas.height - pipeGap - 100) + 50;
+    pipes.push({ x: canvas.width, y: top });
   }
 
-  function ensureMusicPlaying() {
-    if (musicOn !== "true") {
-      bgm.pause();
-      return;
-    }
-    if (bgm.paused) {
-      bgm.volume = 0.4;
-      bgm.play().catch(() => {});
-    }
-  }
+  for (let i = pipes.length-1; i>=0; i--) {
+    let p = pipes[i];
 
-  function stopMusic() {
-    try {
-      bgm.pause();
-      bgm.currentTime = 0;
-    } catch (_) {}
-  }
+    p.x -= pipeSpeed;
 
-  /* LIVES REGEN */
-  function regenLives() {
-    if (ultraLives) {
-      lives = MAX_LIVES;
-      lastLifeTimestamp = Date.now();
-      saveMeta();
-      updateLivesUI();
-      return;
-    }
-    const now = Date.now();
-    if (lives >= MAX_LIVES) {
-      lastLifeTimestamp = now;
-      localStorage.setItem("ww_lastLife", String(lastLifeTimestamp));
-      return;
-    }
-    const elapsed = now - lastLifeTimestamp;
-    const regained = Math.floor(elapsed / REGEN_TIME);
-    if (regained > 0) {
-      lives = Math.min(MAX_LIVES, lives + regained);
-      lastLifeTimestamp = now;
-      saveMeta();
-      updateLivesUI();
-    }
-  }
+    /* collision */
+    if (penguin.x + penguin.r > p.x &&
+        penguin.x - penguin.r < p.x + 60) {
 
-  regenLives();
-  updateLivesUI();
-  updateCoinsUI();
-  updateAudioStatusUI();
-  setInterval(regenLives, 30 * 1000);
-
-  /* DAILY */
-  function updateDailyPanel() {
-    const today = todayStr();
-    if (lastDaily === today) {
-      dailyStatus.textContent = "Already claimed today. Come back tomorrow.";
-      claimDailyBtn.disabled = true;
-      claimDailyBtn.style.opacity = "0.5";
-    } else {
-      const reward = doubleCoins ? DAILY_REWARD_COINS * 2 : DAILY_REWARD_COINS;
-      dailyStatus.textContent = `Available: +${reward} coins.`;
-      claimDailyBtn.disabled = false;
-      claimDailyBtn.style.opacity = "1";
-    }
-  }
-
-  claimDailyBtn.addEventListener("click", () => {
-    const today = todayStr();
-    if (lastDaily === today) {
-      alert("Already claimed today.");
-      return;
-    }
-    lastDaily = today;
-    let reward = DAILY_REWARD_COINS;
-    if (doubleCoins) reward *= 2;
-    coins += reward;
-    saveMeta();
-    updateCoinsUI();
-    updateDailyPanel();
-    alert(`Daily reward claimed: +${reward} coins.`);
-  });
-
-  /* MISSIONS */
-  function missionProgress(m) {
-    if (m.type === "bestScoreAtLeast") {
-      return { current: highScore, target: m.target };
-    }
-    if (m.type === "runsToday") {
-      return { current: runsToday, target: m.target };
-    }
-    return { current: 0, target: m.target };
-  }
-
-  function checkMissionsCompletion() {
-    MISSIONS.forEach(m => {
-      const state = missionState[m.id] || { completed: false, claimed: false };
-      if (state.completed) return;
-      const prog = missionProgress(m);
-      if (prog.current >= m.target) {
-        state.completed = true;
-        missionState[m.id] = state;
+      if (penguin.y - penguin.r < p.y ||
+          penguin.y + penguin.r > p.y + pipeGap) {
+        endGame();
       }
-    });
-  }
-
-  function renderMissionsPanel() {
-    missionsList.innerHTML = "";
-    MISSIONS.forEach(m => {
-      const state = missionState[m.id] || { completed: false, claimed: false };
-      const li = document.createElement("li");
-      li.className = "list-item";
-
-      const label = document.createElement("div");
-      label.className = "list-label";
-      const title = document.createElement("span");
-      title.textContent = m.name;
-      const prog = missionProgress(m);
-      const desc = document.createElement("span");
-      desc.textContent = `${m.desc} (${prog.current}/${m.target}) • Reward: ${m.rewardCoins} coins`;
-      label.appendChild(title);
-      label.appendChild(desc);
-
-      const right = document.createElement("div");
-      const tag = document.createElement("span");
-      tag.textContent = !state.completed ? "In progress" :
-                        !state.claimed ? "Ready" : "Claimed";
-      tag.style.fontSize = "0.75rem";
-      right.appendChild(tag);
-
-      if (state.completed && !state.claimed) {
-        const btn = document.createElement("button");
-        btn.className = "small-btn";
-        btn.textContent = "Claim";
-        btn.onclick = () => {
-          let reward = m.rewardCoins;
-          if (doubleCoins) reward *= 2;
-          coins += reward;
-          state.claimed = true;
-          missionState[m.id] = state;
-          saveMeta();
-          updateCoinsUI();
-          renderMissionsPanel();
-        };
-        right.appendChild(btn);
-      }
-
-      li.appendChild(label);
-      li.appendChild(right);
-      missionsList.appendChild(li);
-    });
-  }
-
-  /* PANELS: SKINS / MAPS / MODES */
-  function renderSkinsPanel() {
-    skinsList.innerHTML = "";
-    SKINS.forEach(skin => {
-      const li = document.createElement("li");
-      li.className = "list-item";
-      const label = document.createElement("div");
-      label.className = "list-label";
-      const title = document.createElement("span");
-      title.textContent = skin.name;
-      const owned = ownedSkins.includes(skin.id);
-      const desc = document.createElement("span");
-      desc.textContent = owned
-        ? skin.desc + (skin.id === equippedSkinId ? " • Equipped" : " • Owned")
-        : `${skin.desc} • Cost: ${skin.cost} coins`;
-      label.appendChild(title);
-      label.appendChild(desc);
-
-      const btn = document.createElement("button");
-      btn.className = "small-btn";
-      if (!owned && skin.cost > 0) {
-        btn.textContent = `Buy ${skin.cost}`;
-        btn.onclick = () => {
-          if (coins < skin.cost) {
-            alert("Not enough coins.");
-            return;
-          }
-          coins -= skin.cost;
-          ownedSkins.push(skin.id);
-          equippedSkinId = skin.id;
-          saveMeta();
-          saveCosmetics();
-          updateCoinsUI();
-          renderSkinsPanel();
-          renderStoreCosmetics();
-          updateHubView();
-        };
-      } else {
-        if (skin.id === equippedSkinId) {
-          btn.textContent = "Equipped";
-          btn.classList.add("equipped", "disabled");
-          btn.disabled = true;
-        } else {
-          btn.textContent = "Equip";
-          btn.onclick = () => {
-            equippedSkinId = skin.id;
-            saveCosmetics();
-            renderSkinsPanel();
-            renderStoreCosmetics();
-            updateHubView();
-          };
-        }
-      }
-
-      li.appendChild(label);
-      li.appendChild(btn);
-      skinsList.appendChild(li);
-    });
-  }
-
-  function renderMapsPanel() {
-    mapsList.innerHTML = "";
-    MAPS.forEach(map => {
-      const li = document.createElement("li");
-      li.className = "list-item";
-      const label = document.createElement("div");
-      label.className = "list-label";
-      const title = document.createElement("span");
-      title.textContent = map.name;
-      const owned = ownedMaps.includes(map.id);
-      const desc = document.createElement("span");
-      desc.textContent = owned
-        ? map.desc + (map.id === equippedMapId ? " • Equipped" : " • Owned")
-        : `${map.desc} • Cost: ${map.cost} coins`;
-      label.appendChild(title);
-      label.appendChild(desc);
-
-      const btn = document.createElement("button");
-      btn.className = "small-btn";
-      if (!owned && map.cost > 0) {
-        btn.textContent = `Buy ${map.cost}`;
-        btn.onclick = () => {
-          if (coins < map.cost) {
-            alert("Not enough coins.");
-            return;
-          }
-          coins -= map.cost;
-          ownedMaps.push(map.id);
-          equippedMapId = map.id;
-          saveMeta();
-          saveCosmetics();
-          updateCoinsUI();
-          renderMapsPanel();
-          renderStoreCosmetics();
-          updateHubView();
-        };
-      } else {
-        if (map.id === equippedMapId) {
-          btn.textContent = "Equipped";
-          btn.classList.add("equipped", "disabled");
-          btn.disabled = true;
-        } else {
-          btn.textContent = "Equip";
-          btn.onclick = () => {
-            equippedMapId = map.id;
-            saveCosmetics();
-            renderMapsPanel();
-            renderStoreCosmetics();
-            updateHubView();
-          };
-        }
-      }
-
-      li.appendChild(label);
-      li.appendChild(btn);
-      mapsList.appendChild(li);
-    });
-  }
-
-  function renderModesPanel() {
-    modesList.innerHTML = "";
-    MODES.forEach(mode => {
-      const li = document.createElement("li");
-      li.className = "list-item";
-      const label = document.createElement("div");
-      label.className = "list-label";
-      const title = document.createElement("span");
-      title.textContent = mode.name;
-      const desc = document.createElement("span");
-      desc.textContent = mode.desc;
-      label.appendChild(title);
-      label.appendChild(desc);
-
-      const btn = document.createElement("button");
-      btn.className = "small-btn";
-      if (mode.id === modeId) {
-        btn.textContent = "Selected";
-        btn.classList.add("equipped", "disabled");
-        btn.disabled = true;
-      } else {
-        btn.textContent = "Set";
-        btn.onclick = () => {
-          modeId = mode.id;
-          saveCosmetics();
-          renderModesPanel();
-          updateHubView();
-        };
-      }
-
-      li.appendChild(label);
-      li.appendChild(btn);
-      modesList.appendChild(li);
-    });
-  }
-
-  /* STORE: PREMIUM + CURRENCY */
-
-  const PREMIUM_ITEMS = [
-    { id: "ultraLives", name: "Unlimited Lives Forever", desc: "Never run out of lives again.", priceLabel: "£19.99" },
-    { id: "removeAds", name: "Remove Ads Forever", desc: "No ads, ever.", priceLabel: "£4.99" },
-    { id: "doubleCoins", name: "Double Coins Forever", desc: "All coins & rewards x2.", priceLabel: "£4.99" },
-    { id: "ultimate", name: "Ultimate Penguin Pack", desc: "Unlimited Lives + Remove Ads + Double Coins + bonus cosmetics.", priceLabel: "£29.99" },
-  ];
-
-  const CURRENCY_PACKS = [
-    { id: "coins-small", name: "Small Coin Pack", desc: "+100 coins.", amount: 100, priceLabel: "£0.99" },
-    { id: "coins-med", name: "Medium Coin Pack", desc: "+300 coins.", amount: 300, priceLabel: "£2.49" },
-    { id: "coins-big", name: "Big Coin Pack", desc: "+800 coins.", amount: 800, priceLabel: "£4.99" },
-  ];
-
-  let currentPurchase = null; // { label, onComplete }
-
-  function openPurchaseConfirm(label, onComplete) {
-    currentPurchase = { label, onComplete };
-    purchaseConfirmText.textContent = label;
-    purchaseConfirm.classList.remove("hidden");
-  }
-
-  function closePurchaseUI() {
-    purchaseConfirm.classList.add("hidden");
-    purchaseProcessing.classList.add("hidden");
-    purchaseSuccess.classList.add("hidden");
-    currentPurchase = null;
-  }
-
-  purchaseConfirmYes.addEventListener("click", () => {
-    purchaseConfirm.classList.add("hidden");
-    purchaseProcessing.classList.remove("hidden");
-    setTimeout(() => {
-      purchaseProcessing.classList.add("hidden");
-      if (currentPurchase && typeof currentPurchase.onComplete === "function") {
-        currentPurchase.onComplete();
-      }
-      playSfx(sfxPurchase);
-      tryVibrate(40);
-      purchaseSuccessText.textContent = "Purchase successful.\n" + (currentPurchase ? currentPurchase.label : "");
-      purchaseSuccess.classList.remove("hidden");
-    }, 1200);
-  });
-
-  purchaseConfirmNo.addEventListener("click", () => {
-    closePurchaseUI();
-  });
-
-  purchaseSuccessOk.addEventListener("click", () => {
-    closePurchaseUI();
-  });
-
-  function renderStoreCosmetics() {
-    storeCosmeticsList.innerHTML = "";
-
-    // Skins
-    SKINS.forEach(skin => {
-      const li = document.createElement("li");
-      li.className = "list-item";
-
-      const label = document.createElement("div");
-      label.className = "list-label";
-      const title = document.createElement("span");
-      title.textContent = `[Skin] ${skin.name}`;
-      const owned = ownedSkins.includes(skin.id);
-      const desc = document.createElement("span");
-      desc.textContent = owned
-        ? skin.desc + (skin.id === equippedSkinId ? " • Equipped" : " • Owned")
-        : `${skin.desc} • Cost: ${skin.cost} coins`;
-      label.appendChild(title);
-      label.appendChild(desc);
-
-      const btn = document.createElement("button");
-      btn.className = "small-btn";
-
-      if (!owned && skin.cost > 0) {
-        btn.textContent = `Buy ${skin.cost}`;
-        btn.onclick = () => {
-          if (coins < skin.cost) {
-            alert("Not enough coins.");
-            return;
-          }
-          coins -= skin.cost;
-          ownedSkins.push(skin.id);
-          equippedSkinId = skin.id;
-          saveMeta();
-          saveCosmetics();
-          updateCoinsUI();
-          renderSkinsPanel();
-          renderStoreCosmetics();
-          updateHubView();
-        };
-      } else {
-        if (skin.id === equippedSkinId) {
-          btn.textContent = "Equipped";
-          btn.classList.add("equipped", "disabled");
-          btn.disabled = true;
-        } else {
-          btn.textContent = "Equip";
-          btn.onclick = () => {
-            equippedSkinId = skin.id;
-            saveCosmetics();
-            renderSkinsPanel();
-            renderStoreCosmetics();
-            updateHubView();
-          };
-        }
-      }
-
-      li.appendChild(label);
-      li.appendChild(btn);
-      storeCosmeticsList.appendChild(li);
-    });
-
-    // Maps
-    MAPS.forEach(map => {
-      const li = document.createElement("li");
-      li.className = "list-item";
-
-      const label = document.createElement("div");
-      label.className = "list-label";
-      const title = document.createElement("span");
-      title.textContent = `[Map] ${map.name}`;
-      const owned = ownedMaps.includes(map.id);
-      const desc = document.createElement("span");
-      desc.textContent = owned
-        ? map.desc + (map.id === equippedMapId ? " • Equipped" : " • Owned")
-        : `${map.desc} • Cost: ${map.cost} coins`;
-      label.appendChild(title);
-      label.appendChild(desc);
-
-      const btn = document.createElement("button");
-      btn.className = "small-btn";
-
-      if (!owned && map.cost > 0) {
-        btn.textContent = `Buy ${map.cost}`;
-        btn.onclick = () => {
-          if (coins < map.cost) {
-            alert("Not enough coins.");
-            return;
-          }
-          coins -= map.cost;
-          ownedMaps.push(map.id);
-          equippedMapId = map.id;
-          saveMeta();
-          saveCosmetics();
-          updateCoinsUI();
-          renderMapsPanel();
-          renderStoreCosmetics();
-          updateHubView();
-        };
-      } else {
-        if (map.id === equippedMapId) {
-          btn.textContent = "Equipped";
-          btn.classList.add("equipped", "disabled");
-          btn.disabled = true;
-        } else {
-          btn.textContent = "Equip";
-          btn.onclick = () => {
-            equippedMapId = map.id;
-            saveCosmetics();
-            renderMapsPanel();
-            renderStoreCosmetics();
-            updateHubView();
-          };
-        }
-      }
-
-      li.appendChild(label);
-      li.appendChild(btn);
-      storeCosmeticsList.appendChild(li);
-    });
-  }
-
-  function renderStorePremium() {
-    storePremiumList.innerHTML = "";
-    PREMIUM_ITEMS.forEach(item => {
-      const li = document.createElement("li");
-      li.className = "list-item";
-
-      const label = document.createElement("div");
-      label.className = "list-label";
-      const title = document.createElement("span");
-      title.textContent = item.name;
-      const desc = document.createElement("span");
-      desc.textContent = item.desc + " • " + item.priceLabel;
-      label.appendChild(title);
-      label.appendChild(desc);
-
-      const btn = document.createElement("button");
-      btn.className = "small-btn";
-
-      let ownedFlag = false;
-      if (item.id === "ultraLives") ownedFlag = ultraLives;
-      if (item.id === "removeAds") ownedFlag = removeAds;
-      if (item.id === "doubleCoins") ownedFlag = doubleCoins;
-      if (item.id === "ultimate") ownedFlag = ultimatePack;
-
-      if (ownedFlag) {
-        btn.textContent = "Owned";
-        btn.classList.add("equipped", "disabled");
-        btn.disabled = true;
-      } else {
-        btn.textContent = item.priceLabel;
-        btn.onclick = () => {
-          openPurchaseConfirm(`${item.name} – ${item.priceLabel}`, () => {
-            if (item.id === "ultraLives") {
-              ultraLives = true;
-              lives = MAX_LIVES;
-            }
-            if (item.id === "removeAds") {
-              removeAds = true;
-            }
-            if (item.id === "doubleCoins") {
-              doubleCoins = true;
-            }
-            if (item.id === "ultimate") {
-              ultimatePack = true;
-              ultraLives = true;
-              removeAds = true;
-              doubleCoins = true;
-              lives = MAX_LIVES;
-              if (!ownedSkins.includes("neon")) ownedSkins.push("neon");
-              if (!ownedMaps.includes("synth")) ownedMaps.push("synth");
-              saveCosmetics();
-            }
-            saveMeta();
-            updateLivesUI();
-            updateCoinsUI();
-            renderStorePremium();
-            renderStoreCosmetics();
-          });
-        };
-      }
-
-      li.appendChild(label);
-      li.appendChild(btn);
-      storePremiumList.appendChild(li);
-    });
-  }
-
-  function renderStoreCurrency() {
-    storeCurrencyList.innerHTML = "";
-    CURRENCY_PACKS.forEach(pack => {
-      const li = document.createElement("li");
-      li.className = "list-item";
-
-      const label = document.createElement("div");
-      label.className = "list-label";
-      const title = document.createElement("span");
-      title.textContent = pack.name;
-      const desc = document.createElement("span");
-      desc.textContent = `${pack.desc} • ${pack.priceLabel}`;
-      label.appendChild(title);
-      label.appendChild(desc);
-
-      const btn = document.createElement("button");
-      btn.className = "small-btn";
-      btn.textContent = pack.priceLabel;
-      btn.onclick = () => {
-        openPurchaseConfirm(`${pack.name} – ${pack.priceLabel}`, () => {
-          coins += pack.amount;
-          saveMeta();
-          updateCoinsUI();
-          renderStoreCurrency();
-        });
-      };
-
-      li.appendChild(label);
-      li.appendChild(btn);
-      storeCurrencyList.appendChild(li);
-    });
-  }
-
-  /* PODIUM */
-  function drawPodiumCharacter() {
-    const skin = getEquippedSkin();
-    podiumCtx.clearRect(0, 0, podiumCanvas.width, podiumCanvas.height);
-    podiumCtx.save();
-    podiumCtx.translate(podiumCanvas.width / 2, podiumCanvas.height / 2 + 8);
-
-    podiumCtx.fillStyle = skin.body;
-    podiumCtx.beginPath();
-    podiumCtx.ellipse(0, 0, 18, 22, 0, 0, Math.PI * 2);
-    podiumCtx.fill();
-
-    podiumCtx.fillStyle = "#ffffff";
-    podiumCtx.beginPath();
-    podiumCtx.ellipse(-1, 2, 12, 16, 0, 0, Math.PI * 2);
-    podiumCtx.fill();
-
-    podiumCtx.fillStyle = "white";
-    podiumCtx.beginPath();
-    podiumCtx.arc(5, -7, 5, 0, Math.PI * 2);
-    podiumCtx.fill();
-    podiumCtx.fillStyle = "black";
-    podiumCtx.beginPath();
-    podiumCtx.arc(6.5, -7, 2, 0, Math.PI * 2);
-    podiumCtx.fill();
-
-    podiumCtx.fillStyle = skin.beak;
-    podiumCtx.beginPath();
-    podiumCtx.moveTo(8, -2);
-    podiumCtx.lineTo(18, 1);
-    podiumCtx.lineTo(8, 4);
-    podiumCtx.fill();
-
-    podiumCtx.fillStyle = skin.wing;
-    podiumCtx.beginPath();
-    podiumCtx.ellipse(-5, 4, 7, 12, -0.4, 0, Math.PI * 2);
-    podiumCtx.fill();
-
-    podiumCtx.fillStyle = skin.beak;
-    podiumCtx.beginPath();
-    podiumCtx.ellipse(-4, 19, 5, 3, 0, 0, Math.PI * 2);
-    podiumCtx.fill();
-
-    podiumCtx.restore();
-  }
-
-  function updateHubView() {
-    const skin = getEquippedSkin();
-    const mode = getSelectedMode();
-    podiumLabel.textContent = skin.name;
-    hubModeLabel.textContent = "Mode: " + mode.name;
-    drawPodiumCharacter();
-    updateLivesUI();
-    updateCoinsUI();
-  }
-
-  /* GAME STATE */
-  let frames = 0;
-  let score = 0;
-  let isRunning = false;
-  let isGameOver = false;
-  let startedFlight = false; // hover until first tap
-
-  const snowflakes = [];
-  function initSnow() {
-    snowflakes.length = 0;
-    for (let i = 0; i < 50; i++) {
-      snowflakes.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        r: Math.random() * 2 + 1,
-        speed: Math.random() * 1 + 0.5,
-      });
-    }
-  }
-  initSnow();
-
-  const penguin = {
-    x: 0,
-    y: 0,
-    radius: 18,
-    velocity: 0,
-    rotation: 0,
-
-    draw() {
-      const skin = getEquippedSkin();
-      ctx.save();
-      ctx.translate(this.x, this.y);
-      const rot = this.velocity * 0.1;
-      this.rotation = Math.min(Math.PI / 4, Math.max(-Math.PI / 4, rot));
-      ctx.rotate(this.rotation);
-
-      ctx.fillStyle = skin.body;
-      ctx.beginPath();
-      ctx.ellipse(0, 0, 20, 25, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = "#ffffff";
-      ctx.beginPath();
-      ctx.ellipse(-2, 2, 14, 18, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = "white";
-      ctx.beginPath();
-      ctx.arc(6, -8, 6, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = "black";
-      ctx.beginPath();
-      ctx.arc(8, -8, 2, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = skin.beak;
-      ctx.beginPath();
-      ctx.moveTo(10, -2);
-      ctx.lineTo(24, 2);
-      ctx.lineTo(10, 6);
-      ctx.fill();
-
-      ctx.fillStyle = skin.wing;
-      ctx.beginPath();
-      const wingY = Math.sin(frames * 0.25) * 3;
-      ctx.ellipse(-5, 5 + wingY, 8, 14, -0.5, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = skin.beak;
-      ctx.beginPath();
-      ctx.ellipse(-5, 22, 6, 4, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.restore();
-    },
-
-    update() {
-      this.velocity += GRAVITY;
-      this.y += this.velocity;
-
-      if (this.y + this.radius >= canvas.height) {
-        this.y = canvas.height - this.radius;
-        triggerGameOver();
-      }
-      if (this.y - this.radius <= 0) {
-        this.y = this.radius;
-        this.velocity = 0;
-      }
-    },
-
-    flap() {
-      this.velocity = FLAP_STRENGTH;
-    },
-
-    reset() {
-      this.x = canvas.width * 0.2;
-      this.y = canvas.height / 2;
-      this.velocity = 0;
-      this.rotation = 0;
-    },
-  };
-
-  const pipes = {
-    items: [],
-    reset() { this.items = []; },
-
-    update() {
-      const mode = getSelectedMode();
-      if (frames % 100 === 0 && startedFlight) {
-        const minLen = 50;
-        const maxPos = canvas.height - minLen - mode.gap;
-        const minPos = minLen;
-        const topY = Math.floor(Math.random() * (maxPos - minPos + 1)) + minPos;
-        this.items.push({ x: canvas.width, y: topY, passed: false, wobblePhase: Math.random() * Math.PI * 2 });
-      }
-
-      for (let i = 0; i < this.items.length; i++) {
-        const p = this.items[i];
-        const m = getSelectedMode();
-        let speed = m.speed;
-
-        // Progressive difficulty ramp
-        if (score >= 25) speed *= 1.1;
-        if (score >= 50) speed *= 1.2;
-        if (score >= 100) speed *= 1.35;
-
-        // Erratic wobble at higher scores
-        if (score >= 80) {
-          const wobble = Math.sin(frames * 0.06 + p.wobblePhase) * 1.5;
-          p.y += wobble;
-        }
-        if (score >= 140) {
-          const wobble = Math.sin(frames * 0.09 + p.wobblePhase) * 2.4;
-          p.y += wobble;
-        }
-
-        p.x -= speed;
-
-        const pipeWidth = 60;
-        const pLeft = penguin.x - penguin.radius;
-        const pRight = penguin.x + penguin.radius;
-        const pTop = penguin.y - penguin.radius;
-        const pBottom = penguin.y + penguin.radius;
-
-        if (pRight > p.x && pLeft < p.x + pipeWidth) {
-          const gap = m.gap - Math.min(score * 0.15, 40); // gap shrinks as score climbs
-          const topLimit = p.y;
-          const bottomLimit = p.y + gap;
-          let hit = false;
-          if (pTop < topLimit) hit = true;
-          if (pBottom > bottomLimit) hit = true;
-
-          if (hit) {
-            triggerGameOver();
-          }
-        }
-
-        if (p.x + pipeWidth < penguin.x && !p.passed) {
-          p.passed = true;
-          score++;
-          let coinGain = 1;
-
-          // score milestones that nudge coins up (soft pressure to store)
-          if (score >= 30 && score < 80) coinGain = 2;
-          else if (score >= 80 && score < 140) coinGain = 3;
-          else if (score >= 140) coinGain = 4;
-
-          if (doubleCoins) coinGain *= 2;
-          coins += coinGain;
-          scoreEl.textContent = score;
-          updateCoinsUI();
-          playSfx(sfxCoin);
-          saveMeta();
-        }
-
-        if (p.x + pipeWidth < 0) {
-          this.items.shift();
-          i--;
-        }
-      }
-    },
-
-    draw() {
-      const map = getEquippedMap();
-      for (let i = 0; i < this.items.length; i++) {
-        const p = this.items[i];
-        const pipeWidth = 60;
-        const m = getSelectedMode();
-        const baseGap = m.gap;
-        const gapShrink = Math.min(score * 0.15, 40);
-        const gap = baseGap - gapShrink;
-
-        const gradTop = ctx.createLinearGradient(p.x, 0, p.x + pipeWidth, 0);
-        gradTop.addColorStop(0, map.gradient[0]);
-        gradTop.addColorStop(0.5, map.gradient[1]);
-        gradTop.addColorStop(1, map.gradient[0]);
-
-        const gradBot = ctx.createLinearGradient(p.x, 0, p.x + pipeWidth, 0);
-        gradBot.addColorStop(0, map.gradient[0]);
-        gradBot.addColorStop(0.5, map.gradient[1]);
-        gradBot.addColorStop(1, map.gradient[0]);
-
-        ctx.fillStyle = gradTop;
-        ctx.fillRect(p.x, 0, pipeWidth, p.y);
-        ctx.fillStyle = "#E0FFFF";
-        ctx.beginPath();
-        ctx.moveTo(p.x + 10, p.y);
-        ctx.lineTo(p.x + 30, p.y + 20);
-        ctx.lineTo(p.x + 50, p.y);
-        ctx.fill();
-
-        ctx.fillStyle = gradBot;
-        ctx.fillRect(
-          p.x,
-          p.y + gap,
-          pipeWidth,
-          canvas.height - (p.y + gap)
-        );
-        ctx.beginPath();
-        ctx.moveTo(p.x + 10, p.y + gap);
-        ctx.lineTo(p.x + 30, p.y + gap - 20);
-        ctx.lineTo(p.x + 50, p.y + gap);
-        ctx.fill();
-
-        ctx.strokeStyle = "#5DBCD2";
-        ctx.lineWidth = 2;
-        ctx.strokeRect(p.x, -2, pipeWidth, p.y + 2);
-        ctx.strokeRect(p.x, p.y + gap, pipeWidth, canvas.height);
-      }
-    },
-  };
-
-  function drawBackground() {
-    const map = getEquippedMap();
-    const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    grad.addColorStop(0, map.gradient[0]);
-    grad.addColorStop(1, map.gradient[1]);
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    ctx.fillStyle = "rgba(255,255,255,0.7)";
-    snowflakes.forEach(f => {
-      ctx.beginPath();
-      ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
-      ctx.fill();
-
-      f.y += f.speed;
-      f.x += Math.sin((f.y + performance.now() * 0.002)) * 0.2;
-
-      if (f.y > canvas.height) {
-        f.y = -5;
-        f.x = Math.random() * canvas.width;
-      }
-    });
-  }
-
-  let lastFrameTime = performance.now();
-
-  function loop(now) {
-    if (!isRunning) {
-      lastFrameTime = now || performance.now();
-      return;
-    }
-    const dt = (now - lastFrameTime) / 1000 || 0;
-    lastFrameTime = now;
-
-    // Hover idle until first tap
-    if (!startedFlight) {
-      penguin.y = canvas.height / 2 + Math.sin(frames * 0.08) * 10;
-      penguin.velocity = 0;
-    } else {
-      penguin.update();
-      pipes.update();
     }
 
-    frames++;
+    /* scored */
+    if (!p.scored && p.x + 60 < penguin.x) {
+      score++;
+      p.scored = true;
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawBackground();
-    pipes.draw();
-    penguin.draw();
+      /* PROGRESSIVE DIFFICULTY */
+      if (score % 10 === 0) pipeSpeed += 0.3;
+      if (score % 15 === 0) pipeGap -= 4;
+    }
 
-    if (!isGameOver) requestAnimationFrame(loop);
+    /* draw pipes */
+    ctx.fillStyle = "#a8f2ff";
+    ctx.fillRect(p.x, 0, 60, p.y);
+    ctx.fillRect(p.x, p.y+pipeGap, 60, canvas.height - (p.y+pipeGap));
+
+    if (p.x < -60) pipes.splice(i,1);
   }
 
-  function triggerGameOver() {
-    if (isGameOver) return;
-    isGameOver = true;
-    isRunning = false;
+  /* SCORE */
+  document.getElementById("score").textContent = score;
 
-    playSfx(sfxHit);
-    tryVibrate([60, 60, 60]);
+  frame++;
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
 
-    if (!ultraLives) {
-      lives = Math.max(0, lives - 1);
-    }
-    lastLifeTimestamp = Date.now();
-    runsToday += 1;
-    runsTodayDate = todayStr();
-    saveMeta();
-    updateLivesUI();
+/* INPUT */
+function flap() {
+  if (!running) return;
+  if (!started) started = true;
+  penguin.vel = -5.5;
+}
+window.addEventListener("mousedown", flap);
+window.addEventListener("touchstart", flap);
 
-    finalScoreEl.textContent = score;
-    if (score > highScore) {
-      highScore = score;
-      localStorage.setItem("waddleHighScore", String(highScore));
-    }
-    bestScoreEl.textContent = highScore;
-    livesLeftLabel.textContent = ultraLives ? "∞" : lives;
-
-    checkMissionsCompletion();
-    saveMeta();
-
-    gameOverScreen.classList.remove("hidden");
-  }
-
-  function startRun() {
-    regenLives();
-    updateLivesUI();
-
-    if (!ultraLives && lives <= 0) {
-      noLivesScreen.classList.remove("hidden");
-      return;
-    }
-
-    hubOverlay.classList.add("hidden");
-    gameOverScreen.classList.add("hidden");
-    noLivesScreen.classList.add("hidden");
-    fakeAdScreen.classList.add("hidden");
-
-    isGameOver = false;
-    isRunning = true;
-    startedFlight = false;
-    score = 0;
-    frames = 0;
-    scoreEl.textContent = score;
-    penguin.reset();
-    pipes.reset();
-    initSnow();
-    ensureMusicPlaying();
-    lastFrameTime = performance.now();
-    requestAnimationFrame(loop);
-  }
-
-  function handleFlapInput(e) {
-    if (e && e.type === "keydown" && e.code === "Space") {
-      e.preventDefault();
-    }
-    if (!isRunning || isGameOver) return;
-
-    // First tap: start actual flight from hover
-    if (!startedFlight) {
-      startedFlight = true;
-      penguin.flap();
-      playSfx(sfxFlap);
-      return;
-    }
-
-    penguin.flap();
-    playSfx(sfxFlap);
-  }
-
-  window.addEventListener("keydown", e => {
-    if (e.code === "Space") handleFlapInput(e);
-  });
-
-  canvas.addEventListener("mousedown", handleFlapInput);
-  canvas.addEventListener("touchstart", e => {
-    e.preventDefault();
-    handleFlapInput(e);
-  }, { passive: false });
-
-  /* HUB BUTTONS & PANELS */
-  btnPlay.addEventListener("click", () => startRun());
-  btnSkins.addEventListener("click", () => { renderSkinsPanel(); skinsPanel.classList.remove("hidden"); });
-  btnMaps.addEventListener("click", () => { renderMapsPanel(); mapsPanel.classList.remove("hidden"); });
-  btnModes.addEventListener("click", () => { renderModesPanel(); modesPanel.classList.remove("hidden"); });
-  btnStore.addEventListener("click", () => {
-    renderStoreCosmetics();
-    renderStorePremium();
-    renderStoreCurrency();
-    storePanel.classList.remove("hidden");
-  });
-  btnSettings.addEventListener("click", () => { settingsPanel.classList.remove("hidden"); });
-  btnMissions.addEventListener("click", () => {
-    checkMissionsCompletion();
-    renderMissionsPanel();
-    missionsPanel.classList.remove("hidden");
-  });
-  btnDaily.addEventListener("click", () => { updateDailyPanel(); dailyPanel.classList.remove("hidden"); });
-
-  document.querySelectorAll("[data-panel-close]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const id = btn.getAttribute("data-panel-close");
-      const panel = document.getElementById(id);
-      if (panel) panel.classList.add("hidden");
-    });
-  });
-
-  restartBtn.addEventListener("click", () => {
-    if (!ultraLives && lives <= 0) {
-      gameOverScreen.classList.add("hidden");
-      noLivesScreen.classList.remove("hidden");
-    } else {
-      gameOverScreen.classList.add("hidden");
-      startRun();
-    }
-  });
-
-  backMenuBtn.addEventListener("click", () => {
-    gameOverScreen.classList.add("hidden");
-    hubOverlay.classList.remove("hidden");
-    stopMusic();
-  });
-
-  backFromNoLivesBtn.addEventListener("click", () => {
-    noLivesScreen.classList.add("hidden");
-    hubOverlay.classList.remove("hidden");
-    stopMusic();
-  });
-
-  /* AUDIO TOGGLES */
-  btnToggleMusic.addEventListener("click", () => {
-    musicOn = musicOn === "true" ? "false" : "true";
-    saveMeta();
-    updateAudioStatusUI();
-    if (musicOn === "true") ensureMusicPlaying();
-    else stopMusic();
-  });
-
-  btnToggleSfx.addEventListener("click", () => {
-    sfxOn = sfxOn === "true" ? "false" : "true";
-    saveMeta();
-    updateAudioStatusUI();
-  });
-
-  btnToggleVibrate.addEventListener("click", () => {
-    vibrateOn = vibrateOn === "true" ? "false" : "true";
-    saveMeta();
-    updateAudioStatusUI();
-  });
-
-  /* Fake rewarded ad / bonus life */
-  watchAdBtn.addEventListener("click", () => {
-    if (removeAds) {
-      lives = Math.min(MAX_LIVES, lives + 1);
-      lastLifeTimestamp = Date.now();
-      saveMeta();
-      updateLivesUI();
-      alert("Ad-free user: +1 bonus life.");
-      noLivesScreen.classList.add("hidden");
-      hubOverlay.classList.remove("hidden");
-      return;
-    }
-
-    noLivesScreen.classList.add("hidden");
-    fakeAdScreen.classList.remove("hidden");
-    runFakeAd();
-  });
-
-  function runFakeAd() {
-    let duration = 5;
-    let remaining = duration;
-    fakeAdBar.style.width = "0%";
-    fakeAdTimer.textContent = `${remaining}s remaining`;
-
-    const interval = setInterval(() => {
-      remaining--;
-      const pct = ((duration - remaining) / duration) * 100;
-      fakeAdBar.style.width = pct + "%";
-      fakeAdTimer.textContent = `${Math.max(remaining, 0)}s remaining`;
-
-      if (remaining <= 0) {
-        clearInterval(interval);
-        setTimeout(() => {
-          fakeAdScreen.classList.add("hidden");
-          lives = Math.min(MAX_LIVES, lives + 1);
-          lastLifeTimestamp = Date.now();
-          saveMeta();
-          updateLivesUI();
-          alert("Thanks for watching! +1 life added.");
-          hubOverlay.classList.remove("hidden");
-        }, 300);
-      }
-    }, 1000);
-  }
-
-  /* FIRST RENDER */
-  updateHubView();
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawBackground();
-  penguin.reset();
-  penguin.draw();
-  updateAudioStatusUI();
-
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("./sw.js").catch(() => {});
-    });
-  }
+/* END GAME */
+function endGame() {
+  running = false;
+  setTimeout(() => {
+    document.getElementById("menu").style.display = "block";
+    document.getElementById("score").style.display = "none";
+  }, 500);
+}
 </script>
+
 </body>
 </html>
-```0
