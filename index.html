@@ -4,12 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Waddle Wings Universe</title>
+  <title>Waddle Wings Universe – Christmas Season</title>
 
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#2C3E50" />
 
-  <!-- AUDIO -->
+  <!-- AUDIO (use your own files / paths) -->
   <audio id="bgm" src="music/background.mp3" loop preload="auto"></audio>
   <audio id="sfx-flap" src="music/flap.wav" preload="auto"></audio>
   <audio id="sfx-coin" src="music/coin.wav" preload="auto"></audio>
@@ -82,7 +82,8 @@
     #hub-overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(150deg, rgba(0,0,0,0.7), rgba(10,20,40,0.95));
+      background: radial-gradient(circle at top, rgba(255,255,255,0.07), transparent 55%),
+                  linear-gradient(150deg, rgba(0,0,0,0.8), rgba(10,20,40,0.95));
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -129,7 +130,9 @@
       width: 72%;
       max-width: 260px;
       height: 160px;
-      background: radial-gradient(circle at 50% 10%, rgba(255,255,255,0.28), transparent 60%);
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.28), transparent 60%),
+        radial-gradient(circle at 0% 100%, rgba(0,150,255,0.18), transparent 60%);
       border-radius: 20px;
       border: 2px solid rgba(255,255,255,0.16);
       box-shadow: inset 0 0 22px rgba(0,0,0,0.6);
@@ -166,7 +169,7 @@
 
     #hub-buttons {
       width: 100%;
-      max-width: 380px;
+      max-width: 400px;
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
@@ -180,10 +183,11 @@
       color: #fff;
       padding: 10px 8px;
       font-family: "Fredoka One", cursive;
-      font-size: 1rem;
+      font-size: 0.95rem;
       box-shadow: 0 4px 0 #c04444;
       cursor: pointer;
       text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+      white-space: nowrap;
     }
 
     .hub-btn.secondary {
@@ -195,7 +199,7 @@
       background: rgba(255,255,255,0.08);
       box-shadow: none;
       border: 1px solid rgba(255,255,255,0.25);
-      font-size: 0.9rem;
+      font-size: 0.85rem;
     }
 
     .hub-btn:active {
@@ -210,6 +214,14 @@
       align-items: center;
       font-size: 0.8rem;
       color: #ccc;
+      gap: 6px;
+    }
+
+    #hub-mode-label,
+    #season-footer-label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     /* PANELS */
@@ -281,15 +293,20 @@
       align-items: center;
       padding: 6px 0;
       border-bottom: 1px solid rgba(255,255,255,0.08);
+      gap: 8px;
     }
 
     .list-label {
       display: flex;
       flex-direction: column;
+      min-width: 0;
     }
 
     .list-label span:first-child {
       font-size: 0.95rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .list-label span:last-child {
@@ -304,17 +321,19 @@
       padding: 2px 8px;
       font-size: 0.7rem;
       margin-left: 4px;
+      white-space: nowrap;
     }
 
     .small-btn {
-      padding: 6px 14px;
-      font-size: 0.8rem;
+      padding: 6px 10px;
+      font-size: 0.78rem;
       border-radius: 20px;
       background: #ff7676;
       border: none;
       color: #fff;
       cursor: pointer;
       box-shadow: 0 3px 0 #c04444;
+      white-space: nowrap;
     }
 
     .small-btn:active {
@@ -340,6 +359,9 @@
       font-size: 0.75rem;
       padding: 5px 6px;
       cursor: pointer;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
     }
 
     .tab-btn.active {
@@ -362,6 +384,7 @@
       border: 3px solid #2C3E50;
       box-shadow: 0 10px 25px rgba(0,0,0,0.4);
       min-width: 240px;
+      max-width: 90vw;
       pointer-events: auto;
       font-size: 0.9rem;
     }
@@ -383,12 +406,13 @@
       background: #ff6b6b;
       color: #fff;
       border: none;
-      padding: 12px 28px;
-      font-size: 1rem;
+      padding: 12px 20px;
+      font-size: 0.95rem;
       border-radius: 30px;
       cursor: pointer;
       box-shadow: 0 4px 0 #c04444;
       margin: 4px 4px;
+      white-space: nowrap;
     }
 
     .main-btn:active {
@@ -401,11 +425,12 @@
       box-shadow: 0 4px 0 #243369;
       color: #fff;
       border: none;
-      padding: 10px 22px;
-      font-size: 0.9rem;
+      padding: 10px 18px;
+      font-size: 0.85rem;
       border-radius: 24px;
       cursor: pointer;
       margin: 4px 4px;
+      white-space: nowrap;
     }
 
     .secondary-btn:active {
@@ -443,6 +468,9 @@
       display: flex;
       gap: 6px;
       pointer-events: none;
+      max-width: 90%;
+      justify-content: center;
+      flex-wrap: wrap;
     }
 
     .powerup-icon {
@@ -463,6 +491,41 @@
       position: absolute;
       bottom: -10px;
       font-size: 0.6rem;
+    }
+
+    /* SEASON PANEL */
+    #season-xp-bar-container {
+      width: 100%;
+      height: 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      overflow: hidden;
+      margin: 6px 0 10px;
+    }
+
+    #season-xp-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg,#ffeb3b,#ff9800);
+    }
+
+    #season-header-line {
+      font-size: 0.85rem;
+      color: #ddd;
+      margin-bottom: 4px;
+    }
+
+    #season-countdown {
+      font-size: 0.8rem;
+      color: #ffcdd2;
+      margin-bottom: 6px;
+    }
+
+    .season-section-title {
+      font-size: 0.85rem;
+      margin-top: 6px;
+      margin-bottom: 2px;
+      color: #eee;
     }
 
     .hidden { display: none !important; }
@@ -487,7 +550,7 @@
   <div id="hub-overlay">
     <div id="hub-header">
       <div id="hub-title">WADDLE WINGS UNIVERSE</div>
-      <div id="hub-subtitle">Skins • Maps • Modes • Lives • Coins • Powerups • Premium</div>
+      <div id="hub-subtitle">Christmas Season • Skins • Maps • Modes • Lives • Powerups</div>
     </div>
 
     <div id="hub-main">
@@ -501,6 +564,7 @@
 
       <div id="hub-buttons">
         <button class="hub-btn" id="btn-play">PLAY</button>
+        <button class="hub-btn secondary" id="btn-season">SEASON</button>
         <button class="hub-btn secondary" id="btn-modes">MODES</button>
         <button class="hub-btn secondary" id="btn-skins">SKINS</button>
         <button class="hub-btn secondary" id="btn-maps">MAPS</button>
@@ -513,7 +577,7 @@
 
     <div id="hub-footer">
       <span id="hub-mode-label">Mode: Normal</span>
-      <span>v3.0 – Dev Build</span>
+      <span id="season-footer-label">Season: Christmas – Lv 1</span>
     </div>
   </div>
 
@@ -567,7 +631,7 @@
     <div class="panel-card">
       <div class="panel-header">
         <div class="panel-title">Settings</div>
-        <button class="panel-close" data-panel-close="panel-settings">×</button>
+      <button class="panel-close" data-panel-close="panel-settings">×</button>
       </div>
       <div class="panel-body">
         <p style="font-size:0.8rem; color:#ddd;">
@@ -591,7 +655,7 @@
           <li class="list-item">
             <div class="list-label">
               <span>Vibration</span>
-              <span>Small haptics on hit, powerups, purchases (where supported).</span>
+              <span>Haptics on hit, powerups, purchases (where supported).</span>
             </div>
             <button class="small-btn" id="btn-toggle-vibrate">Toggle</button>
           </li>
@@ -634,6 +698,34 @@
       <div class="panel-footer">
         <button class="small-btn" id="btn-claim-daily">Claim</button>
         <button class="small-btn" data-panel-close="panel-daily">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEASON PANEL -->
+  <div id="panel-season" class="panel hidden">
+    <div class="panel-card">
+      <div class="panel-header">
+        <div class="panel-title">Season Pass – Christmas Chill</div>
+        <button class="panel-close" data-panel-close="panel-season">×</button>
+      </div>
+      <div class="panel-body">
+        <p id="season-header-line"></p>
+        <p id="season-countdown"></p>
+        <div id="season-xp-bar-container"><div id="season-xp-bar"></div></div>
+        <p style="font-size:0.8rem; color:#ddd; margin-top:0;">
+          Earn Season XP by flying, passing obstacles, and completing missions.
+        </p>
+
+        <p class="season-section-title">Rewards</p>
+        <ul class="list" id="season-rewards-list"></ul>
+
+        <p class="season-section-title">Season Challenges</p>
+        <ul class="list" id="season-challenges-list"></ul>
+      </div>
+      <div class="panel-footer">
+        <button class="small-btn" id="btn-buy-season-premium">Upgrade to Premium</button>
+        <button class="small-btn" data-panel-close="panel-season">Close</button>
       </div>
     </div>
   </div>
@@ -751,6 +843,15 @@
   const REGEN_TIME = 60 * 60 * 1000; // 1 hour
   const DAILY_REWARD_COINS = 20;
 
+  /* SEASON CONFIG – CHRISTMAS */
+  const SEASON_ID = "xmas2025";
+  const SEASON_NAME = "Christmas Chill";
+  // Set an end date – adjust as you like
+  const SEASON_END_TIME = new Date("2026-01-07T00:00:00Z").getTime();
+  const SEASON_XP_PER_LEVEL = 100;
+  const SEASON_MAX_LEVEL = 20;
+  const SEASON_XP_PER_PIPE = 5;
+
   /* AUDIO ELEMENTS */
   const bgm = document.getElementById("bgm");
   const sfxFlap = document.getElementById("sfx-flap");
@@ -765,6 +866,7 @@
 
   const hubOverlay = document.getElementById("hub-overlay");
   const hubModeLabel = document.getElementById("hub-mode-label");
+  const seasonFooterLabel = document.getElementById("season-footer-label");
   const podiumLabel = document.getElementById("podium-label");
   const podiumCanvas = document.getElementById("podium-character");
   const podiumCtx = podiumCanvas.getContext("2d");
@@ -776,6 +878,7 @@
   const dailyPanel = document.getElementById("panel-daily");
   const settingsPanel = document.getElementById("panel-settings");
   const storePanel = document.getElementById("panel-store");
+  const seasonPanel = document.getElementById("panel-season");
 
   const skinsList = document.getElementById("skins-list");
   const mapsList = document.getElementById("maps-list");
@@ -803,6 +906,7 @@
   const livesLeftLabel = document.getElementById("lives-left-label");
 
   const btnPlay = document.getElementById("btn-play");
+  const btnSeason = document.getElementById("btn-season");
   const btnModes = document.getElementById("btn-modes");
   const btnSkins = document.getElementById("btn-skins");
   const btnMaps = document.getElementById("btn-maps");
@@ -830,6 +934,14 @@
   const purchaseSuccessOk = document.getElementById("purchase-success-ok");
 
   const powerupHud = document.getElementById("powerup-hud");
+
+  /* SEASON DOM */
+  const seasonHeaderLine = document.getElementById("season-header-line");
+  const seasonCountdown = document.getElementById("season-countdown");
+  const seasonXpBar = document.getElementById("season-xp-bar");
+  const seasonRewardsList = document.getElementById("season-rewards-list");
+  const seasonChallengesList = document.getElementById("season-challenges-list");
+  const btnBuySeasonPremium = document.getElementById("btn-buy-season-premium");
 
   /* META STATE */
   let lives = parseInt(localStorage.getItem("ww_lives") || String(MAX_LIVES), 10);
@@ -862,6 +974,14 @@
   let vibrateOn = localStorage.getItem("ww_vibrateOn");
   if (vibrateOn === null) vibrateOn = "true";
 
+  /* SEASON STATE */
+  let seasonXp = parseInt(localStorage.getItem("ww_seasonXp_" + SEASON_ID) || "0", 10);
+  if (Number.isNaN(seasonXp)) seasonXp = 0;
+  let seasonPremium = localStorage.getItem("ww_seasonPremium_" + SEASON_ID) === "true";
+  let seasonClaimedRewards = JSON.parse(
+    localStorage.getItem("ww_seasonRewards_" + SEASON_ID) || "[]"
+  ); // [level numbers]
+
   /* POWERUP TOKENS */
   function getToken(key) {
     const val = parseInt(localStorage.getItem(key) || "0", 10);
@@ -890,6 +1010,7 @@
       body: "#2C3E50",
       wing: "#34495E",
       beak: "#FF9800",
+      seasonal: false,
     },
     {
       id: "red",
@@ -899,6 +1020,7 @@
       body: "#C0392B",
       wing: "#922B21",
       beak: "#FFB74D",
+      seasonal: false,
     },
     {
       id: "gold",
@@ -908,6 +1030,7 @@
       body: "#D4AF37",
       wing: "#B08A2E",
       beak: "#FFE082",
+      seasonal: false,
     },
     {
       id: "neon",
@@ -917,7 +1040,38 @@
       body: "#00e5ff",
       wing: "#00b0ff",
       beak: "#ffeb3b",
-    }
+      seasonal: false,
+    },
+    {
+      id: "santa",
+      name: "Santa Waddle",
+      desc: "Festive coat & hat. Season reward.",
+      cost: 0,
+      body: "#B71C1C",
+      wing: "#880E4F",
+      beak: "#FFEB3B",
+      seasonal: true,
+    },
+    {
+      id: "snowman",
+      name: "Snowman Suit",
+      desc: "Penguin in a snowman costume.",
+      cost: 0,
+      body: "#ECEFF1",
+      wing: "#CFD8DC",
+      beak: "#FFB300",
+      seasonal: true,
+    },
+    {
+      id: "candy",
+      name: "Candy Cane",
+      desc: "Red/white striped festive drip.",
+      cost: 0,
+      body: "#FFCDD2",
+      wing: "#EF9A9A",
+      beak: "#FFECB3",
+      seasonal: true,
+    },
   ];
 
   const MAPS = [
@@ -927,6 +1081,7 @@
       desc: "Bright sky and soft snow.",
       cost: 0,
       gradient: ["#87CEEB", "#E0F7FA"],
+      seasonal: false,
     },
     {
       id: "night",
@@ -934,6 +1089,7 @@
       desc: "Dark arctic sky with stars.",
       cost: 40,
       gradient: ["#001c3d", "#00335c"],
+      seasonal: false,
     },
     {
       id: "blizzard",
@@ -941,6 +1097,7 @@
       desc: "Stormy white-out challenge.",
       cost: 60,
       gradient: ["#546E7A", "#ECEFF1"],
+      seasonal: false,
     },
     {
       id: "synth",
@@ -948,7 +1105,16 @@
       desc: "Neon purple & orange horizon.",
       cost: 80,
       gradient: ["#4a148c", "#ff6f00"],
-    }
+      seasonal: false,
+    },
+    {
+      id: "xmas",
+      name: "Christmas Eve",
+      desc: "Northern lights over snowy hills.",
+      cost: 0,
+      gradient: ["#001331", "#0b3c6a"],
+      seasonal: true,
+    },
   ];
 
   const MODES = [
@@ -958,7 +1124,7 @@
     { id: "extreme", name: "Extreme", desc: "Chaos mode, no mercy.", speed: 4.4, gap: 120 },
   ];
 
-  /* MISSIONS (simple demo) */
+  /* MISSIONS */
   const MISSIONS = [
     { id: "score10", name: "First Steps", desc: "Reach score 10.", type: "bestScoreAtLeast", target: 10, rewardCoins: 20 },
     { id: "score25", name: "Getting Good", desc: "Reach score 25.", type: "bestScoreAtLeast", target: 25, rewardCoins: 40 },
@@ -979,6 +1145,70 @@
     runsToday = parseInt(localStorage.getItem("ww_runsToday") || "0", 10);
     if (Number.isNaN(runsToday)) runsToday = 0;
   }
+
+  /* SEASON REWARDS (free & premium track) */
+  const SEASON_REWARDS = [
+    {
+      level: 1,
+      free:  { type: "coins", amount: 20, label: "+20 coins" },
+      premium: { type: "coins", amount: 40, label: "+40 coins" },
+    },
+    {
+      level: 2,
+      free:  { type: "coins", amount: 25, label: "+25 coins" },
+      premium: { type: "skin", skinId: "santa", label: "Skin: Santa Waddle" },
+    },
+    {
+      level: 3,
+      free:  { type: "coins", amount: 30, label: "+30 coins" },
+      premium: { type: "map", mapId: "xmas", label: "Map: Christmas Eve" },
+    },
+    {
+      level: 4,
+      free:  { type: "coins", amount: 35, label: "+35 coins" },
+      premium: { type: "skin", skinId: "snowman", label: "Skin: Snowman Suit" },
+    },
+    {
+      level: 5,
+      free:  { type: "coins", amount: 40, label: "+40 coins" },
+      premium: { type: "skin", skinId: "candy", label: "Skin: Candy Cane" },
+    },
+    {
+      level: 6,
+      free:  { type: "tokens", tokenId: "god", amount: 1, label: "1x God Mode" },
+      premium: { type: "tokens", tokenId: "autopilot", amount: 1, label: "1x Auto-Pilot" },
+    },
+    {
+      level: 7,
+      free:  { type: "tokens", tokenId: "slow", amount: 2, label: "2x Slow Motion" },
+      premium: { type: "tokens", tokenId: "clone", amount: 2, label: "2x Shadow Clone" },
+    },
+    {
+      level: 8,
+      free:  { type: "coins", amount: 60, label: "+60 coins" },
+      premium: { type: "coins", amount: 120, label: "+120 coins" },
+    },
+  ];
+
+  const SEASON_CHALLENGES = [
+    {
+      id: "season_score15",
+      desc: "Christmas Run – reach score 15 in one run.",
+      type: "bestScoreAtLeast",
+      target: 15,
+      xp: 60,
+    },
+    {
+      id: "season_runs5",
+      desc: "Festive Flights – play 5 runs this season.",
+      type: "totalRuns",
+      target: 5,
+      xp: 80,
+    },
+  ];
+  let seasonChallengeState = JSON.parse(
+    localStorage.getItem("ww_seasonChallenges_" + SEASON_ID) || "{}"
+  ); // {id: {completed: bool}}
 
   /* OWNERSHIP */
   let ownedSkins = JSON.parse(localStorage.getItem("ww_ownedSkins") || '["classic"]');
@@ -1007,6 +1237,11 @@
     localStorage.setItem("ww_musicOn", musicOn);
     localStorage.setItem("ww_sfxOn", sfxOn);
     localStorage.setItem("ww_vibrateOn", vibrateOn);
+    // season
+    localStorage.setItem("ww_seasonXp_" + SEASON_ID, String(seasonXp));
+    localStorage.setItem("ww_seasonPremium_" + SEASON_ID, String(seasonPremium));
+    localStorage.setItem("ww_seasonRewards_" + SEASON_ID, JSON.stringify(seasonClaimedRewards));
+    localStorage.setItem("ww_seasonChallenges_" + SEASON_ID, JSON.stringify(seasonChallengeState));
   }
 
   function saveCosmetics() {
@@ -1220,6 +1455,207 @@
     });
   }
 
+  /* SEASON LOGIC */
+  function getSeasonLevel() {
+    const lvl = Math.floor(seasonXp / SEASON_XP_PER_LEVEL) + 1;
+    return Math.min(SEASON_MAX_LEVEL, Math.max(1, lvl));
+  }
+
+  function getSeasonLevelProgress() {
+    const level = getSeasonLevel();
+    const baseXp = (level - 1) * SEASON_XP_PER_LEVEL;
+    const into = seasonXp - baseXp;
+    const needed = SEASON_XP_PER_LEVEL;
+    return { level, into: Math.max(0, into), needed };
+  }
+
+  function formatTimeRemaining(ms) {
+    if (ms <= 0) return "Season ended.";
+    const totalSec = Math.floor(ms / 1000);
+    const days = Math.floor(totalSec / (24 * 3600));
+    const hours = Math.floor((totalSec % (24 * 3600)) / 3600);
+    const mins = Math.floor((totalSec % 3600) / 60);
+    if (days > 0) return `${days}d ${hours}h ${mins}m remaining`;
+    if (hours > 0) return `${hours}h ${mins}m remaining`;
+    return `${mins}m remaining`;
+  }
+
+  function grantSeasonReward(reward) {
+    if (!reward) return;
+    switch (reward.type) {
+      case "coins":
+        coins += reward.amount;
+        break;
+      case "skin":
+        if (reward.skinId && !ownedSkins.includes(reward.skinId)) {
+          ownedSkins.push(reward.skinId);
+        }
+        break;
+      case "map":
+        if (reward.mapId && !ownedMaps.includes(reward.mapId)) {
+          ownedMaps.push(reward.mapId);
+        }
+        break;
+      case "tokens":
+        if (reward.tokenId) {
+          const key = TOKENS[reward.tokenId];
+          if (key) {
+            const newVal = getToken(key) + (reward.amount || 1);
+            setToken(key, newVal);
+          }
+        }
+        break;
+      default:
+        break;
+    }
+  }
+
+  function seasonChallengeProgress(ch) {
+    if (ch.type === "bestScoreAtLeast") {
+      return { current: highScore, target: ch.target };
+    }
+    if (ch.type === "totalRuns") {
+      // Use runsToday as a cheap stand-in for season runs
+      return { current: runsToday, target: ch.target };
+    }
+    return { current: 0, target: ch.target };
+  }
+
+  function checkSeasonChallenges() {
+    SEASON_CHALLENGES.forEach(ch => {
+      const state = seasonChallengeState[ch.id] || { completed: false };
+      if (state.completed) return;
+      const prog = seasonChallengeProgress(ch);
+      if (prog.current >= ch.target) {
+        state.completed = true;
+        seasonChallengeState[ch.id] = state;
+        seasonXp += ch.xp;
+      }
+    });
+  }
+
+  function renderSeasonPanel() {
+    const { level, into, needed } = getSeasonLevelProgress();
+    const pct = Math.min(100, Math.max(0, (into / needed) * 100));
+    seasonHeaderLine.textContent =
+      `${SEASON_NAME} – Level ${level}/${SEASON_MAX_LEVEL} (${seasonXp} XP total)`;
+    seasonXpBar.style.width = pct + "%";
+
+    const now = Date.now();
+    const remaining = SEASON_END_TIME - now;
+    seasonCountdown.textContent = formatTimeRemaining(remaining);
+
+    seasonRewardsList.innerHTML = "";
+    SEASON_REWARDS.forEach(row => {
+      const li = document.createElement("li");
+      li.className = "list-item";
+
+      const label = document.createElement("div");
+      label.className = "list-label";
+      const title = document.createElement("span");
+      title.textContent = "Level " + row.level;
+      const desc = document.createElement("span");
+      desc.textContent =
+        `Free: ${row.free.label} • Premium: ${row.premium.label}`;
+      label.appendChild(title);
+      label.appendChild(desc);
+
+      const right = document.createElement("div");
+      const alreadyClaimed = seasonClaimedRewards.includes(row.level);
+
+      const tag = document.createElement("span");
+      tag.className = "tag";
+      tag.textContent = alreadyClaimed ? "Claimed" : "Reward";
+      right.appendChild(tag);
+
+      if (!alreadyClaimed) {
+        const canClaim = level >= row.level;
+        if (canClaim) {
+          const btnFree = document.createElement("button");
+          btnFree.className = "small-btn";
+          btnFree.textContent = "Claim Free";
+          btnFree.onclick = () => {
+            grantSeasonReward(row.free);
+            seasonClaimedRewards.push(row.level);
+            saveMeta();
+            updateCoinsUI();
+            renderSeasonPanel();
+            renderSkinsPanel();
+            renderMapsPanel();
+            renderStoreCosmeticsTab();
+            updateHubView();
+          };
+          right.appendChild(btnFree);
+
+          if (seasonPremium) {
+            const btnPremium = document.createElement("button");
+            btnPremium.className = "small-btn";
+            btnPremium.textContent = "Claim Premium";
+            btnPremium.onclick = () => {
+              grantSeasonReward(row.free);
+              grantSeasonReward(row.premium);
+              seasonClaimedRewards.push(row.level);
+              saveMeta();
+              updateCoinsUI();
+              renderSeasonPanel();
+              renderSkinsPanel();
+              renderMapsPanel();
+              renderStoreCosmeticsTab();
+              updateHubView();
+            };
+            right.appendChild(btnPremium);
+          } else {
+            const premiumTag = document.createElement("span");
+            premiumTag.className = "tag";
+            premiumTag.textContent = "Premium locked";
+            right.appendChild(premiumTag);
+          }
+        }
+      }
+
+      li.appendChild(label);
+      li.appendChild(right);
+      seasonRewardsList.appendChild(li);
+    });
+
+    seasonChallengesList.innerHTML = "";
+    SEASON_CHALLENGES.forEach(ch => {
+      const state = seasonChallengeState[ch.id] || { completed: false };
+      const li = document.createElement("li");
+      li.className = "list-item";
+
+      const label = document.createElement("div");
+      label.className = "list-label";
+      const title = document.createElement("span");
+      title.textContent = ch.desc;
+      const prog = seasonChallengeProgress(ch);
+      const desc = document.createElement("span");
+      desc.textContent = `Progress: ${prog.current}/${ch.target} • Reward: +${ch.xp} XP`;
+      label.appendChild(title);
+      label.appendChild(desc);
+
+      const right = document.createElement("div");
+      const tag = document.createElement("span");
+      tag.className = "tag";
+      tag.textContent = state.completed ? "Done" : "In progress";
+      right.appendChild(tag);
+
+      li.appendChild(label);
+      li.appendChild(right);
+      seasonChallengesList.appendChild(li);
+    });
+
+    btnBuySeasonPremium.textContent = seasonPremium
+      ? "Season Premium: OWNED"
+      : "Upgrade to Premium (£4.99)";
+  }
+
+  function updateSeasonFooter() {
+    const { level } = getSeasonLevelProgress();
+    seasonFooterLabel.textContent =
+      `Season: Christmas – Lv ${level}${seasonPremium ? " (Premium)" : ""}`;
+  }
+
   /* PANELS: SKINS / MAPS / MODES */
   function renderSkinsPanel() {
     skinsList.innerHTML = "";
@@ -1231,13 +1667,19 @@
       const title = document.createElement("span");
       title.textContent = skin.name;
       const desc = document.createElement("span");
-      desc.textContent = skin.desc;
+      desc.textContent = skin.desc + (skin.seasonal ? " • Season Exclusive" : "");
       label.appendChild(title);
       label.appendChild(desc);
 
       const right = document.createElement("div");
       const owned = ownedSkins.includes(skin.id);
-      if (!owned && skin.cost > 0) {
+
+      if (skin.seasonal && !owned) {
+        const tag = document.createElement("span");
+        tag.className = "tag";
+        tag.textContent = "Season locked";
+        right.appendChild(tag);
+      } else if (!owned && skin.cost > 0) {
         const costSpan = document.createElement("span");
         costSpan.textContent = `${skin.cost} coins`;
         costSpan.style.fontSize = "0.8rem";
@@ -1299,13 +1741,18 @@
       const title = document.createElement("span");
       title.textContent = map.name;
       const desc = document.createElement("span");
-      desc.textContent = map.desc;
+      desc.textContent = map.desc + (map.seasonal ? " • Season Exclusive" : "");
       label.appendChild(title);
       label.appendChild(desc);
 
       const right = document.createElement("div");
       const owned = ownedMaps.includes(map.id);
-      if (!owned && map.cost > 0) {
+      if (map.seasonal && !owned) {
+        const tag = document.createElement("span");
+        tag.className = "tag";
+        tag.textContent = "Season locked";
+        right.appendChild(tag);
+      } else if (!owned && map.cost > 0) {
         const costSpan = document.createElement("span");
         costSpan.textContent = `${map.cost} coins`;
         costSpan.style.fontSize = "0.8rem";
@@ -1399,9 +1846,9 @@
   /* STORE CONTENT */
   function renderStoreCosmeticsTab() {
     storeCosmeticsList.innerHTML = "";
-    // Skins
+    // Skins (non-seasonal)
     SKINS.forEach(skin => {
-      if (skin.cost <= 0) return;
+      if (skin.cost <= 0 || skin.seasonal) return;
       const li = document.createElement("li");
       li.className = "list-item";
 
@@ -1453,9 +1900,9 @@
       storeCosmeticsList.appendChild(li);
     });
 
-    // Maps
+    // Maps (non-seasonal)
     MAPS.forEach(map => {
-      if (map.cost <= 0) return;
+      if (map.cost <= 0 || map.seasonal) return;
       const li = document.createElement("li");
       li.className = "list-item";
 
@@ -1829,6 +2276,7 @@
     drawPodiumCharacter();
     updateLivesUI();
     updateCoinsUI();
+    updateSeasonFooter();
   }
 
   /* GAME STATE */
@@ -1836,7 +2284,7 @@
   let score = 0;
   let isRunning = false;
   let isGameOver = false;
-  let hasStartedRun = false; // hover flag
+  let hasStartedRun = false; // HOVER BEFORE FIRST TAP
 
   const snowflakes = [];
   function initSnow() {
@@ -1863,7 +2311,6 @@
       const skin = getEquippedSkin();
       ctx.save();
       ctx.translate(this.x, this.y);
-
       const rot = this.velocity * 0.1;
       this.rotation = Math.min(Math.PI / 4, Math.max(-Math.PI / 4, rot));
       ctx.rotate(this.rotation);
@@ -1909,15 +2356,6 @@
     },
 
     update() {
-      // HOVER MODE: before first flap, sit in middle and bob
-      if (!hasStartedRun) {
-        const baseY = canvas.height / 2;
-        this.y = baseY + Math.sin(frames * 0.08) * 10;
-        this.velocity = 0;
-        return;
-      }
-
-      // Normal physics
       this.velocity += GRAVITY;
       this.y += this.velocity;
 
@@ -1932,8 +2370,6 @@
     },
 
     flap() {
-      // First flap starts actual run
-      if (!hasStartedRun) hasStartedRun = true;
       this.velocity = FLAP_STRENGTH;
     },
 
@@ -1995,12 +2431,18 @@
         if (p.x + pipeWidth < penguin.x && !p.passed) {
           p.passed = true;
           score++;
+
           let coinGain = 1;
           if (doubleCoins) coinGain *= 2;
           coins += coinGain;
           scoreEl.textContent = score;
           updateCoinsUI();
           playSfx(sfxCoin);
+
+          // season XP on obstacle
+          let xpGain = SEASON_XP_PER_PIPE;
+          seasonXp += xpGain;
+
           saveMeta();
         }
 
@@ -2067,6 +2509,7 @@
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+    // snow
     ctx.fillStyle = "rgba(255,255,255,0.7)";
     snowflakes.forEach(f => {
       ctx.beginPath();
@@ -2171,7 +2614,11 @@
     const effectiveDt = dt * timeScale;
     updatePowerupTimers(effectiveDt);
 
-    if (activeEffects.autopilot && !isGameOver) {
+    if (!hasStartedRun) {
+      // hover animation before first tap
+      penguin.y = canvas.height / 2 + Math.sin(frames * 0.1) * 5;
+      penguin.velocity = 0;
+    } else if (activeEffects.autopilot && !isGameOver) {
       // simple autopilot: oscillate vertically
       penguin.velocity = Math.sin(frames * 0.15) * -4;
       penguin.y += penguin.velocity;
@@ -2217,6 +2664,9 @@
     lastLifeTimestamp = Date.now();
     runsToday += 1;
     runsTodayDate = todayStr();
+
+    checkMissionsCompletion();
+    checkSeasonChallenges();
     saveMeta();
     updateLivesUI();
 
@@ -2228,9 +2678,7 @@
     bestScoreEl.textContent = highScore;
     livesLeftLabel.textContent = ultraLives ? "∞" : lives;
 
-    checkMissionsCompletion();
-    saveMeta();
-
+    updateSeasonFooter();
     gameOverScreen.classList.remove("hidden");
   }
 
@@ -2250,7 +2698,7 @@
 
     isGameOver = false;
     isRunning = true;
-    hasStartedRun = false; // hover until first flap
+    hasStartedRun = false; // reset hover state
     score = 0;
     frames = 0;
     scoreEl.textContent = score;
@@ -2267,6 +2715,12 @@
       e.preventDefault();
     }
     if (!isRunning || isGameOver) return;
+    if (!hasStartedRun) {
+      hasStartedRun = true;
+      penguin.flap();
+      playSfx(sfxFlap);
+      return;
+    }
     if (!activeEffects.autopilot) {
       penguin.flap();
       playSfx(sfxFlap);
@@ -2285,9 +2739,24 @@
 
   /* HUB BUTTONS & PANELS */
   btnPlay.addEventListener("click", () => startRun());
-  btnSkins.addEventListener("click", () => { renderSkinsPanel(); skinsPanel.classList.remove("hidden"); });
-  btnMaps.addEventListener("click", () => { renderMapsPanel(); mapsPanel.classList.remove("hidden"); });
-  btnModes.addEventListener("click", () => { renderModesPanel(); modesPanel.classList.remove("hidden"); });
+
+  btnSeason.addEventListener("click", () => {
+    renderSeasonPanel();
+    seasonPanel.classList.remove("hidden");
+  });
+
+  btnSkins.addEventListener("click", () => {
+    renderSkinsPanel();
+    skinsPanel.classList.remove("hidden");
+  });
+  btnMaps.addEventListener("click", () => {
+    renderMapsPanel();
+    mapsPanel.classList.remove("hidden");
+  });
+  btnModes.addEventListener("click", () => {
+    renderModesPanel();
+    modesPanel.classList.remove("hidden");
+  });
   btnStore.addEventListener("click", () => {
     renderStoreCosmeticsTab();
     renderStorePowerupsTab();
@@ -2296,13 +2765,18 @@
     renderStoreCurrencyTab();
     storePanel.classList.remove("hidden");
   });
-  btnSettings.addEventListener("click", () => { settingsPanel.classList.remove("hidden"); });
+  btnSettings.addEventListener("click", () => {
+    settingsPanel.classList.remove("hidden");
+  });
   btnMissions.addEventListener("click", () => {
     checkMissionsCompletion();
     renderMissionsPanel();
     missionsPanel.classList.remove("hidden");
   });
-  btnDaily.addEventListener("click", () => { updateDailyPanel(); dailyPanel.classList.remove("hidden"); });
+  btnDaily.addEventListener("click", () => {
+    updateDailyPanel();
+    dailyPanel.classList.remove("hidden");
+  });
 
   document.querySelectorAll("[data-panel-close]").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -2400,6 +2874,20 @@
     }, 1000);
   }
 
+  /* SEASON PREMIUM PURCHASE */
+  btnBuySeasonPremium.addEventListener("click", () => {
+    if (seasonPremium) {
+      alert("Season Premium already owned.");
+      return;
+    }
+    openPurchaseConfirm("Season Premium – £4.99", () => {
+      seasonPremium = true;
+      saveMeta();
+      renderSeasonPanel();
+      updateSeasonFooter();
+    });
+  });
+
   /* FIRST RENDER */
   updateHubView();
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -2415,4 +2903,4 @@
   }
 </script>
 </body>
-</html>
+          </html>
