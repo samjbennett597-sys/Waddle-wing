@@ -6,12 +6,15 @@
           content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Waddle Wings: Flappy Penguin</title>
 
-    <!-- PWA bits (used by TWA / app builder) -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2C3E50">
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap');
+
+        * {
+            box-sizing: border-box;
+        }
 
         body {
             margin: 0;
@@ -30,9 +33,9 @@
 
         #game-container {
             position: relative;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
             max-width: 100%;
             max-height: 100%;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
 
         canvas {
@@ -42,73 +45,67 @@
 
         #ui-layer {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             pointer-events: none;
+        }
+
+        #top-bar {
             display: flex;
-            flex-direction: column;
             justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+            font-size: 1.1rem;
         }
 
         #score-display {
-            text-align: center;
-            font-size: 4rem;
-            color: white;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
-            margin-top: 20px;
-            pointer-events: none;
+            font-size: 2.4rem;
         }
 
         #lives-display {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            color: white;
-            font-size: 2rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
-            pointer-events: none;
+            font-size: 1.3rem;
         }
 
-        #start-screen, #game-over-screen {
+        .center-card {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             text-align: center;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 26px;
             border-radius: 20px;
             border: 4px solid #2C3E50;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            min-width: 260px;
             pointer-events: auto;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            min-width: 250px;
         }
 
         h1 {
             color: #2C3E50;
             margin: 0 0 10px 0;
-            font-size: 2rem;
+            font-size: 1.9rem;
         }
 
         p {
             color: #555;
-            font-size: 1.2rem;
-            margin: 10px 0 20px 0;
+            font-size: 1rem;
+            margin: 8px 0 14px;
         }
 
         button {
             background: #FF6B6B;
             color: white;
             border: none;
-            padding: 15px 40px;
-            font-size: 1.5rem;
-            border-radius: 50px;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            border-radius: 40px;
             cursor: pointer;
             font-family: 'Fredoka One', cursive;
             transition: transform 0.1s, background 0.2s;
             box-shadow: 0 4px 0 #C44D4D;
+            margin: 6px 4px;
         }
 
         button:active {
@@ -120,35 +117,34 @@
             background: #FF5252;
         }
 
+        .small {
+            padding: 8px 18px;
+            font-size: 0.9rem;
+        }
+
         .hidden {
             display: none !important;
         }
 
-        /* “No lives” popup */
-        #no-lives {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            background: rgba(255,255,255,0.95);
-            padding: 25px;
-            border-radius: 20px;
-            border: 4px solid #2C3E50;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            min-width: 260px;
-            pointer-events: auto;
-        }
-
-        #no-lives h2 {
-            margin-top: 0;
-            color: #2C3E50;
-        }
-
-        #no-lives small {
-            display: block;
+        #fake-ad-progress {
+            width: 100%;
+            height: 10px;
+            border-radius: 999px;
+            background: #eee;
+            overflow: hidden;
             margin-top: 10px;
-            color: #777;
+        }
+
+        #fake-ad-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg,#FF6B6B,#FFD66B);
+        }
+
+        #fake-ad-timer {
+            font-size: 0.9rem;
+            color: #555;
+            margin-top: 6px;
         }
     </style>
 </head>
@@ -158,50 +154,55 @@
     <canvas id="gameCanvas"></canvas>
 
     <div id="ui-layer">
-        <div id="score-display">0</div>
-        <div id="lives-display">♥ 5</div>
+        <div id="top-bar">
+            <div id="score-display">0</div>
+            <div id="lives-display">♥ 5</div>
+        </div>
     </div>
 
-    <div id="start-screen">
+    <!-- Start screen -->
+    <div id="start-screen" class="center-card">
         <h1>WADDLE WINGS</h1>
-        <p>Tap, Click, or Spacebar to Fly!</p>
+        <p>Tap, click or press Space to flap.<br>Lose a life each time you crash.</p>
         <button id="start-btn">PLAY</button>
     </div>
 
-    <div id="game-over-screen" class="hidden">
+    <!-- Game over screen -->
+    <div id="game-over-screen" class="center-card hidden">
         <h1>OOF!</h1>
         <p>Score: <span id="final-score">0</span></p>
         <p>Best: <span id="best-score">0</span></p>
+        <p>Lives left: <span id="lives-left-label">0</span></p>
         <button id="restart-btn">TRY AGAIN</button>
+        <button id="back-menu-btn" class="small">BACK TO MENU</button>
     </div>
 
-    <div id="no-lives" class="hidden">
-        <h2>No lives!</h2>
-        <p>You’re out of energy.</p>
-        <p>Lives regenerate over time. Come back later or watch an ad to get +1 life.</p>
+    <!-- Out of lives screen -->
+    <div id="no-lives-screen" class="center-card hidden">
+        <h1>NO LIVES</h1>
+        <p>You’ve used all your lives.</p>
+        <p style="font-size:0.9rem;">Lives slowly refill over time (1 per hour).<br>
+        Or watch a short “ad” to get +1 life instantly.</p>
         <button id="watch-ad-btn">WATCH AD</button>
-        <small>(Ad not wired up yet – this is just the front-end.)</small>
+        <button id="back-from-nolives-btn" class="small">BACK TO MENU</button>
+    </div>
+
+    <!-- Fake ad screen -->
+    <div id="fake-ad-screen" class="center-card hidden">
+        <h1>Ad playing…</h1>
+        <p style="font-size:0.9rem;">Pretend this is some dodgy mobile game trailer.</p>
+        <div id="fake-ad-progress">
+            <div id="fake-ad-bar"></div>
+        </div>
+        <div id="fake-ad-timer">5s remaining</div>
     </div>
 </div>
 
 <script>
+    /* ========= CANVAS & BASIC SETUP ========= */
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
-    const scoreEl = document.getElementById('score-display');
-    const livesEl = document.getElementById('lives-display');
-    const startScreen = document.getElementById('start-screen');
-    const gameOverScreen = document.getElementById('game-over-screen');
-    const noLivesScreen = document.getElementById('no-lives');
-
-    const finalScoreEl = document.getElementById('final-score');
-    const bestScoreEl = document.getElementById('best-score');
-
-    const startBtn = document.getElementById('start-btn');
-    const restartBtn = document.getElementById('restart-btn');
-    const watchAdBtn = document.getElementById('watch-ad-btn');
-
-    // Responsive canvas
     function resizeCanvas() {
         const maxWidth = 480;
         const maxHeight = 800;
@@ -220,29 +221,75 @@
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    // Game constants
+    /* ========= DOM HOOKS ========= */
+    const scoreEl = document.getElementById('score-display');
+    const livesEl = document.getElementById('lives-display');
+
+    const startScreen = document.getElementById('start-screen');
+    const gameOverScreen = document.getElementById('game-over-screen');
+    const noLivesScreen = document.getElementById('no-lives-screen');
+    const fakeAdScreen = document.getElementById('fake-ad-screen');
+
+    const startBtn = document.getElementById('start-btn');
+    const restartBtn = document.getElementById('restart-btn');
+    const backMenuBtn = document.getElementById('back-menu-btn');
+    const watchAdBtn = document.getElementById('watch-ad-btn');
+    const backFromNoLivesBtn = document.getElementById('back-from-nolives-btn');
+
+    const finalScoreEl = document.getElementById('final-score');
+    const bestScoreEl = document.getElementById('best-score');
+    const livesLeftLabel = document.getElementById('lives-left-label');
+
+    const fakeAdBar = document.getElementById('fake-ad-bar');
+    const fakeAdTimer = document.getElementById('fake-ad-timer');
+
+    /* ========= GAME CONSTANTS ========= */
     const GRAVITY = 0.25;
     const FLAP_STRENGTH = -5.5;
     const PIPE_SPEED = 3;
     const PIPE_SPAWN_RATE = 100;
     const PIPE_GAP = 160;
 
-    // Lives / energy system
+    // Lives system (Option B)
     const MAX_LIVES = 5;
     const REGEN_TIME = 60 * 60 * 1000; // 1 hour per life
 
-    let lives = parseInt(localStorage.getItem('ww_lives') || MAX_LIVES, 10);
-    let lastLifeTimestamp = parseInt(
-        localStorage.getItem('ww_lastLife') || Date.now().toString(),
-        10
-    );
+    // Lives in storage – safe init
+    let livesStored = localStorage.getItem('ww_lives');
+    let lives;
+    if (livesStored === null) {
+        lives = MAX_LIVES;
+        localStorage.setItem('ww_lives', String(MAX_LIVES));
+    } else {
+        lives = parseInt(livesStored, 10);
+        if (Number.isNaN(lives) || lives < 0 || lives > MAX_LIVES) {
+            lives = MAX_LIVES;
+            localStorage.setItem('ww_lives', String(MAX_LIVES));
+        }
+    }
+
+    let lastLifeTimestampStored = localStorage.getItem('ww_lastLife');
+    let lastLifeTimestamp;
+    if (lastLifeTimestampStored === null) {
+        lastLifeTimestamp = Date.now();
+        localStorage.setItem('ww_lastLife', String(lastLifeTimestamp));
+    } else {
+        lastLifeTimestamp = parseInt(lastLifeTimestampStored, 10);
+        if (Number.isNaN(lastLifeTimestamp)) {
+            lastLifeTimestamp = Date.now();
+            localStorage.setItem('ww_lastLife', String(lastLifeTimestamp));
+        }
+    }
+
+    function updateLivesUI() {
+        livesEl.textContent = '♥ ' + lives;
+    }
 
     function regenLives() {
         const now = Date.now();
-
         if (lives >= MAX_LIVES) {
             lastLifeTimestamp = now;
-            localStorage.setItem('ww_lastLife', lastLifeTimestamp.toString());
+            localStorage.setItem('ww_lastLife', String(lastLifeTimestamp));
             return;
         }
 
@@ -252,40 +299,63 @@
         if (regained > 0) {
             lives = Math.min(MAX_LIVES, lives + regained);
             lastLifeTimestamp = now;
-            localStorage.setItem('ww_lives', lives.toString());
-            localStorage.setItem('ww_lastLife', lastLifeTimestamp.toString());
+            localStorage.setItem('ww_lives', String(lives));
+            localStorage.setItem('ww_lastLife', String(lastLifeTimestamp));
             updateLivesUI();
         }
     }
 
-    function updateLivesUI() {
-        livesEl.textContent = '♥ ' + lives;
-    }
-
-    // Call once on load, then check every 30 seconds
+    // Run once on load and every 30s
     regenLives();
     updateLivesUI();
     setInterval(regenLives, 30 * 1000);
 
-    // Snowflakes
+    /* ========= SNOW BACKGROUND ========= */
     const snowflakes = [];
-    for (let i = 0; i < 50; i++) {
-        snowflakes.push({
-            x: Math.random() * canvas.width,
-            y: Math.random() * canvas.height,
-            r: Math.random() * 2 + 1,
-            speed: Math.random() * 1 + 0.5
+    function initSnow() {
+        snowflakes.length = 0;
+        for (let i = 0; i < 50; i++) {
+            snowflakes.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                r: Math.random() * 2 + 1,
+                speed: Math.random() * 1 + 0.5
+            });
+        }
+    }
+    initSnow();
+
+    function drawBackground() {
+        const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        grad.addColorStop(0, '#87CEEB');
+        grad.addColorStop(1, '#E0F7FA');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = 'rgba(255,255,255,0.7)';
+        snowflakes.forEach(flake => {
+            ctx.beginPath();
+            ctx.arc(flake.x, flake.y, flake.r, 0, Math.PI * 2);
+            ctx.fill();
+
+            flake.y += flake.speed;
+            flake.x += Math.sin((flake.y + performance.now() * 0.002)) * 0.2;
+
+            if (flake.y > canvas.height) {
+                flake.y = -5;
+                flake.x = Math.random() * canvas.width;
+            }
         });
     }
 
-    // Game state
+    /* ========= GAME STATE ========= */
     let frames = 0;
     let score = 0;
     let highScore = parseInt(localStorage.getItem('waddleHighScore') || '0', 10);
     let isRunning = false;
     let isGameOver = false;
 
-    // Penguin
+    /* ========= PENGUIN ========= */
     const penguin = {
         x: 0,
         y: 0,
@@ -296,23 +366,21 @@
         draw() {
             ctx.save();
             ctx.translate(this.x, this.y);
+
             const rot = this.velocity * 0.1;
             this.rotation = Math.min(Math.PI / 4, Math.max(-Math.PI / 4, rot));
             ctx.rotate(this.rotation);
 
-            // Body
             ctx.fillStyle = '#2C3E50';
             ctx.beginPath();
             ctx.ellipse(0, 0, 20, 25, 0, 0, Math.PI * 2);
             ctx.fill();
 
-            // Belly
             ctx.fillStyle = '#FFFFFF';
             ctx.beginPath();
             ctx.ellipse(-2, 2, 14, 18, 0, 0, Math.PI * 2);
             ctx.fill();
 
-            // Eye
             ctx.fillStyle = 'white';
             ctx.beginPath();
             ctx.arc(6, -8, 6, 0, Math.PI * 2);
@@ -322,7 +390,6 @@
             ctx.arc(8, -8, 2, 0, Math.PI * 2);
             ctx.fill();
 
-            // Beak
             ctx.fillStyle = '#FF9800';
             ctx.beginPath();
             ctx.moveTo(10, -2);
@@ -330,14 +397,12 @@
             ctx.lineTo(10, 6);
             ctx.fill();
 
-            // Wing
             ctx.fillStyle = '#34495E';
             ctx.beginPath();
-            const wingY = Math.sin(frames * 0.2) * 3;
+            const wingY = Math.sin(frames * 0.25) * 3;
             ctx.ellipse(-5, 5 + wingY, 8, 14, -0.5, 0, Math.PI * 2);
             ctx.fill();
 
-            // Feet
             ctx.fillStyle = '#FF9800';
             ctx.beginPath();
             ctx.ellipse(-5, 22, 6, 4, 0, 0, Math.PI * 2);
@@ -350,13 +415,11 @@
             this.velocity += GRAVITY;
             this.y += this.velocity;
 
-            // Floor
             if (this.y + this.radius >= canvas.height) {
                 this.y = canvas.height - this.radius;
-                gameOver();
+                triggerGameOver();
             }
 
-            // Ceiling
             if (this.y - this.radius <= 0) {
                 this.y = this.radius;
                 this.velocity = 0;
@@ -375,7 +438,7 @@
         }
     };
 
-    // Pipes
+    /* ========= PIPES ========= */
     const pipes = {
         items: [],
 
@@ -409,14 +472,14 @@
 
                 if (pRight > p.x && pLeft < p.x + pipeWidth) {
                     if (pTop < p.y || pBottom > p.y + PIPE_GAP) {
-                        gameOver();
+                        triggerGameOver();
                     }
                 }
 
                 if (p.x + pipeWidth < penguin.x && !p.passed) {
+                    p.passed = true;
                     score++;
                     scoreEl.textContent = score;
-                    p.passed = true;
                 }
 
                 if (p.x + pipeWidth < 0) {
@@ -474,23 +537,7 @@
         }
     };
 
-    function drawBackground() {
-        ctx.fillStyle = 'rgba(255,255,255,0.6)';
-        snowflakes.forEach(flake => {
-            ctx.beginPath();
-            ctx.arc(flake.x, flake.y, flake.r, 0, Math.PI * 2);
-            ctx.fill();
-
-            flake.y += flake.speed;
-            flake.x += Math.sin(frames * 0.01 + flake.y) * 0.5;
-
-            if (flake.y > canvas.height) {
-                flake.y = -5;
-                flake.x = Math.random() * canvas.width;
-            }
-        });
-    }
-
+    /* ========= MAIN LOOP ========= */
     function loop() {
         if (!isRunning) return;
 
@@ -508,116 +555,189 @@
         }
     }
 
-    function startGame() {
-        regenLives();
+    /* ========= GAME FLOW ========= */
+
+    function resetScreens() {
+        startScreen.classList.add('hidden');
+        gameOverScreen.classList.add('hidden');
+        noLivesScreen.classList.add('hidden');
+        fakeAdScreen.classList.add('hidden');
+    }
+
+    function tryStartGame() {
+        regenLives();      // top up if enough time passed
+        updateLivesUI();
+
         if (lives <= 0) {
-            // No lives – show popup
+            // No lives – show the no-lives popup instead
+            resetScreens();
             noLivesScreen.classList.remove('hidden');
-            startScreen.classList.add('hidden');
-            gameOverScreen.classList.add('hidden');
+            isRunning = false;
+            isGameOver = false;
             return;
         }
 
-        // Spend 1 life at start
-        lives--;
-        localStorage.setItem('ww_lives', lives.toString());
-        lastLifeTimestamp = Date.now();
-        localStorage.setItem('ww_lastLife', lastLifeTimestamp.toString());
-        updateLivesUI();
+        resetScreens();
 
-        penguin.reset();
-        pipes.reset();
         score = 0;
         frames = 0;
         scoreEl.textContent = score;
 
-        startScreen.classList.add('hidden');
-        gameOverScreen.classList.add('hidden');
-        noLivesScreen.classList.add('hidden');
+        penguin.reset();
+        pipes.reset();
+        initSnow();
 
-        isRunning = true;
         isGameOver = false;
-
-        resizeCanvas();
+        isRunning = true;
         loop();
     }
 
-    function gameOver() {
+    function triggerGameOver() {
         if (isGameOver) return;
-        isRunning = false;
         isGameOver = true;
+        isRunning = false;
+
+        // Lose one life on death (Option B)
+        lives = Math.max(0, lives - 1);
+        localStorage.setItem('ww_lives', String(lives));
+        lastLifeTimestamp = Date.now();
+        localStorage.setItem('ww_lastLife', String(lastLifeTimestamp));
+        updateLivesUI();
 
         finalScoreEl.textContent = score;
         if (score > highScore) {
             highScore = score;
-            localStorage.setItem('waddleHighScore', highScore.toString());
+            localStorage.setItem('waddleHighScore', String(highScore));
         }
         bestScoreEl.textContent = highScore;
+        livesLeftLabel.textContent = lives;
+
+        // Show game-over screen
+        resetScreens();
         gameOverScreen.classList.remove('hidden');
     }
 
-    function handleInput(e) {
-        if (e.type === 'keydown' && e.code === 'Space') {
+    /* ========= INPUT ========= */
+
+    function handleFlapInput(e) {
+        if (e && e.type === 'keydown' && e.code === 'Space') {
             e.preventDefault();
         }
-        if (isGameOver) return;
-        if (isRunning) penguin.flap();
+        if (!isRunning || isGameOver) return;
+        penguin.flap();
     }
 
-    // Buttons
-    startBtn.addEventListener('click', startGame);
-    restartBtn.addEventListener('click', startGame);
-
-    // Fake “watch ad” – just grants one life for now
-    watchAdBtn.addEventListener('click', () => {
-        lives = Math.min(MAX_LIVES, lives + 1);
-        localStorage.setItem('ww_lives', lives.toString());
-        lastLifeTimestamp = Date.now();
-        localStorage.setItem('ww_lastLife', lastLifeTimestamp.toString());
-        updateLivesUI();
-        noLivesScreen.classList.add('hidden');
-    });
-
-    // Keyboard
-    window.addEventListener('keydown', e => {
+    window.addEventListener('keydown', (e) => {
         if (e.code === 'Space') {
-            if (!isRunning &&
-                (!startScreen.classList.contains('hidden') ||
-                 !gameOverScreen.classList.contains('hidden'))
-            ) {
-                startGame();
+            if (!isRunning && !isGameOver && !startScreen.classList.contains('hidden')) {
+                tryStartGame();
+            } else if (!isRunning && isGameOver && !gameOverScreen.classList.contains('hidden')) {
+                if (lives > 0) {
+                    tryStartGame();
+                } else {
+                    resetScreens();
+                    noLivesScreen.classList.remove('hidden');
+                }
             } else {
-                handleInput(e);
+                handleFlapInput(e);
             }
         }
     });
 
-    // Touch / mouse
-    canvas.addEventListener('mousedown', handleInput);
-    canvas.addEventListener('touchstart', e => {
+    canvas.addEventListener('mousedown', handleFlapInput);
+    canvas.addEventListener('touchstart', (e) => {
         e.preventDefault();
-        if (!isRunning &&
-            (!startScreen.classList.contains('hidden') ||
-             !gameOverScreen.classList.contains('hidden'))
-        ) {
-            startGame();
+        if (!isRunning && !isGameOver && !startScreen.classList.contains('hidden')) {
+            tryStartGame();
+        } else if (!isRunning && isGameOver && !gameOverScreen.classList.contains('hidden')) {
+            if (lives > 0) {
+                tryStartGame();
+            } else {
+                resetScreens();
+                noLivesScreen.classList.remove('hidden');
+            }
         } else {
-            handleInput(e);
+            handleFlapInput(e);
         }
     }, { passive: false });
 
-    // Service worker (for PWA)
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js')
-                .catch(err => console.log('SW registration failed', err));
-        });
+    /* ========= BUTTON HANDLERS ========= */
+    startBtn.addEventListener('click', tryStartGame);
+
+    restartBtn.addEventListener('click', () => {
+        if (lives > 0) {
+            tryStartGame();
+        } else {
+            resetScreens();
+            noLivesScreen.classList.remove('hidden');
+        }
+    });
+
+    backMenuBtn.addEventListener('click', () => {
+        resetScreens();
+        startScreen.classList.remove('hidden');
+    });
+
+    backFromNoLivesBtn.addEventListener('click', () => {
+        resetScreens();
+        startScreen.classList.remove('hidden');
+    });
+
+    watchAdBtn.addEventListener('click', () => {
+        // Start fake ad
+        resetScreens();
+        fakeAdScreen.classList.remove('hidden');
+        runFakeAd();
+    });
+
+    /* ========= FAKE REWARDED AD ========= */
+    function runFakeAd() {
+        let duration = 5; // seconds
+        let remaining = duration;
+        fakeAdBar.style.width = '0%';
+        fakeAdTimer.textContent = `${remaining}s remaining`;
+
+        const interval = setInterval(() => {
+            remaining--;
+            const pct = ((duration - remaining) / duration) * 100;
+            fakeAdBar.style.width = pct + '%';
+            fakeAdTimer.textContent = `${Math.max(remaining, 0)}s remaining`;
+
+            if (remaining <= 0) {
+                clearInterval(interval);
+
+                // Simulate "ad finished"
+                setTimeout(() => {
+                    // Give +1 life
+                    lives = Math.min(MAX_LIVES, lives + 1);
+                    localStorage.setItem('ww_lives', String(lives));
+                    lastLifeTimestamp = Date.now();
+                    localStorage.setItem('ww_lastLife', String(lastLifeTimestamp));
+                    updateLivesUI();
+
+                    // Back to menu
+                    resetScreens();
+                    startScreen.classList.remove('hidden');
+                    alert('Thanks for watching! You gained +1 life.');
+                }, 300);
+            }
+        }, 1000);
     }
 
-    // Initial draw
+    /* ========= INITIAL DRAW ========= */
     penguin.reset();
     drawBackground();
     penguin.draw();
+    updateLivesUI();
+
+    // Service worker
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker
+                .register('./sw.js')
+                .catch(() => {});
+        });
+    }
 </script>
 </body>
 </html>
