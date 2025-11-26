@@ -1574,7 +1574,7 @@
     { id: "coins-big", name: "Big Coin Pack", desc: "+800 coins.", amount: 800, priceLabel: "£4.99" },
   ];
 
-  let currentPurchase = null; // { type, id, label, onComplete }
+  let currentPurchase = null; // { label, onComplete }
 
   function openPurchaseConfirm(label, onComplete) {
     currentPurchase = { label, onComplete };
@@ -1836,6 +1836,7 @@
   let score = 0;
   let isRunning = false;
   let isGameOver = false;
+  let hasStartedRun = false; // hover flag
 
   const snowflakes = [];
   function initSnow() {
@@ -1862,6 +1863,7 @@
       const skin = getEquippedSkin();
       ctx.save();
       ctx.translate(this.x, this.y);
+
       const rot = this.velocity * 0.1;
       this.rotation = Math.min(Math.PI / 4, Math.max(-Math.PI / 4, rot));
       ctx.rotate(this.rotation);
@@ -1907,6 +1909,15 @@
     },
 
     update() {
+      // HOVER MODE: before first flap, sit in middle and bob
+      if (!hasStartedRun) {
+        const baseY = canvas.height / 2;
+        this.y = baseY + Math.sin(frames * 0.08) * 10;
+        this.velocity = 0;
+        return;
+      }
+
+      // Normal physics
       this.velocity += GRAVITY;
       this.y += this.velocity;
 
@@ -1921,6 +1932,8 @@
     },
 
     flap() {
+      // First flap starts actual run
+      if (!hasStartedRun) hasStartedRun = true;
       this.velocity = FLAP_STRENGTH;
     },
 
@@ -2237,6 +2250,7 @@
 
     isGameOver = false;
     isRunning = true;
+    hasStartedRun = false; // hover until first flap
     score = 0;
     frames = 0;
     scoreEl.textContent = score;
@@ -2401,4 +2415,4 @@
   }
 </script>
 </body>
-  </html>
+</html>
