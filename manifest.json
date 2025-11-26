@@ -1,11 +1,10 @@
 {
-  "name": "Waddle Wings",
+  "name": "Waddle Wings: Flappy Penguin",
   "short_name": "WaddleWings",
-  "start_url": "./index.html",
-  "display": "standalone",
-  "background_color": "#333333",
+  "start_url": "./",
+  "display": "fullscreen",
+  "background_color": "#87CEEB",
   "theme_color": "#2C3E50",
-  "description": "Help the penguin waddle through the ice caves!",
   "orientation": "portrait",
   "icons": [
     {
