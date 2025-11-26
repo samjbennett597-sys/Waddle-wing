@@ -1,257 +1,1917 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Waddle Wings Universe</title>
-<style>
-/* ===== GLOBAL ===== */
-html, body {
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    background: #0e1a25;
-    font-family: 'Fredoka One', sans-serif;
-    touch-action: none;
-}
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Waddle Wings Universe</title>
 
-/* ===== CANVAS ===== */
-#gameCanvas {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: linear-gradient(to bottom, #6fb8ff, #e4f6ff);
-}
+  <meta name="theme-color" content="#1b2735" />
 
-/* ===== FLOATING MENU ===== */
-#menu {
-    position: absolute;
-    top: 10vh;
-    left: 50%;
-    transform: translateX(-50%);
-    text-align: center;
-    color: white;
-    z-index: 10;
-}
+  <!-- Fake audio assets – replace with real files in /music if you want -->
+  <audio id="bgm" src="music/background.mp3" loop preload="auto"></audio>
+  <audio id="sfx-flap" src="music/flap.wav" preload="auto"></audio>
+  <audio id="sfx-coin" src="music/coin.wav" preload="auto"></audio>
+  <audio id="sfx-hit" src="music/hit.wav" preload="auto"></audio>
+  <audio id="sfx-purchase" src="music/purchase.mp3" preload="auto"></audio>
 
-#title {
-    font-size: 7vw;
-    text-shadow: 0 0 20px rgba(0,0,0,0.4);
-}
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap");
 
-#subtitle {
-    font-size: 4vw;
-    margin-top: -10px;
-    opacity: 0.8;
-}
+    * { box-sizing: border-box; }
 
-/* ===== HOVERING PENGUIN ===== */
-#penguin-preview {
-    width: 90px;
-    height: 90px;
-    margin: 20px auto;
-    animation: hover 2s ease-in-out infinite;
-}
+    body {
+      margin: 0;
+      padding: 0;
+      background: #000;
+      color: #fff;
+      font-family: "Fredoka One", cursive;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      width: 100vw;
+      touch-action: none;
+    }
 
-@keyframes hover {
-    0% { transform: translateY(0); }
-    50% { transform: translateY(-12px); }
-    100% { transform: translateY(0); }
-}
+    #game-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      max-width: 480px;
+      max-height: 800px;
+      border-radius: 18px;
+      overflow: hidden;
+      background: #000;
+      box-shadow: 0 0 30px rgba(0,0,0,0.8);
+    }
 
-/* ===== MAIN PLAY/STORE BUTTONS ===== */
-.big-btn {
-    width: 60vw;
-    max-width: 320px;
-    padding: 15px;
-    margin: 10px auto;
-    border-radius: 20px;
-    font-size: 6vw;
-    color: white;
-    cursor: pointer;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    transition: 0.1s ease;
-}
+    canvas { display: block; }
 
-.big-btn:active {
-    transform: scale(0.95);
-}
+    #ui-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
 
-#playBtn { background: #ff5f5f; }
-#storeBtn { background: #466aff; }
+    #top-bar {
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9rem;
+      color: #fff;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+    }
 
-/* ===== ICON ROW ===== */
-#iconRow {
-    margin-top: 10px;
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-}
+    #score-display { font-size: 2.1rem; }
+    #meta-right { text-align: right; }
+    #coins-display { font-size: 1rem; }
+    #lives-display { font-size: 0.9rem; margin-top: 2px; }
 
-.icon-btn {
-    width: 50px;
-    height: 50px;
-    background: rgba(0,0,0,0.25);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    backdrop-filter: blur(4px);
-}
+    /* HUB OVERLAY (shared wrapper) */
+    #hub-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      pointer-events: auto;
+      background: radial-gradient(circle at top, rgba(15,25,40,0.85), rgba(3,6,12,0.95));
+      color: #fff;
+    }
 
-.icon-btn img {
-    width: 28px;
-    height: 28px;
-}
+    /* COMMON HUB HEADER */
+    .hub-header {
+      text-align: center;
+      padding: 10px 8px 4px;
+    }
+    .hub-title {
+      font-size: 1.5rem;
+      letter-spacing: 1px;
+    }
+    .hub-subtitle {
+      font-size: 0.8rem;
+      color: #d0e6ff;
+      margin-top: 4px;
+    }
 
-/* ===== STORE + OTHER PANELS ===== */
-.panel {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 85%;
-    max-width: 420px;
-    background: rgba(20,20,20,0.9);
-    padding: 25px;
-    border-radius: 20px;
-    color: white;
-    display: none;
-    z-index: 20;
-}
+    /* CLASSIC MENU LAYOUT (big buttons grid) */
+    #hub-classic-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 6px 10px 10px;
+    }
 
-.closePanel {
-    margin-top: 20px;
-    background: #ff5f5f;
-    padding: 10px;
-    border-radius: 10px;
-    cursor: pointer;
-    text-align: center;
-}
+    #hub-preview-card {
+      width: 90%;
+      max-width: 380px;
+      height: 220px;
+      border-radius: 24px;
+      background: radial-gradient(circle at top, rgba(255,255,255,0.18), rgba(9,16,30,0.98));
+      border: 2px solid rgba(255,255,255,0.16);
+      box-shadow: 0 14px 30px rgba(0,0,0,0.7);
+      margin-bottom: 12px;
+      position: relative;
+      overflow: hidden;
+    }
 
-/* Snow overlays */
-.snowflake {
-    position: fixed;
-    top: -10px;
-    width: 5px;
-    height: 5px;
-    background: white;
-    border-radius: 50%;
-    opacity: 0.8;
-    animation: snowFall linear infinite;
-}
+    #preview-inner {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
 
-@keyframes snowFall {
-    to { transform: translateY(110vh); opacity: 0.2; }
-}
-</style>
+    #preview-skin-name {
+      margin-top: 18px;
+      font-size: 1rem;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+    }
+
+    #preview-penguin {
+      width: 80px;
+      height: 80px;
+    }
+
+    #classic-grid {
+      width: 100%;
+      max-width: 420px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .big-btn {
+      border-radius: 18px;
+      padding: 12px 6px;
+      border: none;
+      cursor: pointer;
+      font-family: "Fredoka One", cursive;
+      font-size: 1.1rem;
+      text-shadow: 0 2px 3px rgba(0,0,0,0.6);
+      box-shadow: 0 5px 0 rgba(0,0,0,0.5);
+    }
+
+    .big-btn.play {
+      background: linear-gradient(180deg,#ff7373,#ff4d4d);
+      box-shadow: 0 5px 0 #c23b3b;
+    }
+    .big-btn.store {
+      background: linear-gradient(180deg,#5f7bff,#3850d0);
+      box-shadow: 0 5px 0 #24318a;
+    }
+    .big-btn.secondary {
+      background: rgba(10,18,36,0.92);
+      border: 1px solid rgba(255,255,255,0.15);
+      box-shadow: 0 4px 0 rgba(0,0,0,0.5);
+      font-size: 0.95rem;
+    }
+
+    .big-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 rgba(0,0,0,0.6);
+    }
+
+    #hub-classic-footer {
+      padding: 4px 10px 8px;
+      font-size: 0.8rem;
+      display: flex;
+      justify-content: space-between;
+      color: #c4d4ff;
+    }
+
+    /* MINIMAL MENU LAYOUT (Play + Store + icons row) */
+    #hub-minimal-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 6px 10px 10px;
+    }
+
+    #minimal-top-text {
+      text-align: center;
+      font-size: 0.85rem;
+      margin-top: 4px;
+      color: #e0f0ff;
+    }
+
+    #minimal-buttons {
+      margin-top: 26px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .pill-btn {
+      min-width: 120px;
+      border-radius: 999px;
+      border: none;
+      padding: 12px 18px;
+      font-family: "Fredoka One", cursive;
+      font-size: 1.1rem;
+      cursor: pointer;
+      text-shadow: 0 2px 3px rgba(0,0,0,0.7);
+      box-shadow: 0 5px 0 rgba(0,0,0,0.5);
+    }
+
+    .pill-btn.play {
+      background: linear-gradient(180deg,#ff7373,#ff4d4d);
+      box-shadow: 0 5px 0 #c23b3b;
+    }
+    .pill-btn.store {
+      background: linear-gradient(180deg,#5f7bff,#3850d0);
+      box-shadow: 0 5px 0 #24318a;
+    }
+    .pill-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 rgba(0,0,0,0.6);
+    }
+
+    #minimal-icon-row {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .icon-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: rgba(15,20,36,0.9);
+      border: 1px solid rgba(255,255,255,0.18);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 4px 0 rgba(0,0,0,0.65);
+      font-size: 1.1rem;
+    }
+
+    .icon-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 rgba(0,0,0,0.7);
+    }
+
+    #hub-minimal-footer {
+      padding: 4px 10px 8px;
+      font-size: 0.8rem;
+      display: flex;
+      justify-content: space-between;
+      color: #c4d4ff;
+    }
+
+    /* Panel shared styling */
+    .panel {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      pointer-events: auto;
+    }
+
+    .panel-card {
+      background: rgba(10,15,35,0.97);
+      border-radius: 18px;
+      border: 2px solid rgba(255,255,255,0.18);
+      padding: 16px;
+      width: 92%;
+      max-width: 430px;
+      max-height: 80%;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.7);
+      animation: fadeUp 0.2s ease-out;
+      font-size: 0.88rem;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .panel-title { font-size: 1.3rem; }
+
+    .panel-close {
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 1.4rem;
+      cursor: pointer;
+    }
+
+    .panel-body {
+      max-height: 280px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .panel-footer {
+      margin-top: 8px;
+      text-align: right;
+    }
+
+    .list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .list-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.09);
+    }
+
+    .list-label {
+      display: flex;
+      flex-direction: column;
+    }
+    .list-label span:first-child { font-size: 0.96rem; }
+    .list-label span:last-child { font-size: 0.74rem; color: #cbd3ff; }
+
+    .section-label {
+      margin: 8px 0 4px;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #9fb5ff;
+    }
+
+    .small-btn {
+      padding: 6px 14px;
+      font-size: 0.8rem;
+      border-radius: 999px;
+      background: #ff7373;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 3px 0 #c23b3b;
+      min-width: 70px;
+      text-align: center;
+    }
+
+    .small-btn.secondary {
+      background: rgba(255,255,255,0.06);
+      box-shadow: none;
+      border: 1px solid rgba(255,255,255,0.25);
+    }
+
+    .small-btn.equipped {
+      background: #4caf50;
+      box-shadow: 0 3px 0 #2e7d32;
+    }
+
+    .small-btn.disabled {
+      opacity: 0.6;
+      cursor: default;
+      box-shadow: none;
+    }
+
+    .small-btn:active:not(.disabled) {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 rgba(0,0,0,0.7);
+    }
+
+    /* Center cards (game over, fake ad etc) */
+    .center-card {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      min-width: 240px;
+      max-width: 320px;
+      padding: 20px;
+      background: rgba(255,255,255,0.96);
+      color: #263238;
+      border-radius: 18px;
+      border: 3px solid #1b2735;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+      text-align: center;
+      pointer-events: auto;
+      font-size: 0.9rem;
+    }
+
+    .center-card h1 {
+      margin-top: 0;
+      margin-bottom: 8px;
+      font-size: 1.6rem;
+    }
+
+    .main-btn {
+      background: #ff6b6b;
+      color: #fff;
+      border: none;
+      padding: 10px 22px;
+      border-radius: 999px;
+      font-family: "Fredoka One", cursive;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 0 4px 0 #c23b3b;
+      margin: 4px;
+    }
+
+    .secondary-btn {
+      background: #6078ea;
+      color: #fff;
+      border: none;
+      padding: 9px 20px;
+      border-radius: 999px;
+      font-family: "Fredoka One", cursive;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 4px 0 #243089;
+      margin: 4px;
+    }
+
+    .main-btn:active,
+    .secondary-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 rgba(0,0,0,0.7);
+    }
+
+    #fake-ad-progress {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: #eee;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+    #fake-ad-bar {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg,#ff6b6b,#ffd66b);
+    }
+    #fake-ad-timer {
+      font-size: 0.8rem;
+      margin-top: 6px;
+    }
+
+    /* Menu variant toggles */
+    .menu-variant-classic #hub-classic { display: flex; }
+    .menu-variant-classic #hub-minimal { display: none; }
+    .menu-variant-minimal #hub-classic { display: none; }
+    .menu-variant-minimal #hub-minimal { display: flex; }
+
+    #hub-classic,
+    #hub-minimal {
+      flex: 1;
+      flex-direction: column;
+    }
+
+    .hidden { display: none !important; }
+  </style>
 </head>
 <body>
+<div id="game-container">
+  <canvas id="gameCanvas"></canvas>
 
-<canvas id="gameCanvas"></canvas>
-
-<!-- ===== MENU ===== -->
-<div id="menu">
-    <div id="title">WADDLE WINGS UNIVERSE</div>
-    <div id="subtitle">Tap to flap • Don’t choke • Spend coins badly</div>
-
-    <img id="penguin-preview" src="penguin_classic.png">
-
-    <div id="playBtn" class="big-btn">PLAY</div>
-    <div id="storeBtn" class="big-btn">STORE</div>
-
-    <div id="iconRow">
-        <div class="icon-btn"><img src="icon_modes.png"></div>
-        <div class="icon-btn"><img src="icon_maps.png"></div>
-        <div class="icon-btn"><img src="icon_skins.png"></div>
-        <div class="icon-btn"><img src="icon_missions.png"></div>
-        <div class="icon-btn"><img src="icon_daily.png"></div>
-        <div class="icon-btn"><img src="icon_settings.png"></div>
+  <div id="ui-layer">
+    <div id="top-bar">
+      <div id="score-display">0</div>
+      <div id="meta-right">
+        <div id="coins-display">💰 0</div>
+        <div id="lives-display">♥ 5</div>
+      </div>
     </div>
-</div>
+  </div>
 
-<!-- ===== STORE PANEL ===== -->
-<div id="storePanel" class="panel">
-    <h2>Store</h2>
-    <p>Skins • Maps • Premium • Upgrades</p>
+  <!-- HUB OVERLAY -->
+  <div id="hub-overlay">
+    <!-- CLASSIC MENU -->
+    <div id="hub-classic">
+      <div class="hub-header">
+        <div class="hub-title">WADDLE WINGS UNIVERSE</div>
+        <div class="hub-subtitle">Play • Store • Missions • Daily • Settings</div>
+      </div>
+      <div id="hub-classic-main">
+        <div id="hub-preview-card">
+          <div id="preview-inner">
+            <canvas id="preview-penguin" width="80" height="80"></canvas>
+            <div id="preview-skin-name">Classic Penguin</div>
+          </div>
+        </div>
 
-    <p style="opacity:0.6;">(Demo Only — purchases not real yet)</p>
+        <div id="classic-grid">
+          <button id="btn-play" class="big-btn play">PLAY</button>
+          <button id="btn-store" class="big-btn store">STORE</button>
+          <button id="btn-modes" class="big-btn secondary">MODES</button>
+          <button id="btn-skins" class="big-btn secondary">SKINS</button>
+          <button id="btn-maps" class="big-btn secondary">MAPS</button>
+          <button id="btn-missions" class="big-btn secondary">MISSIONS</button>
+          <button id="btn-daily" class="big-btn secondary">DAILY</button>
+          <button id="btn-settings" class="big-btn secondary">⚙</button>
+        </div>
+      </div>
+      <div id="hub-classic-footer">
+        <span id="hub-mode-label">Mode: Normal</span>
+        <span>v3.2 – Dev</span>
+      </div>
+    </div>
 
-    <div class="closePanel" onclick="closeStore()">Close</div>
+    <!-- MINIMAL MENU -->
+    <div id="hub-minimal">
+      <div class="hub-header">
+        <div class="hub-title">WADDLE WINGS UNIVERSE</div>
+        <div class="hub-subtitle">Tap to flap • Don’t choke • Spend coins badly</div>
+      </div>
+      <div id="hub-minimal-main">
+        <div id="minimal-top-text">
+          Your penguin hovers behind the UI. First tap starts the run.
+        </div>
+        <div id="minimal-buttons">
+          <button id="btn-play-min" class="pill-btn play">PLAY</button>
+          <button id="btn-store-min" class="pill-btn store">STORE</button>
+        </div>
+        <div id="minimal-icon-row">
+          <button id="icon-modes" class="icon-btn" title="Modes">🎯</button>
+          <button id="icon-skins" class="icon-btn" title="Skins">🎨</button>
+          <button id="icon-maps" class="icon-btn" title="Maps">🗺</button>
+          <button id="icon-missions" class="icon-btn" title="Missions">⭐</button>
+          <button id="icon-daily" class="icon-btn" title="Daily reward">🎁</button>
+          <button id="icon-settings" class="icon-btn" title="Settings">⚙</button>
+        </div>
+      </div>
+      <div id="hub-minimal-footer">
+        <span id="hub-mode-label-min">Mode: Normal</span>
+        <span>v3.2 – Dev</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANELS -->
+  <div id="panel-skins" class="panel hidden">
+    <div class="panel-card">
+      <div class="panel-header">
+        <div class="panel-title">Skins</div>
+        <button class="panel-close" data-panel-close="panel-skins">×</button>
+      </div>
+      <div class="panel-body">
+        <ul id="skins-list" class="list"></ul>
+      </div>
+      <div class="panel-footer">
+        <button class="small-btn secondary" data-panel-close="panel-skins">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="panel-maps" class="panel hidden">
+    <div class="panel-card">
+      <div class="panel-header">
+        <div class="panel-title">Maps</div>
+        <button class="panel-close" data-panel-close="panel-maps">×</button>
+      </div>
+      <div class="panel-body">
+        <ul id="maps-list" class="list"></ul>
+      </div>
+      <div class="panel-footer">
+        <button class="small-btn secondary" data-panel-close="panel-maps">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="panel-modes" class="panel hidden">
+    <div class="panel-card">
+      <div class="panel-header">
+        <div class="panel-title">Modes</div>
+        <button class="panel-close" data-panel-close="panel-modes">×</button>
+      </div>
+      <div class="panel-body">
+        <ul id="modes-list" class="list"></ul>
+      </div>
+      <div class="panel-footer">
+        <button class="small-btn secondary" data-panel-close="panel-modes">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="panel-missions" class="panel hidden">
+    <div class="panel-card">
+      <div class="panel-header">
+        <div class="panel-title">Missions</div>
+        <button class="panel-close" data-panel-close="panel-missions">×</button>
+      </div>
+      <div class="panel-body">
+        <ul id="missions-list" class="list"></ul>
+      </div>
+      <div class="panel-footer">
+        <button class="small-btn secondary" data-panel-close="panel-missions">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="panel-daily" class="panel hidden">
+    <div class="panel-card">
+      <div class="panel-header">
+        <div class="panel-title">Daily Reward</div>
+        <button class="panel-close" data-panel-close="panel-daily">×</button>
+      </div>
+      <div class="panel-body">
+        <p style="font-size:0.85rem;color:#e0e6ff;">
+          Claim once per calendar day. Double coins applies here too.
+        </p>
+        <p id="daily-status" style="font-size:0.85rem;color:#cfd6ff;"></p>
+      </div>
+      <div class="panel-footer">
+        <button id="btn-claim-daily" class="small-btn">Claim</button>
+        <button class="small-btn secondary" data-panel-close="panel-daily">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="panel-settings" class="panel hidden">
+    <div class="panel-card">
+      <div class="panel-header">
+        <div class="panel-title">Settings</div>
+        <button class="panel-close" data-panel-close="panel-settings">×</button>
+      </div>
+      <div class="panel-body">
+        <ul class="list">
+          <li class="list-item">
+            <div class="list-label">
+              <span>Music</span>
+              <span>Menu + run background track.</span>
+            </div>
+            <button id="btn-toggle-music" class="small-btn">Toggle</button>
+          </li>
+          <li class="list-item">
+            <div class="list-label">
+              <span>Sound FX</span>
+              <span>Flap, coins, hit, purchases.</span>
+            </div>
+            <button id="btn-toggle-sfx" class="small-btn">Toggle</button>
+          </li>
+          <li class="list-item">
+            <div class="list-label">
+              <span>Vibration</span>
+              <span>Small haptics on hits & purchases.</span>
+            </div>
+            <button id="btn-toggle-vibrate" class="small-btn">Toggle</button>
+          </li>
+          <li class="list-item">
+            <div class="list-label">
+              <span>Test Interstitial</span>
+              <span>Debug fake ad popup (replace with real SDK later).</span>
+            </div>
+            <button id="btn-test-ad" class="small-btn secondary">Show</button>
+          </li>
+        </ul>
+        <p id="settings-audio-status" style="font-size:0.78rem;color:#cfd6ff;margin-top:6px;"></p>
+      </div>
+      <div class="panel-footer">
+        <button class="small-btn secondary" data-panel-close="panel-settings">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STORE PANEL (with Reset/Restore buttons) -->
+  <div id="panel-store" class="panel hidden">
+    <div class="panel-card">
+      <div class="panel-header">
+        <div class="panel-title">Store</div>
+        <button class="panel-close" data-panel-close="panel-store">×</button>
+      </div>
+      <div class="panel-body">
+        <div class="section-label">Skins & Maps</div>
+        <ul id="store-cosmetics" class="list"></ul>
+
+        <div class="section-label">Premium Upgrades</div>
+        <ul id="store-premium" class="list"></ul>
+
+        <div class="section-label">Coins</div>
+        <ul id="store-currency" class="list"></ul>
+      </div>
+      <div class="panel-footer">
+        <button id="btn-reset-data" class="small-btn secondary">Reset progress</button>
+        <button id="btn-restore" class="small-btn secondary">Restore purchases</button>
+        <button class="small-btn" data-panel-close="panel-store">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- GAME STATE CARDS -->
+  <div id="game-over-screen" class="center-card hidden">
+    <h1>OOF!</h1>
+    <p>Score: <span id="final-score">0</span></p>
+    <p>Best: <span id="best-score">0</span></p>
+    <p>Lives left: <span id="lives-left-label">0</span></p>
+    <button id="restart-btn" class="main-btn">PLAY AGAIN</button>
+    <button id="back-menu-btn" class="secondary-btn">BACK TO HUB</button>
+  </div>
+
+  <div id="no-lives-screen" class="center-card hidden">
+    <h1>NO LIVES</h1>
+    <p>You’ve run out of lives.</p>
+    <p style="font-size:0.83rem;">
+      Lives regenerate 1 per hour, or you can watch a fake rewarded ad to test the flow.
+    </p>
+    <button id="watch-ad-btn" class="main-btn">WATCH AD</button>
+    <button id="back-from-nolives-btn" class="secondary-btn">BACK</button>
+  </div>
+
+  <div id="fake-ad-screen" class="center-card hidden">
+    <h1>Ad playing…</h1>
+    <p style="font-size:0.85rem;">This is a test ad screen. Swap this for real ad SDK callbacks later.</p>
+    <div id="fake-ad-progress"><div id="fake-ad-bar"></div></div>
+    <div id="fake-ad-timer">5s remaining</div>
+  </div>
 </div>
 
 <script>
-/* ===== CANVAS SETUP ===== */
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
+  /**************************************
+   * CONFIG – CHOOSE MENU VARIANT HERE  *
+   **************************************/
+  const MENU_VARIANT = "classic"; // "classic" or "minimal"
 
-function resize() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-}
-resize();
-window.addEventListener("resize", resize);
+  // Apply body class
+  document.body.classList.add(
+    MENU_VARIANT === "minimal" ? "menu-variant-minimal" : "menu-variant-classic"
+  );
 
-/* ===== PARALLAX PIPES ===== */
-let pipes = [];
-for (let i = 0; i < 4; i++) {
-    pipes.push({
-        x: i * (canvas.width / 2),
-        y: Math.random() * canvas.height,
-        w: 120,
-        h: canvas.height,
-        speed: 0.2
+  /******** BASIC CANVAS SETUP ********/
+  const canvas = document.getElementById("gameCanvas");
+  const ctx = canvas.getContext("2d");
+
+  function resizeCanvas() {
+    let w = window.innerWidth;
+    let h = window.innerHeight;
+    const maxW = 480;
+    const maxH = 800;
+    if (w > maxW) {
+      w = maxW;
+      h = Math.min(h, maxH);
+    }
+    canvas.width = w;
+    canvas.height = h;
+  }
+  window.addEventListener("resize", resizeCanvas);
+  resizeCanvas();
+
+  /******** CONSTANTS ********/
+  const GRAVITY = 0.25;
+  const FLAP_STRENGTH = -5.5;
+  const MAX_LIVES = 5;
+  const LIFE_REGEN_MS = 60 * 60 * 1000;
+  const DAILY_COINS = 20;
+
+  /******** DOM SHORTCUTS ********/
+  const scoreEl = document.getElementById("score-display");
+  const coinsEl = document.getElementById("coins-display");
+  const livesEl = document.getElementById("lives-display");
+  const hubOverlay = document.getElementById("hub-overlay");
+  const previewCanvas = document.getElementById("preview-penguin");
+  const pctx = previewCanvas.getContext("2d");
+  const previewSkinName = document.getElementById("preview-skin-name");
+  const hubModeLabel = document.getElementById("hub-mode-label");
+  const hubModeLabelMin = document.getElementById("hub-mode-label-min");
+
+  // panels
+  const skinsPanel = document.getElementById("panel-skins");
+  const mapsPanel = document.getElementById("panel-maps");
+  const modesPanel = document.getElementById("panel-modes");
+  const missionsPanel = document.getElementById("panel-missions");
+  const dailyPanel = document.getElementById("panel-daily");
+  const settingsPanel = document.getElementById("panel-settings");
+  const storePanel = document.getElementById("panel-store");
+
+  // lists
+  const skinsList = document.getElementById("skins-list");
+  const mapsList = document.getElementById("maps-list");
+  const modesList = document.getElementById("modes-list");
+  const missionsList = document.getElementById("missions-list");
+  const storeCosmetics = document.getElementById("store-cosmetics");
+  const storePremium = document.getElementById("store-premium");
+  const storeCurrency = document.getElementById("store-currency");
+
+  // daily/settings
+  const dailyStatus = document.getElementById("daily-status");
+  const claimDailyBtn = document.getElementById("btn-claim-daily");
+  const settingsStatus = document.getElementById("settings-audio-status");
+
+  // game state cards
+  const gameOverScreen = document.getElementById("game-over-screen");
+  const noLivesScreen = document.getElementById("no-lives-screen");
+  const fakeAdScreen = document.getElementById("fake-ad-screen");
+  const fakeAdBar = document.getElementById("fake-ad-bar");
+  const fakeAdTimer = document.getElementById("fake-ad-timer");
+  const finalScoreEl = document.getElementById("final-score");
+  const bestScoreEl = document.getElementById("best-score");
+  const livesLeftLabel = document.getElementById("lives-left-label");
+
+  // buttons classic
+  const btnPlay = document.getElementById("btn-play");
+  const btnStore = document.getElementById("btn-store");
+  const btnModes = document.getElementById("btn-modes");
+  const btnSkins = document.getElementById("btn-skins");
+  const btnMaps = document.getElementById("btn-maps");
+  const btnMissions = document.getElementById("btn-missions");
+  const btnDaily = document.getElementById("btn-daily");
+  const btnSettings = document.getElementById("btn-settings");
+
+  // buttons minimal
+  const btnPlayMin = document.getElementById("btn-play-min");
+  const btnStoreMin = document.getElementById("btn-store-min");
+  const iconModes = document.getElementById("icon-modes");
+  const iconSkins = document.getElementById("icon-skins");
+  const iconMaps = document.getElementById("icon-maps");
+  const iconMissions = document.getElementById("icon-missions");
+  const iconDaily = document.getElementById("icon-daily");
+  const iconSettings = document.getElementById("icon-settings");
+
+  // store footer buttons
+  const btnResetData = document.getElementById("btn-reset-data");
+  const btnRestore = document.getElementById("btn-restore");
+
+  // game over buttons
+  const restartBtn = document.getElementById("restart-btn");
+  const backMenuBtn = document.getElementById("back-menu-btn");
+  const backFromNoLivesBtn = document.getElementById("back-from-nolives-btn");
+  const watchAdBtn = document.getElementById("watch-ad-btn");
+
+  // settings toggles
+  const btnToggleMusic = document.getElementById("btn-toggle-music");
+  const btnToggleSfx = document.getElementById("btn-toggle-sfx");
+  const btnToggleVibrate = document.getElementById("btn-toggle-vibrate");
+  const btnTestAd = document.getElementById("btn-test-ad");
+
+  // audio
+  const bgm = document.getElementById("bgm");
+  const sfxFlap = document.getElementById("sfx-flap");
+  const sfxCoin = document.getElementById("sfx-coin");
+  const sfxHit = document.getElementById("sfx-hit");
+  const sfxPurchase = document.getElementById("sfx-purchase");
+
+  /******** META STATE ********/
+  function getInt(key, def) {
+    const v = parseInt(localStorage.getItem(key) || def, 10);
+    return Number.isNaN(v) ? def : v;
+  }
+
+  let coins = getInt("ww_coins", 0);
+  let lives = getInt("ww_lives", MAX_LIVES);
+  let lastLifeTs = getInt("ww_lastLife", Date.now());
+  let highScore = getInt("ww_highScore", 0);
+
+  let removeAds = localStorage.getItem("ww_removeAds") === "true";
+  let ultraLives = localStorage.getItem("ww_ultraLives") === "true";
+  let doubleCoins = localStorage.getItem("ww_doubleCoins") === "true";
+
+  let lastDaily = localStorage.getItem("ww_lastDaily") || "";
+
+  let musicOn = localStorage.getItem("ww_musicOn");
+  let sfxOn = localStorage.getItem("ww_sfxOn");
+  let vibrateOn = localStorage.getItem("ww_vibrateOn");
+  if (musicOn === null) musicOn = "true";
+  if (sfxOn === null) sfxOn = "true";
+  if (vibrateOn === null) vibrateOn = "true";
+
+  function saveMeta() {
+    localStorage.setItem("ww_coins", coins);
+    localStorage.setItem("ww_lives", lives);
+    localStorage.setItem("ww_lastLife", lastLifeTs);
+    localStorage.setItem("ww_highScore", highScore);
+    localStorage.setItem("ww_removeAds", removeAds);
+    localStorage.setItem("ww_ultraLives", ultraLives);
+    localStorage.setItem("ww_doubleCoins", doubleCoins);
+    localStorage.setItem("ww_lastDaily", lastDaily);
+    localStorage.setItem("ww_musicOn", musicOn);
+    localStorage.setItem("ww_sfxOn", sfxOn);
+    localStorage.setItem("ww_vibrateOn", vibrateOn);
+  }
+
+  /******** COSMETICS & MODES ********/
+  const SKINS = [
+    { id: "classic", name: "Classic Penguin", desc: "Standard blue hero.", body:"#2C3E50", wing:"#34495E", beak:"#FF9800" },
+    { id: "red",     name: "Red Rebel",       desc: "Looks faster. Isn't.", body:"#C0392B", wing:"#922B21", beak:"#FFB74D", cost:40 },
+    { id: "gold",    name: "Golden Waddle",   desc: "Shiny flex skin.", body:"#D4AF37", wing:"#B08A2E", beak:"#FFE082", cost:100 },
+    { id: "neon",    name: "Neon Cyber",      desc: "Glowing cyber penguin.", body:"#00e5ff", wing:"#00b0ff", beak:"#ffeb3b", cost:120 }
+  ];
+
+  const MAPS = [
+    { id: "day", name: "Snowfield Day",  desc: "Bright sky & soft snow.", gradient:["#87CEEB","#E0F7FA"] },
+    { id: "night", name: "Polar Night", desc: "Dark arctic sky.",        gradient:["#001c3d","#00335c"], cost:40 },
+    { id: "blizzard", name: "Blizzard", desc: "Snowstorm challenge.",    gradient:["#546E7A","#ECEFF1"], cost:60 },
+    { id: "synth", name: "Synthwave Sky", desc: "Neon retro vibes.",     gradient:["#4a148c","#ff6f00"], cost:80 }
+  ];
+
+  const MODES = [
+    { id:"easy", name:"Easy",    desc:"Slower pipes, big gaps.",   speed:2.4, gap:190 },
+    { id:"normal", name:"Normal",desc:"Default challenge.",        speed:3.0, gap:160 },
+    { id:"hard", name:"Hard",    desc:"Faster pipes, smaller gap.",speed:3.6, gap:140 },
+    { id:"extreme", name:"Extreme",desc:"Chaos mode.",             speed:4.4, gap:120 },
+  ];
+
+  const MISSIONS = [
+    { id:"score10", name:"First Steps",   desc:"Reach score 10.", target:10, reward:20 },
+    { id:"score25", name:"Getting Good",  desc:"Reach score 25.", target:25, reward:40 },
+    { id:"score50", name:"No Chill",      desc:"Reach score 50.", target:50, reward:80 },
+  ];
+  let missionState = JSON.parse(localStorage.getItem("ww_missions") || "{}");
+
+  let ownedSkins = JSON.parse(localStorage.getItem("ww_ownedSkins") || '["classic"]');
+  let ownedMaps  = JSON.parse(localStorage.getItem("ww_ownedMaps")  || '["day"]');
+  if (!ownedSkins.includes("classic")) ownedSkins.push("classic");
+  if (!ownedMaps.includes("day")) ownedMaps.push("day");
+  let equippedSkinId = localStorage.getItem("ww_skin") || "classic";
+  let equippedMapId  = localStorage.getItem("ww_map") || "day";
+  let modeId         = localStorage.getItem("ww_mode") || "normal";
+
+  function saveCosmetics() {
+    localStorage.setItem("ww_ownedSkins", JSON.stringify(ownedSkins));
+    localStorage.setItem("ww_ownedMaps", JSON.stringify(ownedMaps));
+    localStorage.setItem("ww_skin", equippedSkinId);
+    localStorage.setItem("ww_map", equippedMapId);
+    localStorage.setItem("ww_mode", modeId);
+  }
+
+  function getSkin() {
+    return SKINS.find(s => s.id === equippedSkinId) || SKINS[0];
+  }
+  function getMap() {
+    return MAPS.find(m => m.id === equippedMapId) || MAPS[0];
+  }
+  function getMode() {
+    return MODES.find(m => m.id === modeId) || MODES[1];
+  }
+
+  /******** PREMIUM & COINS ********/
+  const PREMIUM_ITEMS = [
+    { id:"ultraLives", name:"Unlimited Lives", desc:"Never run out again.", priceLabel:"£19.99" },
+    { id:"removeAds",  name:"Remove Ads",      desc:"No ads, ever.",        priceLabel:"£4.99" },
+    { id:"doubleCoins",name:"Double Coins",    desc:"All coins x2.",        priceLabel:"£4.99" },
+    { id:"ultimate",   name:"Ultimate Pack",   desc:"All of the above + bonus cosmetics.", priceLabel:"£29.99" },
+  ];
+  const CURRENCY_PACKS = [
+    { id:"coins100", name:"Small Coin Pack",  desc:"+100 coins.", amount:100, priceLabel:"£0.99" },
+    { id:"coins300", name:"Medium Coin Pack", desc:"+300 coins.", amount:300, priceLabel:"£2.49" },
+    { id:"coins800", name:"Big Coin Pack",    desc:"+800 coins.", amount:800, priceLabel:"£4.99" },
+  ];
+
+  /******** UTIL ********/
+  function todayStr() {
+    return new Date().toISOString().slice(0,10);
+  }
+  function vibrate(pattern) {
+    if (vibrateOn === "true" && navigator.vibrate) navigator.vibrate(pattern);
+  }
+  function playSfx(sound) {
+    if (sfxOn !== "true" || !sound) return;
+    try {
+      sound.currentTime = 0;
+      sound.play().catch(() => {});
+    } catch {}
+  }
+
+  function ensureMusic() {
+    if (musicOn !== "true") {
+      bgm.pause();
+      return;
+    }
+    if (bgm.paused) {
+      bgm.volume = 0.4;
+      bgm.play().catch(() => {});
+    }
+  }
+  function stopMusic() {
+    try { bgm.pause(); bgm.currentTime = 0; } catch {}
+  }
+
+  function updateLives() {
+    if (ultraLives) {
+      livesEl.textContent = "♥ ∞";
+      return;
+    }
+    const now = Date.now();
+    if (lives < MAX_LIVES) {
+      const elapsed = now - lastLifeTs;
+      const gained = Math.floor(elapsed / LIFE_REGEN_MS);
+      if (gained > 0) {
+        lives = Math.min(MAX_LIVES, lives + gained);
+        lastLifeTs = now;
+        saveMeta();
+      }
+    }
+    livesEl.textContent = "♥ " + lives;
+  }
+
+  function updateCoins() {
+    coinsEl.textContent = "💰 " + coins;
+  }
+  function updateSettingsStatus() {
+    settingsStatus.textContent =
+      "Music: " + (musicOn === "true" ? "ON" : "OFF") +
+      "  •  SFX: " + (sfxOn === "true" ? "ON" : "OFF") +
+      "  •  Vibrate: " + (vibrateOn === "true" ? "ON" : "OFF");
+  }
+
+  /******** DAILY ********/
+  function refreshDailyUI() {
+    const today = todayStr();
+    if (lastDaily === today) {
+      dailyStatus.textContent = "Already claimed today. Come back tomorrow.";
+      claimDailyBtn.disabled = true;
+      claimDailyBtn.style.opacity = "0.6";
+    } else {
+      const amt = doubleCoins ? DAILY_COINS * 2 : DAILY_COINS;
+      dailyStatus.textContent = `Available: +${amt} coins.`;
+      claimDailyBtn.disabled = false;
+      claimDailyBtn.style.opacity = "1";
+    }
+  }
+
+  claimDailyBtn.addEventListener("click", () => {
+    const today = todayStr();
+    if (lastDaily === today) return;
+    lastDaily = today;
+    let amt = DAILY_COINS;
+    if (doubleCoins) amt *= 2;
+    coins += amt;
+    saveMeta();
+    updateCoins();
+    refreshDailyUI();
+    alert(`Daily reward claimed: +${amt} coins.`);
+  });
+
+  /******** MISSIONS ********/
+  function missionProgress(mission) {
+    if (mission.id === "score10" || mission.id === "score25" || mission.id === "score50") {
+      return { current: highScore, target: mission.target };
+    }
+    return { current: 0, target: mission.target };
+  }
+
+  function checkMissionCompletion() {
+    MISSIONS.forEach(m => {
+      const st = missionState[m.id] || { completed:false, claimed:false };
+      if (!st.completed) {
+        const prog = missionProgress(m);
+        if (prog.current >= m.target) {
+          st.completed = true;
+          missionState[m.id] = st;
+        }
+      }
     });
-}
+    localStorage.setItem("ww_missions", JSON.stringify(missionState));
+  }
 
-/* ===== DRAW LOOP ===== */
-function draw() {
-    ctx.clearRect(0,0,canvas.width,canvas.height);
+  function renderMissions() {
+    missionsList.innerHTML = "";
+    MISSIONS.forEach(m => {
+      const st = missionState[m.id] || { completed:false, claimed:false };
+      const li = document.createElement("li");
+      li.className = "list-item";
 
-    // Background pipes
-    pipes.forEach(p => {
-        p.x -= p.speed;
-        if (p.x + p.w < 0) {
-            p.x = canvas.width + Math.random()*200;
-            p.y = Math.random() * canvas.height;
+      const label = document.createElement("div");
+      label.className = "list-label";
+      const t = document.createElement("span");
+      t.textContent = m.name;
+      const prog = missionProgress(m);
+      const d = document.createElement("span");
+      d.textContent = `${m.desc} (${prog.current}/${m.target}) • Reward: ${m.reward} coins`;
+      label.appendChild(t);
+      label.appendChild(d);
+
+      const right = document.createElement("div");
+      const status = document.createElement("span");
+      status.style.fontSize = "0.75rem";
+      status.style.marginRight = "6px";
+      status.textContent = st.claimed ? "Claimed" : st.completed ? "Ready" : "In progress";
+      right.appendChild(status);
+
+      if (st.completed && !st.claimed) {
+        const btn = document.createElement("button");
+        btn.className = "small-btn";
+        btn.textContent = "Claim";
+        btn.onclick = () => {
+          let reward = m.reward;
+          if (doubleCoins) reward *= 2;
+          coins += reward;
+          st.claimed = true;
+          missionState[m.id] = st;
+          saveMeta();
+          updateCoins();
+          renderMissions();
+        };
+        right.appendChild(btn);
+      }
+
+      li.appendChild(label);
+      li.appendChild(right);
+      missionsList.appendChild(li);
+    });
+  }
+
+  /******** PANELS: SKINS / MAPS / MODES ********/
+  function renderSkinsPanel() {
+    skinsList.innerHTML = "";
+    SKINS.forEach(s => {
+      const owned = ownedSkins.includes(s.id);
+      const li = document.createElement("li");
+      li.className = "list-item";
+
+      const lab = document.createElement("div");
+      lab.className = "list-label";
+      const t = document.createElement("span");
+      t.textContent = s.name;
+      const d = document.createElement("span");
+      d.textContent = owned
+        ? s.desc + (s.id === equippedSkinId ? " • Equipped" : " • Owned")
+        : `${s.desc} • Cost: ${s.cost || 0} coins`;
+      lab.appendChild(t);
+      lab.appendChild(d);
+
+      const btn = document.createElement("button");
+      btn.className = "small-btn";
+
+      if (!owned && s.cost > 0) {
+        btn.textContent = `Buy ${s.cost}`;
+        btn.onclick = () => {
+          if (coins < s.cost) return alert("Not enough coins.");
+          coins -= s.cost;
+          ownedSkins.push(s.id);
+          equippedSkinId = s.id;
+          saveMeta(); saveCosmetics(); updateCoins();
+          renderSkinsPanel(); renderStoreCosmetics(); updateHubView();
+        };
+      } else {
+        if (s.id === equippedSkinId) {
+          btn.textContent = "Equipped";
+          btn.classList.add("equipped","disabled");
+          btn.disabled = true;
+        } else {
+          btn.textContent = "Equip";
+          btn.onclick = () => {
+            equippedSkinId = s.id;
+            saveCosmetics();
+            renderSkinsPanel();
+            renderStoreCosmetics();
+            updateHubView();
+          };
+        }
+      }
+
+      li.appendChild(lab);
+      li.appendChild(btn);
+      skinsList.appendChild(li);
+    });
+  }
+
+  function renderMapsPanel() {
+    mapsList.innerHTML = "";
+    MAPS.forEach(m => {
+      const owned = ownedMaps.includes(m.id);
+      const li = document.createElement("li");
+      li.className = "list-item";
+
+      const lab = document.createElement("div");
+      lab.className = "list-label";
+      const t = document.createElement("span");
+      t.textContent = m.name;
+      const d = document.createElement("span");
+      d.textContent = owned
+        ? m.desc + (m.id === equippedMapId ? " • Equipped" : " • Owned")
+        : `${m.desc} • Cost: ${m.cost || 0} coins`;
+      lab.appendChild(t);
+      lab.appendChild(d);
+
+      const btn = document.createElement("button");
+      btn.className = "small-btn";
+
+      if (!owned && m.cost > 0) {
+        btn.textContent = `Buy ${m.cost}`;
+        btn.onclick = () => {
+          if (coins < m.cost) return alert("Not enough coins.");
+          coins -= m.cost;
+          ownedMaps.push(m.id);
+          equippedMapId = m.id;
+          saveMeta(); saveCosmetics(); updateCoins();
+          renderMapsPanel(); renderStoreCosmetics(); updateHubView();
+        };
+      } else {
+        if (m.id === equippedMapId) {
+          btn.textContent = "Equipped";
+          btn.classList.add("equipped","disabled");
+          btn.disabled = true;
+        } else {
+          btn.textContent = "Equip";
+          btn.onclick = () => {
+            equippedMapId = m.id;
+            saveCosmetics();
+            renderMapsPanel();
+            renderStoreCosmetics();
+            updateHubView();
+          };
+        }
+      }
+
+      li.appendChild(lab);
+      li.appendChild(btn);
+      mapsList.appendChild(li);
+    });
+  }
+
+  function renderModesPanel() {
+    modesList.innerHTML = "";
+    MODES.forEach(m => {
+      const li = document.createElement("li");
+      li.className = "list-item";
+
+      const lab = document.createElement("div");
+      lab.className = "list-label";
+      const t = document.createElement("span");
+      t.textContent = m.name;
+      const d = document.createElement("span");
+      d.textContent = m.desc;
+      lab.appendChild(t);
+      lab.appendChild(d);
+
+      const btn = document.createElement("button");
+      btn.className = "small-btn";
+      if (m.id === modeId) {
+        btn.textContent = "Selected";
+        btn.classList.add("equipped","disabled");
+        btn.disabled = true;
+      } else {
+        btn.textContent = "Set";
+        btn.onclick = () => {
+          modeId = m.id;
+          saveCosmetics();
+          renderModesPanel();
+          updateHubView();
+        };
+      }
+
+      li.appendChild(lab);
+      li.appendChild(btn);
+      modesList.appendChild(li);
+    });
+  }
+
+  /******** STORE RENDER ********/
+  function renderStoreCosmetics() {
+    storeCosmetics.innerHTML = "";
+    SKINS.forEach(s => {
+      const li = document.createElement("li");
+      li.className = "list-item";
+      const lab = document.createElement("div");
+      lab.className = "list-label";
+      const t = document.createElement("span");
+      t.textContent = `[Skin] ${s.name}`;
+      const owned = ownedSkins.includes(s.id);
+      const d = document.createElement("span");
+      d.textContent = owned
+        ? s.desc + (s.id === equippedSkinId ? " • Equipped" : " • Owned")
+        : `${s.desc} • Cost: ${s.cost || 0} coins`;
+      lab.appendChild(t); lab.appendChild(d);
+
+      const btn = document.createElement("button");
+      btn.className = "small-btn";
+      if (!owned && s.cost > 0) {
+        btn.textContent = `Buy ${s.cost}`;
+        btn.onclick = () => {
+          if (coins < s.cost) return alert("Not enough coins.");
+          coins -= s.cost;
+          ownedSkins.push(s.id);
+          equippedSkinId = s.id;
+          saveMeta(); saveCosmetics(); updateCoins();
+          renderStoreCosmetics(); renderSkinsPanel(); updateHubView();
+        };
+      } else {
+        if (s.id === equippedSkinId) {
+          btn.textContent = "Equipped";
+          btn.classList.add("equipped","disabled");
+          btn.disabled = true;
+        } else {
+          btn.textContent = "Equip";
+          btn.onclick = () => {
+            equippedSkinId = s.id;
+            saveCosmetics();
+            renderStoreCosmetics(); renderSkinsPanel(); updateHubView();
+          };
+        }
+      }
+
+      li.appendChild(lab); li.appendChild(btn);
+      storeCosmetics.appendChild(li);
+    });
+
+    MAPS.forEach(m => {
+      const li = document.createElement("li");
+      li.className = "list-item";
+      const lab = document.createElement("div");
+      lab.className = "list-label";
+      const t = document.createElement("span");
+      t.textContent = `[Map] ${m.name}`;
+      const owned = ownedMaps.includes(m.id);
+      const d = document.createElement("span");
+      d.textContent = owned
+        ? m.desc + (m.id === equippedMapId ? " • Equipped" : " • Owned")
+        : `${m.desc} • Cost: ${m.cost || 0} coins`;
+      lab.appendChild(t); lab.appendChild(d);
+
+      const btn = document.createElement("button");
+      btn.className = "small-btn";
+      if (!owned && m.cost > 0) {
+        btn.textContent = `Buy ${m.cost}`;
+        btn.onclick = () => {
+          if (coins < m.cost) return alert("Not enough coins.");
+          coins -= m.cost;
+          ownedMaps.push(m.id);
+          equippedMapId = m.id;
+          saveMeta(); saveCosmetics(); updateCoins();
+          renderStoreCosmetics(); renderMapsPanel(); updateHubView();
+        };
+      } else {
+        if (m.id === equippedMapId) {
+          btn.textContent = "Equipped";
+          btn.classList.add("equipped","disabled");
+          btn.disabled = true;
+        } else {
+          btn.textContent = "Equip";
+          btn.onclick = () => {
+            equippedMapId = m.id;
+            saveCosmetics();
+            renderStoreCosmetics(); renderMapsPanel(); updateHubView();
+          };
+        }
+      }
+
+      li.appendChild(lab); li.appendChild(btn);
+      storeCosmetics.appendChild(li);
+    });
+  }
+
+  function renderStorePremium() {
+    storePremium.innerHTML = "";
+    PREMIUM_ITEMS.forEach(item => {
+      const li = document.createElement("li");
+      li.className = "list-item";
+      const lab = document.createElement("div");
+      lab.className = "list-label";
+      const t = document.createElement("span");
+      t.textContent = item.name;
+      const d = document.createElement("span");
+      d.textContent = `${item.desc} • ${item.priceLabel}`;
+      lab.appendChild(t); lab.appendChild(d);
+
+      const btn = document.createElement("button");
+      btn.className = "small-btn";
+
+      let owned = false;
+      if (item.id === "ultraLives") owned = ultraLives;
+      if (item.id === "removeAds") owned = removeAds;
+      if (item.id === "doubleCoins") owned = doubleCoins;
+      if (item.id === "ultimate")   owned = ultraLives && removeAds && doubleCoins;
+
+      if (owned) {
+        btn.textContent = "Owned";
+        btn.classList.add("equipped","disabled");
+        btn.disabled = true;
+      } else {
+        btn.textContent = item.priceLabel;
+        btn.onclick = () => {
+          // This is where real Google Play Billing would go.
+          // For now we just simulate purchase success.
+          if (!confirm(`Test purchase: ${item.name} – ${item.priceLabel}?`)) return;
+          if (item.id === "ultraLives") ultraLives = true;
+          if (item.id === "removeAds")  removeAds = true;
+          if (item.id === "doubleCoins") doubleCoins = true;
+          if (item.id === "ultimate") {
+            ultraLives = true;
+            removeAds = true;
+            doubleCoins = true;
+            if (!ownedSkins.includes("neon")) ownedSkins.push("neon");
+            if (!ownedMaps.includes("synth")) ownedMaps.push("synth");
+            saveCosmetics();
+          }
+          lives = MAX_LIVES;
+          saveMeta();
+          updateLives();
+          updateCoins();
+          renderStorePremium();
+          renderStoreCosmetics();
+          playSfx(sfxPurchase);
+          vibrate(40);
+          alert("Test purchase complete. Replace with real billing later.");
+        };
+      }
+
+      li.appendChild(lab); li.appendChild(btn);
+      storePremium.appendChild(li);
+    });
+  }
+
+  function renderStoreCurrency() {
+    storeCurrency.innerHTML = "";
+    CURRENCY_PACKS.forEach(p => {
+      const li = document.createElement("li");
+      li.className = "list-item";
+      const lab = document.createElement("div");
+      lab.className = "list-label";
+      const t = document.createElement("span");
+      t.textContent = p.name;
+      const d = document.createElement("span");
+      d.textContent = `${p.desc} • ${p.priceLabel}`;
+      lab.appendChild(t); lab.appendChild(d);
+
+      const btn = document.createElement("button");
+      btn.className = "small-btn";
+      btn.textContent = p.priceLabel;
+      btn.onclick = () => {
+        if (!confirm(`Test purchase: ${p.name} – ${p.priceLabel}?`)) return;
+        coins += p.amount;
+        saveMeta();
+        updateCoins();
+        renderStoreCurrency();
+        playSfx(sfxPurchase);
+        vibrate(40);
+      };
+
+      li.appendChild(lab); li.appendChild(btn);
+      storeCurrency.appendChild(li);
+    });
+  }
+
+  /******** RESET & RESTORE ********/
+  btnResetData.addEventListener("click", () => {
+    if (!confirm("Reset ALL progress, coins, cosmetics and purchases? This cannot be undone.")) return;
+    localStorage.clear();
+    location.reload();
+  });
+
+  btnRestore.addEventListener("click", () => {
+    alert("Restore purchases stub.\nIn a real build you’d call Google Play Billing here and re-apply entitlements.");
+  });
+
+  /******** PREVIEW PENGUIN ********/
+  function drawPreviewPenguin() {
+    const s = getSkin();
+    pctx.clearRect(0,0,previewCanvas.width,previewCanvas.height);
+    pctx.save();
+    pctx.translate(previewCanvas.width / 2, previewCanvas.height / 2 + 6);
+
+    pctx.fillStyle = s.body;
+    pctx.beginPath();
+    pctx.ellipse(0,0,18,22,0,0,Math.PI*2);
+    pctx.fill();
+
+    pctx.fillStyle = "#fff";
+    pctx.beginPath();
+    pctx.ellipse(-2,2,12,16,0,0,Math.PI*2);
+    pctx.fill();
+
+    pctx.fillStyle = "#fff";
+    pctx.beginPath();
+    pctx.arc(6,-7,5,0,Math.PI*2);
+    pctx.fill();
+    pctx.fillStyle = "#000";
+    pctx.beginPath();
+    pctx.arc(7,-7,2,0,Math.PI*2);
+    pctx.fill();
+
+    pctx.fillStyle = s.beak;
+    pctx.beginPath();
+    pctx.moveTo(9,-2);
+    pctx.lineTo(18,1);
+    pctx.lineTo(9,4);
+    pctx.fill();
+
+    pctx.fillStyle = s.wing;
+    pctx.beginPath();
+    pctx.ellipse(-6,4,7,12,-0.4,0,Math.PI*2);
+    pctx.fill();
+
+    pctx.restore();
+
+    previewSkinName.textContent = s.name;
+  }
+
+  function updateHubView() {
+    const mode = getMode();
+    hubModeLabel.textContent = "Mode: " + mode.name;
+    hubModeLabelMin.textContent = "Mode: " + mode.name;
+    drawPreviewPenguin();
+    updateLives();
+    updateCoins();
+  }
+
+  /******** GAME CORE ********/
+  let frames = 0;
+  let score = 0;
+  let isRunning = false;
+  let isGameOver = false;
+  let startedFlight = false;
+
+  const snow = [];
+  function initSnow() {
+    snow.length = 0;
+    for (let i=0;i<50;i++) {
+      snow.push({
+        x: Math.random()*canvas.width,
+        y: Math.random()*canvas.height,
+        r: Math.random()*2+1,
+        s: Math.random()*1+0.4,
+      });
+    }
+  }
+  initSnow();
+
+  const penguin = {
+    x: 0, y: 0, v: 0, r: 0, rad: 18,
+    reset() {
+      this.x = canvas.width*0.25;
+      this.y = canvas.height*0.5;
+      this.v = 0;
+      this.r = 0;
+    },
+    flap() {
+      this.v = FLAP_STRENGTH;
+    },
+    update() {
+      this.v += GRAVITY;
+      this.y += this.v;
+      if (this.y - this.rad < 0) {
+        this.y = this.rad;
+        this.v = 0;
+      }
+      if (this.y + this.rad > canvas.height) {
+        this.y = canvas.height - this.rad;
+        triggerGameOver();
+      }
+    },
+    draw() {
+      const s = getSkin();
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      this.r = Math.max(-Math.PI/4, Math.min(Math.PI/4, this.v*0.1));
+      ctx.rotate(this.r);
+
+      ctx.fillStyle = s.body;
+      ctx.beginPath();
+      ctx.ellipse(0,0,20,25,0,0,Math.PI*2);
+      ctx.fill();
+
+      ctx.fillStyle = "#fff";
+      ctx.beginPath();
+      ctx.ellipse(-2,2,14,18,0,0,Math.PI*2);
+      ctx.fill();
+
+      ctx.fillStyle = "#fff";
+      ctx.beginPath();
+      ctx.arc(6,-8,6,0,Math.PI*2);
+      ctx.fill();
+      ctx.fillStyle = "#000";
+      ctx.beginPath();
+      ctx.arc(8,-8,2,0,Math.PI*2);
+      ctx.fill();
+
+      ctx.fillStyle = s.beak;
+      ctx.beginPath();
+      ctx.moveTo(10,-2);
+      ctx.lineTo(24,2);
+      ctx.lineTo(10,6);
+      ctx.fill();
+
+      ctx.fillStyle = s.wing;
+      ctx.beginPath();
+      const wingY = Math.sin(frames*0.25)*3;
+      ctx.ellipse(-5,5+wingY,8,14,-0.5,0,Math.PI*2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+  };
+
+  const pipes = {
+    list: [],
+    reset() { this.list = []; },
+    update() {
+      const mode = getMode();
+
+      if (frames % 95 === 0) {
+        const minTop = 40;
+        const maxTop = canvas.height - mode.gap - 60;
+        const top = Math.random()*(maxTop-minTop) + minTop;
+        this.list.push({ x: canvas.width, y: top, passed:false });
+      }
+
+      for (let i=0;i<this.list.length;i++) {
+        const p = this.list[i];
+        let speed = mode.speed;
+        if (score >= 40) speed *= 1.1;
+        if (score >= 80) speed *= 1.25;
+        p.x -= speed;
+
+        const pipeW = 60;
+        const left = penguin.x - penguin.rad;
+        const right = penguin.x + penguin.rad;
+        const top = penguin.y - penguin.rad;
+        const bottom = penguin.y + penguin.rad;
+
+        if (right > p.x && left < p.x + pipeW) {
+          const gapTop = p.y;
+          const gapBottom = p.y + mode.gap;
+          if (top < gapTop || bottom > gapBottom) {
+            triggerGameOver();
+          }
         }
 
-        // soft glowing pipe
-        let grd = ctx.createLinearGradient(0, p.y, 0, p.y+p.h);
-        grd.addColorStop(0,"rgba(255,255,255,0.25)");
-        grd.addColorStop(1,"rgba(200,220,255,0.1)");
+        if (!p.passed && p.x + pipeW < penguin.x) {
+          p.passed = true;
+          score++;
+          let gain = 1;
+          if (doubleCoins) gain *= 2;
+          coins += gain;
+          scoreEl.textContent = score;
+          updateCoins();
+          saveMeta();
+          playSfx(sfxCoin);
+        }
 
-        ctx.fillStyle = grd;
-        ctx.fillRect(p.x, 0, p.w, canvas.height);
-    });
+        if (p.x + pipeW < -5) {
+          this.list.splice(i,1);
+          i--;
+        }
+      }
+    },
+    draw() {
+      const map = getMap();
+      this.list.forEach(p => {
+        const pipeW = 60;
+        const gradTop = ctx.createLinearGradient(p.x,0,p.x+pipeW,0);
+        gradTop.addColorStop(0,map.gradient[0]);
+        gradTop.addColorStop(1,map.gradient[1]);
+        const gradBottom = gradTop;
 
-    requestAnimationFrame(draw);
-}
-draw();
+        const gap = getMode().gap;
+        ctx.fillStyle = gradTop;
+        ctx.fillRect(p.x,0,pipeW,p.y);
+        ctx.fillStyle = "#dff9ff";
+        ctx.beginPath();
+        ctx.moveTo(p.x+10,p.y);
+        ctx.lineTo(p.x+30,p.y+18);
+        ctx.lineTo(p.x+50,p.y);
+        ctx.fill();
 
-/* ===== STORE HANDLING ===== */
-const storePanel = document.getElementById("storePanel");
-document.getElementById("storeBtn").onclick = () => {
-    storePanel.style.display = "block";
-};
-function closeStore() {
-    storePanel.style.display = "none";
-}
-
-/* ===== SNOW ===== */
-function createSnow() {
-    for (let i = 0; i < 30; i++) {
-        let s = document.createElement("div");
-        s.classList.add("snowflake");
-        s.style.left = Math.random()*100+"vw";
-        s.style.animationDuration = (4 + Math.random()*4)+"s";
-        s.style.opacity = Math.random()*0.7+0.2;
-        document.body.appendChild(s);
+        ctx.fillStyle = gradBottom;
+        ctx.fillRect(p.x,p.y+gap,pipeW,canvas.height-(p.y+gap));
+        ctx.beginPath();
+        ctx.moveTo(p.x+10,p.y+gap);
+        ctx.lineTo(p.x+30,p.y+gap-18);
+        ctx.lineTo(p.x+50,p.y+gap);
+        ctx.fill();
+      });
     }
-}
-createSnow();
-</script>
+  };
 
+  function drawBackground() {
+    const map = getMap();
+    const grad = ctx.createLinearGradient(0,0,0,canvas.height);
+    grad.addColorStop(0,map.gradient[0]);
+    grad.addColorStop(1,map.gradient[1]);
+    ctx.fillStyle = grad;
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    ctx.fillStyle = "rgba(255,255,255,0.7)";
+    snow.forEach(f => {
+      ctx.beginPath();
+      ctx.arc(f.x,f.y,f.r,0,Math.PI*2);
+      ctx.fill();
+      f.y += f.s;
+      f.x += Math.sin((f.y+frames*0.1))*0.2;
+      if (f.y > canvas.height) {
+        f.y = -5;
+        f.x = Math.random()*canvas.width;
+      }
+    });
+  }
+
+  let lastTime = performance.now();
+  function loop(now) {
+    if (!isRunning) {
+      lastTime = now;
+      return;
+    }
+    const dt = (now-lastTime)/1000 || 0;
+    lastTime = now;
+
+    frames++;
+
+    if (!startedFlight) {
+      penguin.y = canvas.height/2 + Math.sin(frames*0.06)*10;
+    } else {
+      penguin.update();
+      pipes.update();
+    }
+
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    drawBackground();
+    pipes.draw();
+    penguin.draw();
+
+    if (!isGameOver) requestAnimationFrame(loop);
+  }
+
+  function triggerGameOver() {
+    if (isGameOver) return;
+    isGameOver = true;
+    isRunning = false;
+    playSfx(sfxHit);
+    vibrate([80,80,80]);
+
+    if (!ultraLives) {
+      lives = Math.max(0,lives-1);
+      lastLifeTs = Date.now();
+    }
+    saveMeta();
+    updateLives();
+
+    finalScoreEl.textContent = score;
+    if (score > highScore) {
+      highScore = score;
+      localStorage.setItem("ww_highScore", highScore);
+    }
+    bestScoreEl.textContent = highScore;
+    livesLeftLabel.textContent = ultraLives ? "∞" : lives;
+
+    checkMissionCompletion();
+    gameOverScreen.classList.remove("hidden");
+  }
+
+  function startRun() {
+    updateLives();
+    if (!ultraLives && lives <= 0) {
+      noLivesScreen.classList.remove("hidden");
+      return;
+    }
+    isGameOver = false;
+    isRunning = true;
+    startedFlight = false;
+    score = 0;
+    frames = 0;
+    scoreEl.textContent = "0";
+    penguin.reset();
+    pipes.reset();
+    initSnow();
+    hubOverlay.classList.add("hidden");
+    gameOverScreen.classList.add("hidden");
+    noLivesScreen.classList.add("hidden");
+    ensureMusic();
+    lastTime = performance.now();
+    requestAnimationFrame(loop);
+  }
+
+  function handleFlap(e) {
+    if (e && e.code === "Space") e.preventDefault();
+    if (!isRunning || isGameOver) return;
+    if (!startedFlight) {
+      startedFlight = true;
+    }
+    penguin.flap();
+    playSfx(sfxFlap);
+  }
+
+  window.addEventListener("keydown", e => {
+    if (e.code === "Space") handleFlap(e);
+  });
+  canvas.addEventListener("mousedown", handleFlap);
+  canvas.addEventListener("touchstart", e => { e.preventDefault(); handleFlap(e); }, { passive:false });
+
+  /******** HUB BUTTONS ********/
+  if (btnPlay) btnPlay.addEventListener("click", startRun);
+  if (btnStore) btnStore.addEventListener("click", () => {
+    renderStoreCosmetics(); renderStorePremium(); renderStoreCurrency();
+    storePanel.classList.remove("hidden");
+  });
+  if (btnModes) btnModes.addEventListener("click", () => { renderModesPanel(); modesPanel.classList.remove("hidden"); });
+  if (btnSkins) btnSkins.addEventListener("click", () => { renderSkinsPanel(); skinsPanel.classList.remove("hidden"); });
+  if (btnMaps) btnMaps.addEventListener("click", () => { renderMapsPanel(); mapsPanel.classList.remove("hidden"); });
+  if (btnMissions) btnMissions.addEventListener("click", () => { checkMissionCompletion(); renderMissions(); missionsPanel.classList.remove("hidden"); });
+  if (btnDaily) btnDaily.addEventListener("click", () => { refreshDailyUI(); dailyPanel.classList.remove("hidden"); });
+  if (btnSettings) btnSettings.addEventListener("click", () => { updateSettingsStatus(); settingsPanel.classList.remove("hidden"); });
+
+  // minimal menu hooks
+  if (btnPlayMin) btnPlayMin.addEventListener("click", startRun);
+  if (btnStoreMin) btnStoreMin.addEventListener("click", () => {
+    renderStoreCosmetics(); renderStorePremium(); renderStoreCurrency();
+    storePanel.classList.remove("hidden");
+  });
+  if (iconModes) iconModes.addEventListener("click", () => { renderModesPanel(); modesPanel.classList.remove("hidden"); });
+  if (iconSkins) iconSkins.addEventListener("click", () => { renderSkinsPanel(); skinsPanel.classList.remove("hidden"); });
+  if (iconMaps) iconMaps.addEventListener("click", () => { renderMapsPanel(); mapsPanel.classList.remove("hidden"); });
+  if (iconMissions) iconMissions.addEventListener("click", () => { checkMissionCompletion(); renderMissions(); missionsPanel.classList.remove("hidden"); });
+  if (iconDaily) iconDaily.addEventListener("click", () => { refreshDailyUI(); dailyPanel.classList.remove("hidden"); });
+  if (iconSettings) iconSettings.addEventListener("click", () => { updateSettingsStatus(); settingsPanel.classList.remove("hidden"); });
+
+  document.querySelectorAll("[data-panel-close]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-panel-close");
+      const panel = document.getElementById(id);
+      if (panel) panel.classList.add("hidden");
+    });
+  });
+
+  restartBtn.addEventListener("click", () => {
+    if (!ultraLives && lives <= 0) {
+      gameOverScreen.classList.add("hidden");
+      noLivesScreen.classList.remove("hidden");
+    } else {
+      startRun();
+    }
+  });
+  backMenuBtn.addEventListener("click", () => {
+    gameOverScreen.classList.add("hidden");
+    hubOverlay.classList.remove("hidden");
+    stopMusic();
+  });
+  backFromNoLivesBtn.addEventListener("click", () => {
+    noLivesScreen.classList.add("hidden");
+    hubOverlay.classList.remove("hidden");
+  });
+
+  // fake rewarded ad for +1 life
+  watchAdBtn.addEventListener("click", () => {
+    noLivesScreen.classList.add("hidden");
+    runFakeAd(() => {
+      lives = Math.min(MAX_LIVES, lives+1);
+      lastLifeTs = Date.now();
+      saveMeta();
+      updateLives();
+      hubOverlay.classList.remove("hidden");
+      alert("+1 life added (fake ad). Replace with real rewarded callback.");
+    });
+  });
+
+  // settings test ad
+  btnTestAd.addEventListener("click", () => {
+    runFakeAd(() => alert("Interstitial finished. Hook this to ad SDK events."));
+  });
+
+  function runFakeAd(onDone) {
+    fakeAdScreen.classList.remove("hidden");
+    let total = 5;
+    let remain = total;
+    fakeAdBar.style.width = "0%";
+    fakeAdTimer.textContent = total + "s remaining";
+    const int = setInterval(() => {
+      remain--;
+      const pct = ((total-remain)/total)*100;
+      fakeAdBar.style.width = pct + "%";
+      fakeAdTimer.textContent = Math.max(remain,0) + "s remaining";
+      if (remain <= 0) {
+        clearInterval(int);
+        setTimeout(() => {
+          fakeAdScreen.classList.add("hidden");
+          if (typeof onDone === "function") onDone();
+        }, 350);
+      }
+    }, 1000);
+  }
+
+  // audio toggles
+  btnToggleMusic.addEventListener("click", () => {
+    musicOn = musicOn === "true" ? "false" : "true";
+    saveMeta(); updateSettingsStatus();
+    if (musicOn === "true") ensureMusic();
+    else stopMusic();
+  });
+  btnToggleSfx.addEventListener("click", () => {
+    sfxOn = sfxOn === "true" ? "false" : "true";
+    saveMeta(); updateSettingsStatus();
+  });
+  btnToggleVibrate.addEventListener("click", () => {
+    vibrateOn = vibrateOn === "true" ? "false" : "true";
+    saveMeta(); updateSettingsStatus();
+  });
+
+  /******** INITIAL RENDER ********/
+  updateLives();
+  updateCoins();
+  updateSettingsStatus();
+  updateHubView();
+  drawBackground();
+  penguin.reset();
+  penguin.draw();
+
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./sw.js").catch(() => {});
+    });
+  }
+</script>
 </body>
 </html>
