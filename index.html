@@ -4,12 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Waddle Wings Universe – Christmas Season</title>
+  <title>Waddle Wings Universe</title>
 
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#2C3E50" />
 
-  <!-- AUDIO (use your own files / paths) -->
+  <!-- AUDIO -->
   <audio id="bgm" src="music/background.mp3" loop preload="auto"></audio>
   <audio id="sfx-flap" src="music/flap.wav" preload="auto"></audio>
   <audio id="sfx-coin" src="music/coin.wav" preload="auto"></audio>
@@ -82,8 +82,7 @@
     #hub-overlay {
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at top, rgba(255,255,255,0.07), transparent 55%),
-                  linear-gradient(150deg, rgba(0,0,0,0.8), rgba(10,20,40,0.95));
+      background: linear-gradient(150deg, rgba(0,0,0,0.7), rgba(10,20,40,0.95));
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -130,9 +129,7 @@
       width: 72%;
       max-width: 260px;
       height: 160px;
-      background:
-        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.28), transparent 60%),
-        radial-gradient(circle at 0% 100%, rgba(0,150,255,0.18), transparent 60%);
+      background: radial-gradient(circle at 50% 10%, rgba(255,255,255,0.28), transparent 60%);
       border-radius: 20px;
       border: 2px solid rgba(255,255,255,0.16);
       box-shadow: inset 0 0 22px rgba(0,0,0,0.6);
@@ -169,7 +166,7 @@
 
     #hub-buttons {
       width: 100%;
-      max-width: 400px;
+      max-width: 380px;
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
@@ -183,11 +180,10 @@
       color: #fff;
       padding: 10px 8px;
       font-family: "Fredoka One", cursive;
-      font-size: 0.95rem;
+      font-size: 1rem;
       box-shadow: 0 4px 0 #c04444;
       cursor: pointer;
       text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-      white-space: nowrap;
     }
 
     .hub-btn.secondary {
@@ -199,7 +195,7 @@
       background: rgba(255,255,255,0.08);
       box-shadow: none;
       border: 1px solid rgba(255,255,255,0.25);
-      font-size: 0.85rem;
+      font-size: 0.9rem;
     }
 
     .hub-btn:active {
@@ -214,14 +210,6 @@
       align-items: center;
       font-size: 0.8rem;
       color: #ccc;
-      gap: 6px;
-    }
-
-    #hub-mode-label,
-    #season-footer-label {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
     }
 
     /* PANELS */
@@ -293,20 +281,15 @@
       align-items: center;
       padding: 6px 0;
       border-bottom: 1px solid rgba(255,255,255,0.08);
-      gap: 8px;
     }
 
     .list-label {
       display: flex;
       flex-direction: column;
-      min-width: 0;
     }
 
     .list-label span:first-child {
       font-size: 0.95rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
 
     .list-label span:last-child {
@@ -314,26 +297,36 @@
       color: #aaa;
     }
 
-    .tag {
-      display: inline-block;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.12);
-      padding: 2px 8px;
-      font-size: 0.7rem;
-      margin-left: 4px;
-      white-space: nowrap;
+    .section-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #bbb;
+      margin: 8px 0 2px;
     }
 
     .small-btn {
-      padding: 6px 10px;
-      font-size: 0.78rem;
+      padding: 6px 14px;
+      font-size: 0.8rem;
       border-radius: 20px;
       background: #ff7676;
       border: none;
       color: #fff;
       cursor: pointer;
       box-shadow: 0 3px 0 #c04444;
-      white-space: nowrap;
+      min-width: 80px;
+      text-align: center;
+    }
+
+    .small-btn.off {
+      background: rgba(255,255,255,0.1);
+      box-shadow: none;
+      border: 1px solid rgba(255,255,255,0.25);
+    }
+
+    .small-btn.equipped {
+      background: #4caf50;
+      box-shadow: 0 3px 0 #2e7d32;
     }
 
     .small-btn:active {
@@ -341,33 +334,10 @@
       box-shadow: 0 1px 0 #c04444;
     }
 
-    /* STORE TABS */
-    .tabs {
-      display: flex;
-      gap: 4px;
-      margin-bottom: 8px;
-      flex-wrap: wrap;
-    }
-
-    .tab-btn {
-      flex: 1;
-      min-width: 0;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.2);
-      background: rgba(255,255,255,0.04);
-      color: #fff;
-      font-size: 0.75rem;
-      padding: 5px 6px;
-      cursor: pointer;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      overflow: hidden;
-    }
-
-    .tab-btn.active {
-      background: linear-gradient(180deg,#ffb84d,#ff8a00);
-      border-color: transparent;
-      color: #222;
+    .small-btn.disabled {
+      opacity: 0.6;
+      cursor: default;
+      box-shadow: none;
     }
 
     /* CENTER CARDS */
@@ -384,7 +354,6 @@
       border: 3px solid #2C3E50;
       box-shadow: 0 10px 25px rgba(0,0,0,0.4);
       min-width: 240px;
-      max-width: 90vw;
       pointer-events: auto;
       font-size: 0.9rem;
     }
@@ -406,13 +375,12 @@
       background: #ff6b6b;
       color: #fff;
       border: none;
-      padding: 12px 20px;
-      font-size: 0.95rem;
+      padding: 12px 28px;
+      font-size: 1rem;
       border-radius: 30px;
       cursor: pointer;
       box-shadow: 0 4px 0 #c04444;
       margin: 4px 4px;
-      white-space: nowrap;
     }
 
     .main-btn:active {
@@ -425,12 +393,11 @@
       box-shadow: 0 4px 0 #243369;
       color: #fff;
       border: none;
-      padding: 10px 18px;
-      font-size: 0.85rem;
+      padding: 10px 22px;
+      font-size: 0.9rem;
       border-radius: 24px;
       cursor: pointer;
       margin: 4px 4px;
-      white-space: nowrap;
     }
 
     .secondary-btn:active {
@@ -468,9 +435,6 @@
       display: flex;
       gap: 6px;
       pointer-events: none;
-      max-width: 90%;
-      justify-content: center;
-      flex-wrap: wrap;
     }
 
     .powerup-icon {
@@ -491,41 +455,6 @@
       position: absolute;
       bottom: -10px;
       font-size: 0.6rem;
-    }
-
-    /* SEASON PANEL */
-    #season-xp-bar-container {
-      width: 100%;
-      height: 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.08);
-      overflow: hidden;
-      margin: 6px 0 10px;
-    }
-
-    #season-xp-bar {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg,#ffeb3b,#ff9800);
-    }
-
-    #season-header-line {
-      font-size: 0.85rem;
-      color: #ddd;
-      margin-bottom: 4px;
-    }
-
-    #season-countdown {
-      font-size: 0.8rem;
-      color: #ffcdd2;
-      margin-bottom: 6px;
-    }
-
-    .season-section-title {
-      font-size: 0.85rem;
-      margin-top: 6px;
-      margin-bottom: 2px;
-      color: #eee;
     }
 
     .hidden { display: none !important; }
@@ -550,7 +479,7 @@
   <div id="hub-overlay">
     <div id="hub-header">
       <div id="hub-title">WADDLE WINGS UNIVERSE</div>
-      <div id="hub-subtitle">Christmas Season • Skins • Maps • Modes • Lives • Powerups</div>
+      <div id="hub-subtitle">Skins • Maps • Modes • Lives • Coins • Powerups • Premium</div>
     </div>
 
     <div id="hub-main">
@@ -564,7 +493,6 @@
 
       <div id="hub-buttons">
         <button class="hub-btn" id="btn-play">PLAY</button>
-        <button class="hub-btn secondary" id="btn-season">SEASON</button>
         <button class="hub-btn secondary" id="btn-modes">MODES</button>
         <button class="hub-btn secondary" id="btn-skins">SKINS</button>
         <button class="hub-btn secondary" id="btn-maps">MAPS</button>
@@ -577,7 +505,7 @@
 
     <div id="hub-footer">
       <span id="hub-mode-label">Mode: Normal</span>
-      <span id="season-footer-label">Season: Christmas – Lv 1</span>
+      <span>v3.1 – Dev Build</span>
     </div>
   </div>
 
@@ -631,7 +559,7 @@
     <div class="panel-card">
       <div class="panel-header">
         <div class="panel-title">Settings</div>
-      <button class="panel-close" data-panel-close="panel-settings">×</button>
+        <button class="panel-close" data-panel-close="panel-settings">×</button>
       </div>
       <div class="panel-body">
         <p style="font-size:0.8rem; color:#ddd;">
@@ -655,7 +583,7 @@
           <li class="list-item">
             <div class="list-label">
               <span>Vibration</span>
-              <span>Haptics on hit, powerups, purchases (where supported).</span>
+              <span>Small haptics on hit, powerups, purchases (where supported).</span>
             </div>
             <button class="small-btn" id="btn-toggle-vibrate">Toggle</button>
           </li>
@@ -702,35 +630,7 @@
     </div>
   </div>
 
-  <!-- SEASON PANEL -->
-  <div id="panel-season" class="panel hidden">
-    <div class="panel-card">
-      <div class="panel-header">
-        <div class="panel-title">Season Pass – Christmas Chill</div>
-        <button class="panel-close" data-panel-close="panel-season">×</button>
-      </div>
-      <div class="panel-body">
-        <p id="season-header-line"></p>
-        <p id="season-countdown"></p>
-        <div id="season-xp-bar-container"><div id="season-xp-bar"></div></div>
-        <p style="font-size:0.8rem; color:#ddd; margin-top:0;">
-          Earn Season XP by flying, passing obstacles, and completing missions.
-        </p>
-
-        <p class="season-section-title">Rewards</p>
-        <ul class="list" id="season-rewards-list"></ul>
-
-        <p class="season-section-title">Season Challenges</p>
-        <ul class="list" id="season-challenges-list"></ul>
-      </div>
-      <div class="panel-footer">
-        <button class="small-btn" id="btn-buy-season-premium">Upgrade to Premium</button>
-        <button class="small-btn" data-panel-close="panel-season">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- STORE PANEL -->
+  <!-- SIMPLE STORE PANEL (ONE LIST) -->
   <div id="panel-store" class="panel hidden">
     <div class="panel-card">
       <div class="panel-header">
@@ -738,28 +638,17 @@
         <button class="panel-close" data-panel-close="panel-store">×</button>
       </div>
       <div class="panel-body">
-        <div class="tabs">
-          <button class="tab-btn active" data-tab="store-cosmetics">Cosmetics</button>
-          <button class="tab-btn" data-tab="store-powerups">Powerups</button>
-          <button class="tab-btn" data-tab="store-premium">Premium</button>
-          <button class="tab-btn" data-tab="store-bundles">Bundles</button>
-          <button class="tab-btn" data-tab="store-currency">Coins</button>
-        </div>
-        <div id="store-cosmetics" class="store-tab">
-          <ul class="list" id="store-cosmetics-list"></ul>
-        </div>
-        <div id="store-powerups" class="store-tab hidden">
-          <ul class="list" id="store-powerups-list"></ul>
-        </div>
-        <div id="store-premium" class="store-tab hidden">
-          <ul class="list" id="store-premium-list"></ul>
-        </div>
-        <div id="store-bundles" class="store-tab hidden">
-          <ul class="list" id="store-bundles-list"></ul>
-        </div>
-        <div id="store-currency" class="store-tab hidden">
-          <ul class="list" id="store-currency-list"></ul>
-        </div>
+        <div class="section-label">Skins & Maps</div>
+        <ul class="list" id="store-cosmetics"></ul>
+
+        <div class="section-label">Powerups (consumables)</div>
+        <ul class="list" id="store-powerups"></ul>
+
+        <div class="section-label">Premium Upgrades</div>
+        <ul class="list" id="store-premium"></ul>
+
+        <div class="section-label">Coins</div>
+        <ul class="list" id="store-currency"></ul>
       </div>
       <div class="panel-footer">
         <button class="small-btn" data-panel-close="panel-store">Close</button>
@@ -843,15 +732,6 @@
   const REGEN_TIME = 60 * 60 * 1000; // 1 hour
   const DAILY_REWARD_COINS = 20;
 
-  /* SEASON CONFIG – CHRISTMAS */
-  const SEASON_ID = "xmas2025";
-  const SEASON_NAME = "Christmas Chill";
-  // Set an end date – adjust as you like
-  const SEASON_END_TIME = new Date("2026-01-07T00:00:00Z").getTime();
-  const SEASON_XP_PER_LEVEL = 100;
-  const SEASON_MAX_LEVEL = 20;
-  const SEASON_XP_PER_PIPE = 5;
-
   /* AUDIO ELEMENTS */
   const bgm = document.getElementById("bgm");
   const sfxFlap = document.getElementById("sfx-flap");
@@ -866,7 +746,6 @@
 
   const hubOverlay = document.getElementById("hub-overlay");
   const hubModeLabel = document.getElementById("hub-mode-label");
-  const seasonFooterLabel = document.getElementById("season-footer-label");
   const podiumLabel = document.getElementById("podium-label");
   const podiumCanvas = document.getElementById("podium-character");
   const podiumCtx = podiumCanvas.getContext("2d");
@@ -878,18 +757,16 @@
   const dailyPanel = document.getElementById("panel-daily");
   const settingsPanel = document.getElementById("panel-settings");
   const storePanel = document.getElementById("panel-store");
-  const seasonPanel = document.getElementById("panel-season");
 
   const skinsList = document.getElementById("skins-list");
   const mapsList = document.getElementById("maps-list");
   const modesList = document.getElementById("modes-list");
   const missionsList = document.getElementById("missions-list");
 
-  const storeCosmeticsList = document.getElementById("store-cosmetics-list");
-  const storePowerupsList = document.getElementById("store-powerups-list");
-  const storePremiumList = document.getElementById("store-premium-list");
-  const storeBundlesList = document.getElementById("store-bundles-list");
-  const storeCurrencyList = document.getElementById("store-currency-list");
+  const storeCosmeticsList = document.getElementById("store-cosmetics");
+  const storePowerupsList = document.getElementById("store-powerups");
+  const storePremiumList = document.getElementById("store-premium");
+  const storeCurrencyList = document.getElementById("store-currency");
 
   const settingsAudioStatus = document.getElementById("settings-audio-status");
   const dailyStatus = document.getElementById("daily-status");
@@ -906,7 +783,6 @@
   const livesLeftLabel = document.getElementById("lives-left-label");
 
   const btnPlay = document.getElementById("btn-play");
-  const btnSeason = document.getElementById("btn-season");
   const btnModes = document.getElementById("btn-modes");
   const btnSkins = document.getElementById("btn-skins");
   const btnMaps = document.getElementById("btn-maps");
@@ -934,14 +810,6 @@
   const purchaseSuccessOk = document.getElementById("purchase-success-ok");
 
   const powerupHud = document.getElementById("powerup-hud");
-
-  /* SEASON DOM */
-  const seasonHeaderLine = document.getElementById("season-header-line");
-  const seasonCountdown = document.getElementById("season-countdown");
-  const seasonXpBar = document.getElementById("season-xp-bar");
-  const seasonRewardsList = document.getElementById("season-rewards-list");
-  const seasonChallengesList = document.getElementById("season-challenges-list");
-  const btnBuySeasonPremium = document.getElementById("btn-buy-season-premium");
 
   /* META STATE */
   let lives = parseInt(localStorage.getItem("ww_lives") || String(MAX_LIVES), 10);
@@ -974,14 +842,6 @@
   let vibrateOn = localStorage.getItem("ww_vibrateOn");
   if (vibrateOn === null) vibrateOn = "true";
 
-  /* SEASON STATE */
-  let seasonXp = parseInt(localStorage.getItem("ww_seasonXp_" + SEASON_ID) || "0", 10);
-  if (Number.isNaN(seasonXp)) seasonXp = 0;
-  let seasonPremium = localStorage.getItem("ww_seasonPremium_" + SEASON_ID) === "true";
-  let seasonClaimedRewards = JSON.parse(
-    localStorage.getItem("ww_seasonRewards_" + SEASON_ID) || "[]"
-  ); // [level numbers]
-
   /* POWERUP TOKENS */
   function getToken(key) {
     const val = parseInt(localStorage.getItem(key) || "0", 10);
@@ -1010,7 +870,6 @@
       body: "#2C3E50",
       wing: "#34495E",
       beak: "#FF9800",
-      seasonal: false,
     },
     {
       id: "red",
@@ -1020,7 +879,6 @@
       body: "#C0392B",
       wing: "#922B21",
       beak: "#FFB74D",
-      seasonal: false,
     },
     {
       id: "gold",
@@ -1030,7 +888,6 @@
       body: "#D4AF37",
       wing: "#B08A2E",
       beak: "#FFE082",
-      seasonal: false,
     },
     {
       id: "neon",
@@ -1040,38 +897,7 @@
       body: "#00e5ff",
       wing: "#00b0ff",
       beak: "#ffeb3b",
-      seasonal: false,
-    },
-    {
-      id: "santa",
-      name: "Santa Waddle",
-      desc: "Festive coat & hat. Season reward.",
-      cost: 0,
-      body: "#B71C1C",
-      wing: "#880E4F",
-      beak: "#FFEB3B",
-      seasonal: true,
-    },
-    {
-      id: "snowman",
-      name: "Snowman Suit",
-      desc: "Penguin in a snowman costume.",
-      cost: 0,
-      body: "#ECEFF1",
-      wing: "#CFD8DC",
-      beak: "#FFB300",
-      seasonal: true,
-    },
-    {
-      id: "candy",
-      name: "Candy Cane",
-      desc: "Red/white striped festive drip.",
-      cost: 0,
-      body: "#FFCDD2",
-      wing: "#EF9A9A",
-      beak: "#FFECB3",
-      seasonal: true,
-    },
+    }
   ];
 
   const MAPS = [
@@ -1081,7 +907,6 @@
       desc: "Bright sky and soft snow.",
       cost: 0,
       gradient: ["#87CEEB", "#E0F7FA"],
-      seasonal: false,
     },
     {
       id: "night",
@@ -1089,7 +914,6 @@
       desc: "Dark arctic sky with stars.",
       cost: 40,
       gradient: ["#001c3d", "#00335c"],
-      seasonal: false,
     },
     {
       id: "blizzard",
@@ -1097,7 +921,6 @@
       desc: "Stormy white-out challenge.",
       cost: 60,
       gradient: ["#546E7A", "#ECEFF1"],
-      seasonal: false,
     },
     {
       id: "synth",
@@ -1105,16 +928,7 @@
       desc: "Neon purple & orange horizon.",
       cost: 80,
       gradient: ["#4a148c", "#ff6f00"],
-      seasonal: false,
-    },
-    {
-      id: "xmas",
-      name: "Christmas Eve",
-      desc: "Northern lights over snowy hills.",
-      cost: 0,
-      gradient: ["#001331", "#0b3c6a"],
-      seasonal: true,
-    },
+    }
   ];
 
   const MODES = [
@@ -1146,70 +960,6 @@
     if (Number.isNaN(runsToday)) runsToday = 0;
   }
 
-  /* SEASON REWARDS (free & premium track) */
-  const SEASON_REWARDS = [
-    {
-      level: 1,
-      free:  { type: "coins", amount: 20, label: "+20 coins" },
-      premium: { type: "coins", amount: 40, label: "+40 coins" },
-    },
-    {
-      level: 2,
-      free:  { type: "coins", amount: 25, label: "+25 coins" },
-      premium: { type: "skin", skinId: "santa", label: "Skin: Santa Waddle" },
-    },
-    {
-      level: 3,
-      free:  { type: "coins", amount: 30, label: "+30 coins" },
-      premium: { type: "map", mapId: "xmas", label: "Map: Christmas Eve" },
-    },
-    {
-      level: 4,
-      free:  { type: "coins", amount: 35, label: "+35 coins" },
-      premium: { type: "skin", skinId: "snowman", label: "Skin: Snowman Suit" },
-    },
-    {
-      level: 5,
-      free:  { type: "coins", amount: 40, label: "+40 coins" },
-      premium: { type: "skin", skinId: "candy", label: "Skin: Candy Cane" },
-    },
-    {
-      level: 6,
-      free:  { type: "tokens", tokenId: "god", amount: 1, label: "1x God Mode" },
-      premium: { type: "tokens", tokenId: "autopilot", amount: 1, label: "1x Auto-Pilot" },
-    },
-    {
-      level: 7,
-      free:  { type: "tokens", tokenId: "slow", amount: 2, label: "2x Slow Motion" },
-      premium: { type: "tokens", tokenId: "clone", amount: 2, label: "2x Shadow Clone" },
-    },
-    {
-      level: 8,
-      free:  { type: "coins", amount: 60, label: "+60 coins" },
-      premium: { type: "coins", amount: 120, label: "+120 coins" },
-    },
-  ];
-
-  const SEASON_CHALLENGES = [
-    {
-      id: "season_score15",
-      desc: "Christmas Run – reach score 15 in one run.",
-      type: "bestScoreAtLeast",
-      target: 15,
-      xp: 60,
-    },
-    {
-      id: "season_runs5",
-      desc: "Festive Flights – play 5 runs this season.",
-      type: "totalRuns",
-      target: 5,
-      xp: 80,
-    },
-  ];
-  let seasonChallengeState = JSON.parse(
-    localStorage.getItem("ww_seasonChallenges_" + SEASON_ID) || "{}"
-  ); // {id: {completed: bool}}
-
   /* OWNERSHIP */
   let ownedSkins = JSON.parse(localStorage.getItem("ww_ownedSkins") || '["classic"]');
   if (!ownedSkins.includes("classic")) ownedSkins.push("classic");
@@ -1237,11 +987,6 @@
     localStorage.setItem("ww_musicOn", musicOn);
     localStorage.setItem("ww_sfxOn", sfxOn);
     localStorage.setItem("ww_vibrateOn", vibrateOn);
-    // season
-    localStorage.setItem("ww_seasonXp_" + SEASON_ID, String(seasonXp));
-    localStorage.setItem("ww_seasonPremium_" + SEASON_ID, String(seasonPremium));
-    localStorage.setItem("ww_seasonRewards_" + SEASON_ID, JSON.stringify(seasonClaimedRewards));
-    localStorage.setItem("ww_seasonChallenges_" + SEASON_ID, JSON.stringify(seasonChallengeState));
   }
 
   function saveCosmetics() {
@@ -1422,14 +1167,8 @@
       const right = document.createElement("div");
       const tag = document.createElement("span");
       tag.className = "tag";
-
-      if (!state.completed) {
-        tag.textContent = "In progress";
-      } else if (state.completed && !state.claimed) {
-        tag.textContent = "Ready";
-      } else {
-        tag.textContent = "Claimed";
-      }
+      tag.textContent = !state.completed ? "In progress" :
+                        !state.claimed ? "Ready" : "Claimed";
       right.appendChild(tag);
 
       if (state.completed && !state.claimed) {
@@ -1455,207 +1194,6 @@
     });
   }
 
-  /* SEASON LOGIC */
-  function getSeasonLevel() {
-    const lvl = Math.floor(seasonXp / SEASON_XP_PER_LEVEL) + 1;
-    return Math.min(SEASON_MAX_LEVEL, Math.max(1, lvl));
-  }
-
-  function getSeasonLevelProgress() {
-    const level = getSeasonLevel();
-    const baseXp = (level - 1) * SEASON_XP_PER_LEVEL;
-    const into = seasonXp - baseXp;
-    const needed = SEASON_XP_PER_LEVEL;
-    return { level, into: Math.max(0, into), needed };
-  }
-
-  function formatTimeRemaining(ms) {
-    if (ms <= 0) return "Season ended.";
-    const totalSec = Math.floor(ms / 1000);
-    const days = Math.floor(totalSec / (24 * 3600));
-    const hours = Math.floor((totalSec % (24 * 3600)) / 3600);
-    const mins = Math.floor((totalSec % 3600) / 60);
-    if (days > 0) return `${days}d ${hours}h ${mins}m remaining`;
-    if (hours > 0) return `${hours}h ${mins}m remaining`;
-    return `${mins}m remaining`;
-  }
-
-  function grantSeasonReward(reward) {
-    if (!reward) return;
-    switch (reward.type) {
-      case "coins":
-        coins += reward.amount;
-        break;
-      case "skin":
-        if (reward.skinId && !ownedSkins.includes(reward.skinId)) {
-          ownedSkins.push(reward.skinId);
-        }
-        break;
-      case "map":
-        if (reward.mapId && !ownedMaps.includes(reward.mapId)) {
-          ownedMaps.push(reward.mapId);
-        }
-        break;
-      case "tokens":
-        if (reward.tokenId) {
-          const key = TOKENS[reward.tokenId];
-          if (key) {
-            const newVal = getToken(key) + (reward.amount || 1);
-            setToken(key, newVal);
-          }
-        }
-        break;
-      default:
-        break;
-    }
-  }
-
-  function seasonChallengeProgress(ch) {
-    if (ch.type === "bestScoreAtLeast") {
-      return { current: highScore, target: ch.target };
-    }
-    if (ch.type === "totalRuns") {
-      // Use runsToday as a cheap stand-in for season runs
-      return { current: runsToday, target: ch.target };
-    }
-    return { current: 0, target: ch.target };
-  }
-
-  function checkSeasonChallenges() {
-    SEASON_CHALLENGES.forEach(ch => {
-      const state = seasonChallengeState[ch.id] || { completed: false };
-      if (state.completed) return;
-      const prog = seasonChallengeProgress(ch);
-      if (prog.current >= ch.target) {
-        state.completed = true;
-        seasonChallengeState[ch.id] = state;
-        seasonXp += ch.xp;
-      }
-    });
-  }
-
-  function renderSeasonPanel() {
-    const { level, into, needed } = getSeasonLevelProgress();
-    const pct = Math.min(100, Math.max(0, (into / needed) * 100));
-    seasonHeaderLine.textContent =
-      `${SEASON_NAME} – Level ${level}/${SEASON_MAX_LEVEL} (${seasonXp} XP total)`;
-    seasonXpBar.style.width = pct + "%";
-
-    const now = Date.now();
-    const remaining = SEASON_END_TIME - now;
-    seasonCountdown.textContent = formatTimeRemaining(remaining);
-
-    seasonRewardsList.innerHTML = "";
-    SEASON_REWARDS.forEach(row => {
-      const li = document.createElement("li");
-      li.className = "list-item";
-
-      const label = document.createElement("div");
-      label.className = "list-label";
-      const title = document.createElement("span");
-      title.textContent = "Level " + row.level;
-      const desc = document.createElement("span");
-      desc.textContent =
-        `Free: ${row.free.label} • Premium: ${row.premium.label}`;
-      label.appendChild(title);
-      label.appendChild(desc);
-
-      const right = document.createElement("div");
-      const alreadyClaimed = seasonClaimedRewards.includes(row.level);
-
-      const tag = document.createElement("span");
-      tag.className = "tag";
-      tag.textContent = alreadyClaimed ? "Claimed" : "Reward";
-      right.appendChild(tag);
-
-      if (!alreadyClaimed) {
-        const canClaim = level >= row.level;
-        if (canClaim) {
-          const btnFree = document.createElement("button");
-          btnFree.className = "small-btn";
-          btnFree.textContent = "Claim Free";
-          btnFree.onclick = () => {
-            grantSeasonReward(row.free);
-            seasonClaimedRewards.push(row.level);
-            saveMeta();
-            updateCoinsUI();
-            renderSeasonPanel();
-            renderSkinsPanel();
-            renderMapsPanel();
-            renderStoreCosmeticsTab();
-            updateHubView();
-          };
-          right.appendChild(btnFree);
-
-          if (seasonPremium) {
-            const btnPremium = document.createElement("button");
-            btnPremium.className = "small-btn";
-            btnPremium.textContent = "Claim Premium";
-            btnPremium.onclick = () => {
-              grantSeasonReward(row.free);
-              grantSeasonReward(row.premium);
-              seasonClaimedRewards.push(row.level);
-              saveMeta();
-              updateCoinsUI();
-              renderSeasonPanel();
-              renderSkinsPanel();
-              renderMapsPanel();
-              renderStoreCosmeticsTab();
-              updateHubView();
-            };
-            right.appendChild(btnPremium);
-          } else {
-            const premiumTag = document.createElement("span");
-            premiumTag.className = "tag";
-            premiumTag.textContent = "Premium locked";
-            right.appendChild(premiumTag);
-          }
-        }
-      }
-
-      li.appendChild(label);
-      li.appendChild(right);
-      seasonRewardsList.appendChild(li);
-    });
-
-    seasonChallengesList.innerHTML = "";
-    SEASON_CHALLENGES.forEach(ch => {
-      const state = seasonChallengeState[ch.id] || { completed: false };
-      const li = document.createElement("li");
-      li.className = "list-item";
-
-      const label = document.createElement("div");
-      label.className = "list-label";
-      const title = document.createElement("span");
-      title.textContent = ch.desc;
-      const prog = seasonChallengeProgress(ch);
-      const desc = document.createElement("span");
-      desc.textContent = `Progress: ${prog.current}/${ch.target} • Reward: +${ch.xp} XP`;
-      label.appendChild(title);
-      label.appendChild(desc);
-
-      const right = document.createElement("div");
-      const tag = document.createElement("span");
-      tag.className = "tag";
-      tag.textContent = state.completed ? "Done" : "In progress";
-      right.appendChild(tag);
-
-      li.appendChild(label);
-      li.appendChild(right);
-      seasonChallengesList.appendChild(li);
-    });
-
-    btnBuySeasonPremium.textContent = seasonPremium
-      ? "Season Premium: OWNED"
-      : "Upgrade to Premium (£4.99)";
-  }
-
-  function updateSeasonFooter() {
-    const { level } = getSeasonLevelProgress();
-    seasonFooterLabel.textContent =
-      `Season: Christmas – Lv ${level}${seasonPremium ? " (Premium)" : ""}`;
-  }
-
   /* PANELS: SKINS / MAPS / MODES */
   function renderSkinsPanel() {
     skinsList.innerHTML = "";
@@ -1666,29 +1204,18 @@
       label.className = "list-label";
       const title = document.createElement("span");
       title.textContent = skin.name;
+      const owned = ownedSkins.includes(skin.id);
       const desc = document.createElement("span");
-      desc.textContent = skin.desc + (skin.seasonal ? " • Season Exclusive" : "");
+      desc.textContent = owned
+        ? skin.desc + (skin.id === equippedSkinId ? " • Equipped" : " • Owned")
+        : `${skin.desc} • Cost: ${skin.cost} coins`;
       label.appendChild(title);
       label.appendChild(desc);
 
-      const right = document.createElement("div");
-      const owned = ownedSkins.includes(skin.id);
-
-      if (skin.seasonal && !owned) {
-        const tag = document.createElement("span");
-        tag.className = "tag";
-        tag.textContent = "Season locked";
-        right.appendChild(tag);
-      } else if (!owned && skin.cost > 0) {
-        const costSpan = document.createElement("span");
-        costSpan.textContent = `${skin.cost} coins`;
-        costSpan.style.fontSize = "0.8rem";
-        costSpan.style.marginRight = "6px";
-        right.appendChild(costSpan);
-
-        const btn = document.createElement("button");
-        btn.className = "small-btn";
-        btn.textContent = "Buy";
+      const btn = document.createElement("button");
+      btn.className = "small-btn";
+      if (!owned && skin.cost > 0) {
+        btn.textContent = `Buy ${skin.cost}`;
         btn.onclick = () => {
           if (coins < skin.cost) {
             alert("Not enough coins.");
@@ -1701,32 +1228,28 @@
           saveCosmetics();
           updateCoinsUI();
           renderSkinsPanel();
-          renderStoreCosmeticsTab();
+          renderStoreCosmetics();
           updateHubView();
         };
-        right.appendChild(btn);
       } else {
-        const tag = document.createElement("span");
-        tag.className = "tag";
-        tag.textContent = skin.id === equippedSkinId ? "Equipped" : "Owned";
-        right.appendChild(tag);
-
-        if (skin.id !== equippedSkinId) {
-          const btn = document.createElement("button");
-          btn.className = "small-btn";
+        if (skin.id === equippedSkinId) {
+          btn.textContent = "Equipped";
+          btn.classList.add("equipped", "disabled");
+          btn.disabled = true;
+        } else {
           btn.textContent = "Equip";
           btn.onclick = () => {
             equippedSkinId = skin.id;
             saveCosmetics();
             renderSkinsPanel();
+            renderStoreCosmetics();
             updateHubView();
           };
-          right.appendChild(btn);
         }
       }
 
       li.appendChild(label);
-      li.appendChild(right);
+      li.appendChild(btn);
       skinsList.appendChild(li);
     });
   }
@@ -1740,28 +1263,18 @@
       label.className = "list-label";
       const title = document.createElement("span");
       title.textContent = map.name;
+      const owned = ownedMaps.includes(map.id);
       const desc = document.createElement("span");
-      desc.textContent = map.desc + (map.seasonal ? " • Season Exclusive" : "");
+      desc.textContent = owned
+        ? map.desc + (map.id === equippedMapId ? " • Equipped" : " • Owned")
+        : `${map.desc} • Cost: ${map.cost} coins`;
       label.appendChild(title);
       label.appendChild(desc);
 
-      const right = document.createElement("div");
-      const owned = ownedMaps.includes(map.id);
-      if (map.seasonal && !owned) {
-        const tag = document.createElement("span");
-        tag.className = "tag";
-        tag.textContent = "Season locked";
-        right.appendChild(tag);
-      } else if (!owned && map.cost > 0) {
-        const costSpan = document.createElement("span");
-        costSpan.textContent = `${map.cost} coins`;
-        costSpan.style.fontSize = "0.8rem";
-        costSpan.style.marginRight = "6px";
-        right.appendChild(costSpan);
-
-        const btn = document.createElement("button");
-        btn.className = "small-btn";
-        btn.textContent = "Buy";
+      const btn = document.createElement("button");
+      btn.className = "small-btn";
+      if (!owned && map.cost > 0) {
+        btn.textContent = `Buy ${map.cost}`;
         btn.onclick = () => {
           if (coins < map.cost) {
             alert("Not enough coins.");
@@ -1774,32 +1287,28 @@
           saveCosmetics();
           updateCoinsUI();
           renderMapsPanel();
-          renderStoreCosmeticsTab();
+          renderStoreCosmetics();
           updateHubView();
         };
-        right.appendChild(btn);
       } else {
-        const tag = document.createElement("span");
-        tag.className = "tag";
-        tag.textContent = map.id === equippedMapId ? "Equipped" : "Owned";
-        right.appendChild(tag);
-
-        if (map.id !== equippedMapId) {
-          const btn = document.createElement("button");
-          btn.className = "small-btn";
+        if (map.id === equippedMapId) {
+          btn.textContent = "Equipped";
+          btn.classList.add("equipped", "disabled");
+          btn.disabled = true;
+        } else {
           btn.textContent = "Equip";
           btn.onclick = () => {
             equippedMapId = map.id;
             saveCosmetics();
             renderMapsPanel();
+            renderStoreCosmetics();
             updateHubView();
           };
-          right.appendChild(btn);
         }
       }
 
       li.appendChild(label);
-      li.appendChild(right);
+      li.appendChild(btn);
       mapsList.appendChild(li);
     });
   }
@@ -1818,15 +1327,13 @@
       label.appendChild(title);
       label.appendChild(desc);
 
-      const right = document.createElement("div");
-      const tag = document.createElement("span");
-      tag.className = "tag";
-      tag.textContent = mode.id === modeId ? "Selected" : "";
-      right.appendChild(tag);
-
-      if (mode.id !== modeId) {
-        const btn = document.createElement("button");
-        btn.className = "small-btn";
+      const btn = document.createElement("button");
+      btn.className = "small-btn";
+      if (mode.id === modeId) {
+        btn.textContent = "Selected";
+        btn.classList.add("equipped", "disabled");
+        btn.disabled = true;
+      } else {
         btn.textContent = "Set";
         btn.onclick = () => {
           modeId = mode.id;
@@ -1834,185 +1341,31 @@
           renderModesPanel();
           updateHubView();
         };
-        right.appendChild(btn);
       }
 
       li.appendChild(label);
-      li.appendChild(right);
+      li.appendChild(btn);
       modesList.appendChild(li);
     });
   }
 
-  /* STORE CONTENT */
-  function renderStoreCosmeticsTab() {
-    storeCosmeticsList.innerHTML = "";
-    // Skins (non-seasonal)
-    SKINS.forEach(skin => {
-      if (skin.cost <= 0 || skin.seasonal) return;
-      const li = document.createElement("li");
-      li.className = "list-item";
-
-      const label = document.createElement("div");
-      label.className = "list-label";
-      const title = document.createElement("span");
-      title.textContent = "Skin: " + skin.name;
-      const desc = document.createElement("span");
-      desc.textContent = skin.desc + ` • ${skin.cost} coins`;
-      label.appendChild(title);
-      label.appendChild(desc);
-
-      const right = document.createElement("div");
-      const owned = ownedSkins.includes(skin.id);
-      const tag = document.createElement("span");
-      tag.className = "tag";
-      tag.textContent = owned ? "Owned" : "New";
-      right.appendChild(tag);
-
-      const btn = document.createElement("button");
-      btn.className = "small-btn";
-      btn.textContent = owned ? "Equip" : "Buy";
-      btn.onclick = () => {
-        if (!owned) {
-          if (coins < skin.cost) {
-            alert("Not enough coins.");
-            return;
-          }
-          coins -= skin.cost;
-          ownedSkins.push(skin.id);
-          equippedSkinId = skin.id;
-          saveMeta();
-          saveCosmetics();
-          updateCoinsUI();
-          renderSkinsPanel();
-          renderStoreCosmeticsTab();
-          updateHubView();
-        } else {
-          equippedSkinId = skin.id;
-          saveCosmetics();
-          renderSkinsPanel();
-          updateHubView();
-        }
-      };
-      right.appendChild(btn);
-
-      li.appendChild(label);
-      li.appendChild(right);
-      storeCosmeticsList.appendChild(li);
-    });
-
-    // Maps (non-seasonal)
-    MAPS.forEach(map => {
-      if (map.cost <= 0 || map.seasonal) return;
-      const li = document.createElement("li");
-      li.className = "list-item";
-
-      const label = document.createElement("div");
-      label.className = "list-label";
-      const title = document.createElement("span");
-      title.textContent = "Map: " + map.name;
-      const desc = document.createElement("span");
-      desc.textContent = map.desc + ` • ${map.cost} coins`;
-      label.appendChild(title);
-      label.appendChild(desc);
-
-      const right = document.createElement("div");
-      const owned = ownedMaps.includes(map.id);
-      const tag = document.createElement("span");
-      tag.className = "tag";
-      tag.textContent = owned ? "Owned" : "New";
-      right.appendChild(tag);
-
-      const btn = document.createElement("button");
-      btn.className = "small-btn";
-      btn.textContent = owned ? "Use" : "Buy";
-      btn.onclick = () => {
-        if (!owned) {
-          if (coins < map.cost) {
-            alert("Not enough coins.");
-            return;
-          }
-          coins -= map.cost;
-          ownedMaps.push(map.id);
-          equippedMapId = map.id;
-          saveMeta();
-          saveCosmetics();
-          updateCoinsUI();
-          renderMapsPanel();
-          renderStoreCosmeticsTab();
-          updateHubView();
-        } else {
-          equippedMapId = map.id;
-          saveCosmetics();
-          renderMapsPanel();
-          updateHubView();
-        }
-      };
-      right.appendChild(btn);
-
-      li.appendChild(label);
-      li.appendChild(right);
-      storeCosmeticsList.appendChild(li);
-    });
-  }
+  /* SIMPLE STORE RENDERING */
 
   const POWERUP_DEFS = [
     { id: "god", name: "God Mode (10s)", desc: "Invincible for 10 seconds.", tokenKey: TOKENS.god, priceCoins: 40 },
     { id: "autopilot", name: "Auto-Pilot", desc: "AI flies until death.", tokenKey: TOKENS.autopilot, priceCoins: 50 },
     { id: "slow", name: "Slow Motion (5s)", desc: "Pipes move slower.", tokenKey: TOKENS.slow, priceCoins: 30 },
     { id: "magnet", name: "Coin Magnet (10s)", desc: "Coins get pulled in.", tokenKey: TOKENS.magnet, priceCoins: 30 },
-    { id: "shrink", name: "Shrink (5s)", desc: "Hitbox smaller for a bit.", tokenKey: TOKENS.shrink, priceCoins: 25 },
+    { id: "shrink", name: "Shrink (5s)", desc: "Smaller hitbox for a bit.", tokenKey: TOKENS.shrink, priceCoins: 25 },
     { id: "clone", name: "Shadow Clone (10s)", desc: "Ghost doubles coins.", tokenKey: TOKENS.clone, priceCoins: 35 },
     { id: "cont", name: "Continue Token", desc: "Resume once after death.", tokenKey: TOKENS.cont, priceCoins: 40 },
   ];
-
-  function renderStorePowerupsTab() {
-    storePowerupsList.innerHTML = "";
-    POWERUP_DEFS.forEach(p => {
-      const li = document.createElement("li");
-      li.className = "list-item";
-
-      const label = document.createElement("div");
-      label.className = "list-label";
-      const title = document.createElement("span");
-      const count = getToken(p.tokenKey);
-      title.textContent = `${p.name} (x${count})`;
-      const desc = document.createElement("span");
-      desc.textContent = `${p.desc} • ${p.priceCoins} coins`;
-      label.appendChild(title);
-      label.appendChild(desc);
-
-      const right = document.createElement("div");
-      const btn = document.createElement("button");
-      btn.className = "small-btn";
-      btn.textContent = "Buy";
-      btn.onclick = () => {
-        if (coins < p.priceCoins) {
-          alert("Not enough coins.");
-          return;
-        }
-        coins -= p.priceCoins;
-        const newCount = getToken(p.tokenKey) + 1;
-        setToken(p.tokenKey, newCount);
-        saveMeta();
-        updateCoinsUI();
-        renderStorePowerupsTab();
-      };
-      right.appendChild(btn);
-
-      li.appendChild(label);
-      li.appendChild(right);
-      storePowerupsList.appendChild(li);
-    });
-  }
 
   const PREMIUM_ITEMS = [
     { id: "ultraLives", name: "Unlimited Lives Forever", desc: "Never run out of lives again.", priceLabel: "£19.99" },
     { id: "removeAds", name: "Remove Ads Forever", desc: "No ads, ever.", priceLabel: "£4.99" },
     { id: "doubleCoins", name: "Double Coins Forever", desc: "All coins & rewards x2.", priceLabel: "£4.99" },
-  ];
-
-  const BUNDLES = [
-    { id: "ultimate", name: "Ultimate Penguin Pack", desc: "Unlimited Lives, Remove Ads, Double Coins, bonus cosmetics.", priceLabel: "£29.99" }
+    { id: "ultimate", name: "Ultimate Penguin Pack", desc: "Unlimited Lives + Remove Ads + Double Coins + bonus cosmetics.", priceLabel: "£29.99" },
   ];
 
   const CURRENCY_PACKS = [
@@ -2059,7 +1412,170 @@
     closePurchaseUI();
   });
 
-  function renderStorePremiumTab() {
+  /* STORE: COSMETICS SECTION (SINGLE LIST, TOGGLE STYLE) */
+  function renderStoreCosmetics() {
+    storeCosmeticsList.innerHTML = "";
+
+    // Skins
+    SKINS.forEach(skin => {
+      const li = document.createElement("li");
+      li.className = "list-item";
+
+      const label = document.createElement("div");
+      label.className = "list-label";
+      const title = document.createElement("span");
+      title.textContent = `[Skin] ${skin.name}`;
+      const owned = ownedSkins.includes(skin.id);
+      const desc = document.createElement("span");
+      desc.textContent = owned
+        ? skin.desc + (skin.id === equippedSkinId ? " • Equipped" : " • Owned")
+        : `${skin.desc} • Cost: ${skin.cost} coins`;
+      label.appendChild(title);
+      label.appendChild(desc);
+
+      const btn = document.createElement("button");
+      btn.className = "small-btn";
+
+      if (!owned && skin.cost > 0) {
+        btn.textContent = `Buy ${skin.cost}`;
+        btn.onclick = () => {
+          if (coins < skin.cost) {
+            alert("Not enough coins.");
+            return;
+          }
+          coins -= skin.cost;
+          ownedSkins.push(skin.id);
+          equippedSkinId = skin.id; // auto-equip
+          saveMeta();
+          saveCosmetics();
+          updateCoinsUI();
+          renderSkinsPanel();
+          renderStoreCosmetics();
+          updateHubView();
+        };
+      } else {
+        if (skin.id === equippedSkinId) {
+          btn.textContent = "Equipped";
+          btn.classList.add("equipped", "disabled");
+          btn.disabled = true;
+        } else {
+          btn.textContent = "Equip";
+          btn.onclick = () => {
+            equippedSkinId = skin.id;
+            saveCosmetics();
+            renderSkinsPanel();
+            renderStoreCosmetics();
+            updateHubView();
+          };
+        }
+      }
+
+      li.appendChild(label);
+      li.appendChild(btn);
+      storeCosmeticsList.appendChild(li);
+    });
+
+    // Maps
+    MAPS.forEach(map => {
+      const li = document.createElement("li");
+      li.className = "list-item";
+
+      const label = document.createElement("div");
+      label.className = "list-label";
+      const title = document.createElement("span");
+      title.textContent = `[Map] ${map.name}`;
+      const owned = ownedMaps.includes(map.id);
+      const desc = document.createElement("span");
+      desc.textContent = owned
+        ? map.desc + (map.id === equippedMapId ? " • Equipped" : " • Owned")
+        : `${map.desc} • Cost: ${map.cost} coins`;
+      label.appendChild(title);
+      label.appendChild(desc);
+
+      const btn = document.createElement("button");
+      btn.className = "small-btn";
+
+      if (!owned && map.cost > 0) {
+        btn.textContent = `Buy ${map.cost}`;
+        btn.onclick = () => {
+          if (coins < map.cost) {
+            alert("Not enough coins.");
+            return;
+          }
+          coins -= map.cost;
+          ownedMaps.push(map.id);
+          equippedMapId = map.id; // auto-equip
+          saveMeta();
+          saveCosmetics();
+          updateCoinsUI();
+          renderMapsPanel();
+          renderStoreCosmetics();
+          updateHubView();
+        };
+      } else {
+        if (map.id === equippedMapId) {
+          btn.textContent = "Equipped";
+          btn.classList.add("equipped", "disabled");
+          btn.disabled = true;
+        } else {
+          btn.textContent = "Equip";
+          btn.onclick = () => {
+            equippedMapId = map.id;
+            saveCosmetics();
+            renderMapsPanel();
+            renderStoreCosmetics();
+            updateHubView();
+          };
+        }
+      }
+
+      li.appendChild(label);
+      li.appendChild(btn);
+      storeCosmeticsList.appendChild(li);
+    });
+  }
+
+  /* STORE: POWERUPS (CONSUMABLES) */
+  function renderStorePowerups() {
+    storePowerupsList.innerHTML = "";
+    POWERUP_DEFS.forEach(p => {
+      const li = document.createElement("li");
+      li.className = "list-item";
+
+      const label = document.createElement("div");
+      label.className = "list-label";
+      const title = document.createElement("span");
+      const count = getToken(p.tokenKey);
+      title.textContent = `${p.name} (x${count})`;
+      const desc = document.createElement("span");
+      desc.textContent = `${p.desc} • ${p.priceCoins} coins each`;
+      label.appendChild(title);
+      label.appendChild(desc);
+
+      const btn = document.createElement("button");
+      btn.className = "small-btn";
+      btn.textContent = `Buy ${p.priceCoins}`;
+      btn.onclick = () => {
+        if (coins < p.priceCoins) {
+          alert("Not enough coins.");
+          return;
+        }
+        coins -= p.priceCoins;
+        const newCount = count + 1;
+        setToken(p.tokenKey, newCount);
+        saveMeta();
+        updateCoinsUI();
+        renderStorePowerups();
+      };
+
+      li.appendChild(label);
+      li.appendChild(btn);
+      storePowerupsList.appendChild(li);
+    });
+  }
+
+  /* STORE: PREMIUM */
+  function renderStorePremium() {
     storePremiumList.innerHTML = "";
     PREMIUM_ITEMS.forEach(item => {
       const li = document.createElement("li");
@@ -2074,23 +1590,21 @@
       label.appendChild(title);
       label.appendChild(desc);
 
-      const right = document.createElement("div");
-      const tag = document.createElement("span");
-      tag.className = "tag";
+      const btn = document.createElement("button");
+      btn.className = "small-btn";
+
       let ownedFlag = false;
       if (item.id === "ultraLives") ownedFlag = ultraLives;
       if (item.id === "removeAds") ownedFlag = removeAds;
       if (item.id === "doubleCoins") ownedFlag = doubleCoins;
-      tag.textContent = ownedFlag ? "Owned" : "Premium";
-      right.appendChild(tag);
+      if (item.id === "ultimate") ownedFlag = ultimatePack;
 
-      const btn = document.createElement("button");
-      btn.className = "small-btn";
-      btn.textContent = ownedFlag ? "Owned" : item.priceLabel;
       if (ownedFlag) {
+        btn.textContent = "Owned";
+        btn.classList.add("equipped", "disabled");
         btn.disabled = true;
-        btn.style.opacity = "0.6";
       } else {
+        btn.textContent = item.priceLabel;
         btn.onclick = () => {
           openPurchaseConfirm(`${item.name} – ${item.priceLabel}`, () => {
             if (item.id === "ultraLives") {
@@ -2103,80 +1617,33 @@
             if (item.id === "doubleCoins") {
               doubleCoins = true;
             }
+            if (item.id === "ultimate") {
+              ultimatePack = true;
+              ultraLives = true;
+              removeAds = true;
+              doubleCoins = true;
+              lives = MAX_LIVES;
+              if (!ownedSkins.includes("neon")) ownedSkins.push("neon");
+              if (!ownedMaps.includes("synth")) ownedMaps.push("synth");
+              saveCosmetics();
+            }
             saveMeta();
             updateLivesUI();
             updateCoinsUI();
-            renderStorePremiumTab();
+            renderStorePremium();
+            renderStoreCosmetics();
           });
         };
       }
-      right.appendChild(btn);
 
       li.appendChild(label);
-      li.appendChild(right);
+      li.appendChild(btn);
       storePremiumList.appendChild(li);
     });
   }
 
-  function renderStoreBundlesTab() {
-    storeBundlesList.innerHTML = "";
-    BUNDLES.forEach(bundle => {
-      const li = document.createElement("li");
-      li.className = "list-item";
-
-      const label = document.createElement("div");
-      label.className = "list-label";
-      const title = document.createElement("span");
-      title.textContent = bundle.name;
-      const desc = document.createElement("span");
-      desc.textContent = bundle.desc + " • " + bundle.priceLabel;
-      label.appendChild(title);
-      label.appendChild(desc);
-
-      const right = document.createElement("div");
-      const tag = document.createElement("span");
-      tag.className = "tag";
-      tag.textContent = ultimatePack ? "Owned" : "Bundle";
-      right.appendChild(tag);
-
-      const btn = document.createElement("button");
-      btn.className = "small-btn";
-      btn.textContent = ultimatePack ? "Owned" : bundle.priceLabel;
-      if (ultimatePack) {
-        btn.disabled = true;
-        btn.style.opacity = "0.6";
-      } else {
-        btn.onclick = () => {
-          openPurchaseConfirm(`${bundle.name} – ${bundle.priceLabel}`, () => {
-            ultimatePack = true;
-            ultraLives = true;
-            removeAds = true;
-            doubleCoins = true;
-            lives = MAX_LIVES;
-            // free cosmetics
-            if (!ownedSkins.includes("neon")) ownedSkins.push("neon");
-            if (!ownedMaps.includes("synth")) ownedMaps.push("synth");
-            saveMeta();
-            saveCosmetics();
-            updateLivesUI();
-            updateCoinsUI();
-            renderStorePremiumTab();
-            renderStoreBundlesTab();
-            renderSkinsPanel();
-            renderMapsPanel();
-            updateHubView();
-          });
-        };
-      }
-      right.appendChild(btn);
-
-      li.appendChild(label);
-      li.appendChild(right);
-      storeBundlesList.appendChild(li);
-    });
-  }
-
-  function renderStoreCurrencyTab() {
+  /* STORE: COINS */
+  function renderStoreCurrency() {
     storeCurrencyList.innerHTML = "";
     CURRENCY_PACKS.forEach(pack => {
       const li = document.createElement("li");
@@ -2191,7 +1658,6 @@
       label.appendChild(title);
       label.appendChild(desc);
 
-      const right = document.createElement("div");
       const btn = document.createElement("button");
       btn.className = "small-btn";
       btn.textContent = pack.priceLabel;
@@ -2200,27 +1666,15 @@
           coins += pack.amount;
           saveMeta();
           updateCoinsUI();
+          renderStoreCurrency();
         });
       };
-      right.appendChild(btn);
 
       li.appendChild(label);
-      li.appendChild(right);
+      li.appendChild(btn);
       storeCurrencyList.appendChild(li);
     });
   }
-
-  /* STORE TABS LOGIC */
-  document.querySelectorAll(".tab-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const tabId = btn.getAttribute("data-tab");
-      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      document.querySelectorAll(".store-tab").forEach(tab => tab.classList.add("hidden"));
-      const activeTab = document.getElementById(tabId);
-      if (activeTab) activeTab.classList.remove("hidden");
-    });
-  });
 
   /* PODIUM */
   function drawPodiumCharacter() {
@@ -2276,7 +1730,6 @@
     drawPodiumCharacter();
     updateLivesUI();
     updateCoinsUI();
-    updateSeasonFooter();
   }
 
   /* GAME STATE */
@@ -2284,7 +1737,7 @@
   let score = 0;
   let isRunning = false;
   let isGameOver = false;
-  let hasStartedRun = false; // HOVER BEFORE FIRST TAP
+  let startedFlight = false; // hover until first input
 
   const snowflakes = [];
   function initSnow() {
@@ -2400,7 +1853,6 @@
         const m = getSelectedMode();
         let speed = m.speed;
 
-        // difficulty ramp & erratic behaviour
         if (score >= 50) speed *= 1.1;
         if (score >= 100) {
           speed *= 1.25;
@@ -2431,18 +1883,13 @@
         if (p.x + pipeWidth < penguin.x && !p.passed) {
           p.passed = true;
           score++;
-
           let coinGain = 1;
           if (doubleCoins) coinGain *= 2;
+          if (activeEffects.clone > 0) coinGain *= 2;
           coins += coinGain;
           scoreEl.textContent = score;
           updateCoinsUI();
           playSfx(sfxCoin);
-
-          // season XP on obstacle
-          let xpGain = SEASON_XP_PER_PIPE;
-          seasonXp += xpGain;
-
           saveMeta();
         }
 
@@ -2509,7 +1956,6 @@
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // snow
     ctx.fillStyle = "rgba(255,255,255,0.7)";
     snowflakes.forEach(f => {
       ctx.beginPath();
@@ -2614,12 +2060,11 @@
     const effectiveDt = dt * timeScale;
     updatePowerupTimers(effectiveDt);
 
-    if (!hasStartedRun) {
-      // hover animation before first tap
-      penguin.y = canvas.height / 2 + Math.sin(frames * 0.1) * 5;
+    // Idle hover until first input
+    if (!startedFlight) {
+      penguin.y = canvas.height / 2 + Math.sin(frames * 0.08) * 10;
       penguin.velocity = 0;
     } else if (activeEffects.autopilot && !isGameOver) {
-      // simple autopilot: oscillate vertically
       penguin.velocity = Math.sin(frames * 0.15) * -4;
       penguin.y += penguin.velocity;
       if (penguin.y < penguin.radius) penguin.y = penguin.radius;
@@ -2629,7 +2074,10 @@
       penguin.update();
     }
 
-    pipes.update();
+    if (startedFlight) {
+      pipes.update();
+    }
+
     frames++;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -2651,7 +2099,7 @@
 
   function triggerGameOver() {
     if (isGameOver) return;
-    if (activeEffects.god > 0) return; // god mode blocks death
+    if (activeEffects.god > 0) return;
     isGameOver = true;
     isRunning = false;
 
@@ -2664,9 +2112,6 @@
     lastLifeTimestamp = Date.now();
     runsToday += 1;
     runsTodayDate = todayStr();
-
-    checkMissionsCompletion();
-    checkSeasonChallenges();
     saveMeta();
     updateLivesUI();
 
@@ -2678,7 +2123,9 @@
     bestScoreEl.textContent = highScore;
     livesLeftLabel.textContent = ultraLives ? "∞" : lives;
 
-    updateSeasonFooter();
+    checkMissionsCompletion();
+    saveMeta();
+
     gameOverScreen.classList.remove("hidden");
   }
 
@@ -2698,7 +2145,7 @@
 
     isGameOver = false;
     isRunning = true;
-    hasStartedRun = false; // reset hover state
+    startedFlight = false; // reset hover state
     score = 0;
     frames = 0;
     scoreEl.textContent = score;
@@ -2715,12 +2162,15 @@
       e.preventDefault();
     }
     if (!isRunning || isGameOver) return;
-    if (!hasStartedRun) {
-      hasStartedRun = true;
+
+    // First tap: start actual flight from hover
+    if (!startedFlight) {
+      startedFlight = true;
       penguin.flap();
       playSfx(sfxFlap);
       return;
     }
+
     if (!activeEffects.autopilot) {
       penguin.flap();
       playSfx(sfxFlap);
@@ -2739,44 +2189,23 @@
 
   /* HUB BUTTONS & PANELS */
   btnPlay.addEventListener("click", () => startRun());
-
-  btnSeason.addEventListener("click", () => {
-    renderSeasonPanel();
-    seasonPanel.classList.remove("hidden");
-  });
-
-  btnSkins.addEventListener("click", () => {
-    renderSkinsPanel();
-    skinsPanel.classList.remove("hidden");
-  });
-  btnMaps.addEventListener("click", () => {
-    renderMapsPanel();
-    mapsPanel.classList.remove("hidden");
-  });
-  btnModes.addEventListener("click", () => {
-    renderModesPanel();
-    modesPanel.classList.remove("hidden");
-  });
+  btnSkins.addEventListener("click", () => { renderSkinsPanel(); skinsPanel.classList.remove("hidden"); });
+  btnMaps.addEventListener("click", () => { renderMapsPanel(); mapsPanel.classList.remove("hidden"); });
+  btnModes.addEventListener("click", () => { renderModesPanel(); modesPanel.classList.remove("hidden"); });
   btnStore.addEventListener("click", () => {
-    renderStoreCosmeticsTab();
-    renderStorePowerupsTab();
-    renderStorePremiumTab();
-    renderStoreBundlesTab();
-    renderStoreCurrencyTab();
+    renderStoreCosmetics();
+    renderStorePowerups();
+    renderStorePremium();
+    renderStoreCurrency();
     storePanel.classList.remove("hidden");
   });
-  btnSettings.addEventListener("click", () => {
-    settingsPanel.classList.remove("hidden");
-  });
+  btnSettings.addEventListener("click", () => { settingsPanel.classList.remove("hidden"); });
   btnMissions.addEventListener("click", () => {
     checkMissionsCompletion();
     renderMissionsPanel();
     missionsPanel.classList.remove("hidden");
   });
-  btnDaily.addEventListener("click", () => {
-    updateDailyPanel();
-    dailyPanel.classList.remove("hidden");
-  });
+  btnDaily.addEventListener("click", () => { updateDailyPanel(); dailyPanel.classList.remove("hidden"); });
 
   document.querySelectorAll("[data-panel-close]").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -2874,20 +2303,6 @@
     }, 1000);
   }
 
-  /* SEASON PREMIUM PURCHASE */
-  btnBuySeasonPremium.addEventListener("click", () => {
-    if (seasonPremium) {
-      alert("Season Premium already owned.");
-      return;
-    }
-    openPurchaseConfirm("Season Premium – £4.99", () => {
-      seasonPremium = true;
-      saveMeta();
-      renderSeasonPanel();
-      updateSeasonFooter();
-    });
-  });
-
   /* FIRST RENDER */
   updateHubView();
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -2903,4 +2318,4 @@
   }
 </script>
 </body>
-          </html>
+  </html>
