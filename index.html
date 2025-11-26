@@ -1,1542 +1,1761 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Waddle Wings Universe</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Waddle Wings Universe</title>
 
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#2C3E50">
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#2C3E50" />
 
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap');
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap");
 
-        * { box-sizing: border-box; }
+    * { box-sizing: border-box; }
 
-        body {
-            margin: 0;
-            padding: 0;
-            background: #111;
-            color: #fff;
-            font-family: 'Fredoka One', cursive;
-            overflow: hidden;
-            touch-action: none;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            width: 100vw;
-        }
+    body {
+      margin: 0;
+      padding: 0;
+      background: #111;
+      color: #fff;
+      font-family: "Fredoka One", cursive;
+      overflow: hidden;
+      touch-action: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      width: 100vw;
+    }
 
-        #game-container {
-            position: relative;
-            max-width: 100%;
-            max-height: 100%;
-            box-shadow: 0 0 25px rgba(0,0,0,0.6);
-            border-radius: 16px;
-            overflow: hidden;
-        }
+    #game-container {
+      position: relative;
+      max-width: 100%;
+      max-height: 100%;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.6);
+      border-radius: 16px;
+      overflow: hidden;
+      background: #000;
+    }
 
-        canvas {
-            display: block;
-            background: linear-gradient(to bottom, #87CEEB, #E0F7FA);
-        }
+    canvas {
+      display: block;
+    }
 
-        #ui-layer {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-        }
+    #ui-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
 
-        #top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 12px;
-            color: #fff;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
-            font-size: 0.9rem;
-        }
+    #top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      font-size: 0.9rem;
+      color: #fff;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+    }
 
-        #score-display {
-            font-size: 2.2rem;
-        }
+    #score-display {
+      font-size: 2.1rem;
+    }
 
-        #meta-right {
-            text-align: right;
-            font-size: 0.9rem;
-        }
+    #meta-right {
+      text-align: right;
+      font-size: 0.85rem;
+    }
 
-        #coins-display {
-            font-size: 1rem;
-        }
+    #coins-display { font-size: 1rem; }
+    #lives-display { font-size: 0.95rem; margin-top: 4px; }
 
-        #lives-display {
-            font-size: 1rem;
-            margin-top: 4px;
-        }
+    /* HUB / UNIVERSE MENU */
+    #hub-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(150deg, rgba(0,0,0,0.7), rgba(10,20,40,0.95));
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      pointer-events: auto;
+      animation: hubFadeIn 0.25s ease-out;
+    }
 
-        /* HUB OVERLAY (Universe menu) */
-        #hub-overlay {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(160deg, rgba(0,0,0,0.7), rgba(10,20,40,0.9));
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            pointer-events: auto;
-            animation: hubFadeIn 0.3s ease-out;
-        }
+    @keyframes hubFadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-        @keyframes hubFadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+    #hub-header {
+      padding: 10px 14px 4px;
+      text-align: center;
+    }
 
-        #hub-header {
-            padding: 10px 14px 4px;
-            text-align: center;
-        }
+    #hub-title {
+      font-size: 1.4rem;
+      letter-spacing: 1px;
+    }
 
-        #hub-title {
-            font-size: 1.4rem;
-            letter-spacing: 1px;
-        }
+    #hub-subtitle {
+      font-size: 0.8rem;
+      color: #ccc;
+    }
 
-        #hub-subtitle {
-            font-size: 0.8rem;
-            color: #ccc;
-        }
+    #hub-main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 4px 8px 10px;
+    }
 
-        #hub-main {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 4px 8px 12px;
-        }
+    #podium-wrapper {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
 
-        #podium-wrapper {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            margin-bottom: 10px;
-        }
+    #podium {
+      position: relative;
+      width: 72%;
+      max-width: 260px;
+      height: 160px;
+      background: radial-gradient(circle at 50% 10%, rgba(255,255,255,0.28), transparent 60%);
+      border-radius: 20px;
+      border: 2px solid rgba(255,255,255,0.16);
+      box-shadow: inset 0 0 22px rgba(0,0,0,0.6);
+      overflow: hidden;
+    }
 
-        #podium {
-            position: relative;
-            width: 70%;
-            max-width: 260px;
-            height: 160px;
-            background: radial-gradient(circle at 50% 10%, rgba(255,255,255,0.3), transparent 60%);
-            border-radius: 20px;
-            border: 2px solid rgba(255,255,255,0.15);
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
-            overflow: hidden;
-        }
+    #podium-platform {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 72%;
+      height: 28px;
+      background: linear-gradient(90deg,#374b67,#223044);
+      border-radius: 999px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.7);
+    }
 
-        #podium-platform {
-            position: absolute;
-            bottom: 18px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 70%;
-            height: 26px;
-            background: linear-gradient(90deg, #374b67, #223044);
-            border-radius: 999px;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.7);
-        }
+    #podium-label {
+      position: absolute;
+      bottom: 3px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.8rem;
+      color: #d0e6ff;
+    }
 
-        #podium-label {
-            position: absolute;
-            bottom: 2px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 0.8rem;
-            color: #d0e6ff;
-        }
+    #podium-character {
+      position: absolute;
+      bottom: 35px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
 
-        #podium-character {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80px;
-            height: 80px;
-        }
+    #hub-buttons {
+      width: 100%;
+      max-width: 380px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
 
-        /* HUB BUTTON GRID */
-        #hub-buttons {
-            width: 100%;
-            max-width: 360px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-bottom: 4px;
-        }
+    .hub-btn {
+      border-radius: 12px;
+      background: linear-gradient(180deg, #ff7676, #ff5252);
+      border: none;
+      color: #fff;
+      padding: 10px 8px;
+      font-family: "Fredoka One", cursive;
+      font-size: 1rem;
+      box-shadow: 0 4px 0 #c04444;
+      cursor: pointer;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    }
 
-        .hub-btn {
-            border-radius: 12px;
-            background: linear-gradient(180deg, #ff7676, #ff5252);
-            border: none;
-            color: #fff;
-            padding: 10px 8px;
-            font-family: 'Fredoka One', cursive;
-            font-size: 1rem;
-            box-shadow: 0 4px 0 #c04444;
-            cursor: pointer;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-        }
+    .hub-btn.secondary {
+      background: linear-gradient(180deg,#6078ea,#364fc7);
+      box-shadow: 0 4px 0 #243369;
+    }
 
-        .hub-btn:active {
-            transform: translateY(3px);
-            box-shadow: 0 1px 0 #c04444;
-        }
+    .hub-btn.ghost {
+      background: rgba(255,255,255,0.08);
+      box-shadow: none;
+      border: 1px solid rgba(255,255,255,0.25);
+      font-size: 0.9rem;
+    }
 
-        .hub-btn.secondary {
-            background: linear-gradient(180deg, #6078ea, #364fc7);
-            box-shadow: 0 4px 0 #243369;
-        }
+    .hub-btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 rgba(0,0,0,0.7);
+    }
 
-        .hub-btn.ghost {
-            background: rgba(255,255,255,0.08);
-            box-shadow: none;
-            border: 1px solid rgba(255,255,255,0.3);
-            font-size: 0.9rem;
-        }
+    #hub-footer {
+      padding: 6px 12px 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: #ccc;
+    }
 
-        #hub-footer {
-            padding: 6px 12px 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.8rem;
-            color: #ccc;
-        }
+    /* PANELS (Shop / Skins / Maps / Modes / Settings / Missions / Daily) */
+    .panel {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      pointer-events: auto;
+    }
 
-        /* MODAL PANELS (Shop, Skins, Maps, Settings) */
-        .panel {
-            position: absolute;
-            inset: 0;
-            background: rgba(0,0,0,0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            pointer-events: auto;
-        }
+    .panel-card {
+      background: rgba(10,15,35,0.97);
+      border-radius: 18px;
+      border: 2px solid rgba(255,255,255,0.18);
+      padding: 18px;
+      width: 90%;
+      max-width: 380px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+      animation: slideUp 0.2s ease-out;
+      font-size: 0.88rem;
+    }
 
-        .panel-card {
-            background: rgba(10,15,35,0.96);
-            border-radius: 18px;
-            border: 2px solid rgba(255,255,255,0.18);
-            padding: 18px;
-            width: 90%;
-            max-width: 360px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.7);
-            animation: slideUp 0.2s ease-out;
-        }
+    @keyframes slideUp {
+      from { transform: translateY(12px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
 
-        @keyframes slideUp {
-            from { transform: translateY(12px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
 
-        .panel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
+    .panel-title {
+      font-size: 1.2rem;
+    }
 
-        .panel-title {
-            font-size: 1.2rem;
-        }
+    .panel-close {
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 1.4rem;
+      cursor: pointer;
+    }
 
-        .panel-close {
-            background: transparent;
-            border: none;
-            color: #fff;
-            font-size: 1.4rem;
-            cursor: pointer;
-        }
+    .panel-body {
+      max-height: 260px;
+      overflow-y: auto;
+    }
 
-        .panel-body {
-            max-height: 260px;
-            overflow-y: auto;
-            font-size: 0.9rem;
-        }
+    .panel-footer {
+      margin-top: 10px;
+      text-align: right;
+    }
 
-        .list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
+    .list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
 
-        .list-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 6px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-        }
+    .list-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
 
-        .list-label {
-            display: flex;
-            flex-direction: column;
-        }
+    .list-label {
+      display: flex;
+      flex-direction: column;
+    }
 
-        .list-label span:nth-child(1) {
-            font-size: 0.95rem;
-        }
+    .list-label span:first-child {
+      font-size: 0.95rem;
+    }
 
-        .list-label span:nth-child(2) {
-            font-size: 0.75rem;
-            color: #aaa;
-        }
+    .list-label span:last-child {
+      font-size: 0.75rem;
+      color: #aaa;
+    }
 
-        .tag {
-            display: inline-block;
-            border-radius: 999px;
-            background: rgba(255,255,255,0.1);
-            padding: 2px 8px;
-            font-size: 0.7rem;
-            margin-left: 4px;
-        }
+    .tag {
+      display: inline-block;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.12);
+      padding: 2px 8px;
+      font-size: 0.7rem;
+      margin-left: 4px;
+    }
 
-        .panel-footer {
-            margin-top: 10px;
-            text-align: right;
-        }
+    .small-btn {
+      padding: 6px 14px;
+      font-size: 0.8rem;
+      border-radius: 20px;
+      background: #ff7676;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 3px 0 #c04444;
+    }
 
-        .small-btn {
-            padding: 6px 16px;
-            font-size: 0.85rem;
-            border-radius: 20px;
-            background: #ff7676;
-            border: none;
-            color: #fff;
-            cursor: pointer;
-            box-shadow: 0 3px 0 #c04444;
-        }
+    .small-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #c04444;
+    }
 
-        .small-btn:active {
-            transform: translateY(2px);
-            box-shadow: 0 1px 0 #c04444;
-        }
+    /* CARDS (game over / no lives / ad / daily) */
+    .center-card {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      background: rgba(255,255,255,0.96);
+      color: #333;
+      padding: 24px;
+      border-radius: 18px;
+      border: 3px solid #2C3E50;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+      min-width: 240px;
+      pointer-events: auto;
+      font-size: 0.9rem;
+    }
 
-        /* GAME-STATE OVERLAYS */
-        .center-card {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            background: rgba(255,255,255,0.95);
-            color: #333;
-            padding: 24px;
-            border-radius: 18px;
-            border: 3px solid #2C3E50;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-            min-width: 240px;
-            pointer-events: auto;
-        }
+    .center-card h1 {
+      margin: 0 0 10px;
+      font-size: 1.8rem;
+    }
 
-        .center-card h1 {
-            margin: 0 0 10px;
-            font-size: 1.8rem;
-        }
+    .center-card p {
+      margin: 6px 0 10px;
+    }
 
-        .center-card p {
-            margin: 6px 0 10px;
-            font-size: 0.9rem;
-        }
+    button {
+      font-family: "Fredoka One", cursive;
+    }
 
-        .hidden {
-            display: none !important;
-        }
+    .main-btn {
+      background: #ff6b6b;
+      color: #fff;
+      border: none;
+      padding: 12px 28px;
+      font-size: 1rem;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 4px 0 #c04444;
+      margin: 4px 4px;
+    }
 
-        #fake-ad-progress {
-            width: 100%;
-            height: 10px;
-            border-radius: 999px;
-            background: #eee;
-            overflow: hidden;
-            margin-top: 10px;
-        }
+    .main-btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 #c04444;
+    }
 
-        #fake-ad-bar {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg,#FF6B6B,#FFD66B);
-        }
+    .secondary-btn {
+      background: #6078ea;
+      box-shadow: 0 4px 0 #243369;
+      color: #fff;
+      border: none;
+      padding: 10px 22px;
+      font-size: 0.9rem;
+      border-radius: 24px;
+      cursor: pointer;
+      margin: 4px 4px;
+    }
 
-        #fake-ad-timer {
-            font-size: 0.85rem;
-            margin-top: 6px;
-            color: #555;
-        }
-    </style>
+    .secondary-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #243369;
+    }
+
+    #fake-ad-progress {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: #eee;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    #fake-ad-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg,#ff6b6b,#ffd66b);
+    }
+
+    #fake-ad-timer {
+      font-size: 0.85rem;
+      margin-top: 6px;
+      color: #555;
+    }
+
+    .hidden { display: none !important; }
+  </style>
 </head>
 <body>
-
 <div id="game-container">
-    <canvas id="gameCanvas"></canvas>
+  <canvas id="gameCanvas"></canvas>
 
-    <div id="ui-layer">
-        <div id="top-bar">
-            <div id="score-display">0</div>
-            <div id="meta-right">
-                <div id="coins-display">💰 0</div>
-                <div id="lives-display">♥ 5</div>
-            </div>
-        </div>
+  <div id="ui-layer">
+    <div id="top-bar">
+      <div id="score-display">0</div>
+      <div id="meta-right">
+        <div id="coins-display">💰 0</div>
+        <div id="lives-display">♥ 5</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HUB MENU -->
+  <div id="hub-overlay">
+    <div id="hub-header">
+      <div id="hub-title">WADDLE WINGS UNIVERSE</div>
+      <div id="hub-subtitle">Skins • Maps • Modes • Lives • Coins • Missions</div>
     </div>
 
-    <!-- HUB / UNIVERSE MENU -->
-    <div id="hub-overlay">
-        <div id="hub-header">
-            <div id="hub-title">WADDLE WINGS UNIVERSE</div>
-            <div id="hub-subtitle">Skins • Maps • Modes • Lives • Coins</div>
+    <div id="hub-main">
+      <div id="podium-wrapper">
+        <div id="podium">
+          <div id="podium-platform"></div>
+          <div id="podium-label">Classic Penguin</div>
+          <canvas id="podium-character" width="80" height="80"></canvas>
         </div>
+      </div>
 
-        <div id="hub-main">
-            <div id="podium-wrapper">
-                <div id="podium">
-                    <div id="podium-platform"></div>
-                    <div id="podium-label">Classic Penguin</div>
-                    <canvas id="podium-character" width="80" height="80"></canvas>
-                </div>
-            </div>
-
-            <div id="hub-buttons">
-                <button class="hub-btn" id="btn-play">PLAY</button>
-                <button class="hub-btn secondary" id="btn-modes">MODES</button>
-                <button class="hub-btn secondary" id="btn-skins">SKINS</button>
-                <button class="hub-btn secondary" id="btn-maps">MAPS</button>
-                <button class="hub-btn secondary" id="btn-shop">SHOP</button>
-                <button class="hub-btn ghost" id="btn-settings">SETTINGS</button>
-            </div>
-        </div>
-
-        <div id="hub-footer">
-            <span id="hub-mode-label">Mode: Normal</span>
-            <span>v1.0 – Dev Build</span>
-        </div>
+      <div id="hub-buttons">
+        <button class="hub-btn" id="btn-play">PLAY</button>
+        <button class="hub-btn secondary" id="btn-modes">MODES</button>
+        <button class="hub-btn secondary" id="btn-skins">SKINS</button>
+        <button class="hub-btn secondary" id="btn-maps">MAPS</button>
+        <button class="hub-btn secondary" id="btn-shop">SHOP</button>
+        <button class="hub-btn ghost" id="btn-missions">MISSIONS</button>
+        <button class="hub-btn ghost" id="btn-daily">DAILY REWARD</button>
+        <button class="hub-btn ghost" id="btn-settings">SETTINGS</button>
+      </div>
     </div>
 
-    <!-- PANELS -->
-    <div id="panel-shop" class="panel hidden">
-        <div class="panel-card">
-            <div class="panel-header">
-                <div class="panel-title">Shop</div>
-                <button class="panel-close" data-panel-close="panel-shop">×</button>
-            </div>
-            <div class="panel-body">
-                <ul class="list" id="shop-list"></ul>
-            </div>
-            <div class="panel-footer">
-                <button class="small-btn" data-panel-close="panel-shop">Close</button>
-            </div>
-        </div>
+    <div id="hub-footer">
+      <span id="hub-mode-label">Mode: Normal</span>
+      <span>v2.0 – Dev Build</span>
     </div>
+  </div>
 
-    <div id="panel-skins" class="panel hidden">
-        <div class="panel-card">
-            <div class="panel-header">
-                <div class="panel-title">Skins</div>
-                <button class="panel-close" data-panel-close="panel-skins">×</button>
-            </div>
-            <div class="panel-body">
-                <ul class="list" id="skins-list"></ul>
-            </div>
-            <div class="panel-footer">
-                <button class="small-btn" data-panel-close="panel-skins">Close</button>
-            </div>
-        </div>
+  <!-- PANELS -->
+  <div id="panel-shop" class="panel hidden">
+    <div class="panel-card">
+      <div class="panel-header">
+        <div class="panel-title">Shop</div>
+        <button class="panel-close" data-panel-close="panel-shop">×</button>
+      </div>
+      <div class="panel-body">
+        <ul class="list" id="shop-list"></ul>
+      </div>
+      <div class="panel-footer">
+        <button class="small-btn" data-panel-close="panel-shop">Close</button>
+      </div>
     </div>
+  </div>
 
-    <div id="panel-maps" class="panel hidden">
-        <div class="panel-card">
-            <div class="panel-header">
-                <div class="panel-title">Maps</div>
-                <button class="panel-close" data-panel-close="panel-maps">×</button>
-            </div>
-            <div class="panel-body">
-                <ul class="list" id="maps-list"></ul>
-            </div>
-            <div class="panel-footer">
-                <button class="small-btn" data-panel-close="panel-maps">Close</button>
-            </div>
-        </div>
+  <div id="panel-skins" class="panel hidden">
+    <div class="panel-card">
+      <div class="panel-header">
+        <div class="panel-title">Skins</div>
+        <button class="panel-close" data-panel-close="panel-skins">×</button>
+      </div>
+      <div class="panel-body">
+        <ul class="list" id="skins-list"></ul>
+      </div>
+      <div class="panel-footer">
+        <button class="small-btn" data-panel-close="panel-skins">Close</button>
+      </div>
     </div>
+  </div>
 
-    <div id="panel-modes" class="panel hidden">
-        <div class="panel-card">
-            <div class="panel-header">
-                <div class="panel-title">Modes</div>
-                <button class="panel-close" data-panel-close="panel-modes">×</button>
-            </div>
-            <div class="panel-body">
-                <ul class="list" id="modes-list"></ul>
-            </div>
-            <div class="panel-footer">
-                <button class="small-btn" data-panel-close="panel-modes">Close</button>
-            </div>
-        </div>
+  <div id="panel-maps" class="panel hidden">
+    <div class="panel-card">
+      <div class="panel-header">
+        <div class="panel-title">Maps</div>
+        <button class="panel-close" data-panel-close="panel-maps">×</button>
+      </div>
+      <div class="panel-body">
+        <ul class="list" id="maps-list"></ul>
+      </div>
+      <div class="panel-footer">
+        <button class="small-btn" data-panel-close="panel-maps">Close</button>
+      </div>
     </div>
+  </div>
 
-    <div id="panel-settings" class="panel hidden">
-        <div class="panel-card">
-            <div class="panel-header">
-                <div class="panel-title">Settings</div>
-                <button class="panel-close" data-panel-close="panel-settings">×</button>
-            </div>
-            <div class="panel-body">
-                <p style="font-size:0.85rem; color:#ddd;">
-                    This is a dev web build. In the real Play Store version, purchases
-                    go through Google Play Billing. Here you can simulate “Remove Ads”.
-                </p>
-                <ul class="list">
-                    <li class="list-item">
-                        <div class="list-label">
-                            <span>Remove Ads</span>
-                            <span>One-time £4.99 (dev unlock toggle)</span>
-                        </div>
-                        <button class="small-btn" id="btn-remove-ads">Toggle</button>
-                    </li>
-                </ul>
-                <p id="settings-ads-status" style="font-size:0.8rem; color:#ccc; margin-top:8px;">
-                    Ads currently: ON (rewarded only)
-                </p>
-            </div>
-            <div class="panel-footer">
-                <button class="small-btn" data-panel-close="panel-settings">Close</button>
-            </div>
-        </div>
+  <div id="panel-modes" class="panel hidden">
+    <div class="panel-card">
+      <div class="panel-header">
+        <div class="panel-title">Modes</div>
+        <button class="panel-close" data-panel-close="panel-modes">×</button>
+      </div>
+      <div class="panel-body">
+        <ul class="list" id="modes-list"></ul>
+      </div>
+      <div class="panel-footer">
+        <button class="small-btn" data-panel-close="panel-modes">Close</button>
+      </div>
     </div>
+  </div>
 
-    <!-- GAME STATE CARDS -->
-    <div id="game-over-screen" class="center-card hidden">
-        <h1>OOF!</h1>
-        <p>Score: <span id="final-score">0</span></p>
-        <p>Best: <span id="best-score">0</span></p>
-        <p>Lives left: <span id="lives-left-label">0</span></p>
-        <button id="restart-btn">PLAY AGAIN</button>
-        <button id="back-menu-btn">BACK TO HUB</button>
-    </div>
-
-    <div id="no-lives-screen" class="center-card hidden">
-        <h1>NO LIVES</h1>
-        <p>You’ve used all your lives.</p>
-        <p style="font-size:0.85rem;">
-            Lives slowly refill over time (1 per hour).<br>
-            You can also watch a short ad for +1 life.
+  <div id="panel-settings" class="panel hidden">
+    <div class="panel-card">
+      <div class="panel-header">
+        <div class="panel-title">Settings</div>
+        <button class="panel-close" data-panel-close="panel-settings">×</button>
+      </div>
+      <div class="panel-body">
+        <p style="font-size:0.8rem; color:#ddd;">
+          This is a dev web build. In the real Play Store version, purchases
+          go through Google Play Billing. Here you can toggle "Remove Ads"
+          to simulate a £4.99 purchase.
         </p>
-        <button id="watch-ad-btn">WATCH AD</button>
-        <button id="back-from-nolives-btn">BACK TO HUB</button>
+        <ul class="list">
+          <li class="list-item">
+            <div class="list-label">
+              <span>Remove Ads</span>
+              <span>One-time £4.99 (dev unlock toggle)</span>
+            </div>
+            <button class="small-btn" id="btn-remove-ads">Toggle</button>
+          </li>
+        </ul>
+        <p id="settings-ads-status" style="font-size:0.8rem; color:#ccc; margin-top:8px;">
+          Ads currently: ON (rewarded only)
+        </p>
+      </div>
+      <div class="panel-footer">
+        <button class="small-btn" data-panel-close="panel-settings">Close</button>
+      </div>
     </div>
+  </div>
 
-    <div id="fake-ad-screen" class="center-card hidden">
-        <h1>Ad playing…</h1>
-        <p style="font-size:0.9rem;">Pretend this is a dramatic mobile game trailer.</p>
-        <div id="fake-ad-progress">
-            <div id="fake-ad-bar"></div>
-        </div>
-        <div id="fake-ad-timer">5s remaining</div>
+  <div id="panel-missions" class="panel hidden">
+    <div class="panel-card">
+      <div class="panel-header">
+        <div class="panel-title">Missions</div>
+        <button class="panel-close" data-panel-close="panel-missions">×</button>
+      </div>
+      <div class="panel-body">
+        <ul class="list" id="missions-list"></ul>
+      </div>
+      <div class="panel-footer">
+        <button class="small-btn" data-panel-close="panel-missions">Close</button>
+      </div>
     </div>
+  </div>
+
+  <div id="panel-daily" class="panel hidden">
+    <div class="panel-card">
+      <div class="panel-header">
+        <div class="panel-title">Daily Reward</div>
+        <button class="panel-close" data-panel-close="panel-daily">×</button>
+      </div>
+      <div class="panel-body">
+        <p style="font-size:0.85rem; color:#ddd;">
+          Claim once per day for a free coin boost.
+        </p>
+        <p id="daily-status" style="font-size:0.85rem; color:#ccc;"></p>
+      </div>
+      <div class="panel-footer">
+        <button class="small-btn" id="btn-claim-daily">Claim</button>
+        <button class="small-btn" data-panel-close="panel-daily">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- GAME STATE CARDS -->
+  <div id="game-over-screen" class="center-card hidden">
+    <h1>OOF!</h1>
+    <p>Score: <span id="final-score">0</span></p>
+    <p>Best: <span id="best-score">0</span></p>
+    <p>Lives left: <span id="lives-left-label">0</span></p>
+    <button id="restart-btn" class="main-btn">PLAY AGAIN</button>
+    <button id="back-menu-btn" class="secondary-btn">BACK TO HUB</button>
+  </div>
+
+  <div id="no-lives-screen" class="center-card hidden">
+    <h1>NO LIVES</h1>
+    <p>You’re out of lives.</p>
+    <p style="font-size:0.85rem;">
+      Lives regenerate over time (1 per hour), or you can watch an ad for +1 life.
+    </p>
+    <button id="watch-ad-btn" class="main-btn">WATCH AD</button>
+    <button id="back-from-nolives-btn" class="secondary-btn">BACK TO HUB</button>
+  </div>
+
+  <div id="fake-ad-screen" class="center-card hidden">
+    <h1>Ad playing…</h1>
+    <p style="font-size:0.9rem;">Pretend this is some cheesy mobile game trailer.</p>
+    <div id="fake-ad-progress">
+      <div id="fake-ad-bar"></div>
+    </div>
+    <div id="fake-ad-timer">5s remaining</div>
+  </div>
 </div>
 
 <script>
-    /* ======= BASIC SETUP ======= */
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-    function resizeCanvas() {
-        const maxWidth = 480;
-        const maxHeight = 800;
-        let w = window.innerWidth;
-        let h = window.innerHeight;
-        if (w > maxWidth) {
-            w = maxWidth;
-            h = Math.min(window.innerHeight, maxHeight);
-        }
-        canvas.width = w;
-        canvas.height = h;
+  /* ===== BASICS ===== */
+  const canvas = document.getElementById("gameCanvas");
+  const ctx = canvas.getContext("2d");
+
+  function resizeCanvas() {
+    const maxWidth = 480;
+    const maxHeight = 800;
+    let w = window.innerWidth;
+    let h = window.innerHeight;
+    if (w > maxWidth) {
+      w = maxWidth;
+      h = Math.min(window.innerHeight, maxHeight);
     }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
+    canvas.width = w;
+    canvas.height = h;
+  }
+  window.addEventListener("resize", resizeCanvas);
+  resizeCanvas();
 
-    /* ======= DOM HOOKS ======= */
-    const scoreEl = document.getElementById('score-display');
-    const coinsEl = document.getElementById('coins-display');
-    const livesEl = document.getElementById('lives-display');
+  /* GAME CONSTANTS */
+  const GRAVITY = 0.25;
+  const FLAP_STRENGTH = -5.5;
+  const MAX_LIVES = 5;
+  const REGEN_TIME = 60 * 60 * 1000; // 1 hour
+  const DAILY_REWARD_COINS = 20;
 
-    const hubOverlay = document.getElementById('hub-overlay');
-    const hubModeLabel = document.getElementById('hub-mode-label');
-    const podiumLabel = document.getElementById('podium-label');
-    const podiumCanvas = document.getElementById('podium-character');
-    const podiumCtx = podiumCanvas.getContext('2d');
+  /* DOM HANDLES */
+  const scoreEl = document.getElementById("score-display");
+  const coinsEl = document.getElementById("coins-display");
+  const livesEl = document.getElementById("lives-display");
 
-    const shopPanel = document.getElementById('panel-shop');
-    const skinsPanel = document.getElementById('panel-skins');
-    const mapsPanel = document.getElementById('panel-maps');
-    const modesPanel = document.getElementById('panel-modes');
-    const settingsPanel = document.getElementById('panel-settings');
-    const settingsAdsStatus = document.getElementById('settings-ads-status');
+  const hubOverlay = document.getElementById("hub-overlay");
+  const hubModeLabel = document.getElementById("hub-mode-label");
+  const podiumLabel = document.getElementById("podium-label");
+  const podiumCanvas = document.getElementById("podium-character");
+  const podiumCtx = podiumCanvas.getContext("2d");
 
-    const shopList = document.getElementById('shop-list');
-    const skinsList = document.getElementById('skins-list');
-    const mapsList = document.getElementById('maps-list');
-    const modesList = document.getElementById('modes-list');
-    const removeAdsBtn = document.getElementById('btn-remove-ads');
+  const shopPanel = document.getElementById("panel-shop");
+  const skinsPanel = document.getElementById("panel-skins");
+  const mapsPanel = document.getElementById("panel-maps");
+  const modesPanel = document.getElementById("panel-modes");
+  const missionsPanel = document.getElementById("panel-missions");
+  const dailyPanel = document.getElementById("panel-daily");
+  const settingsPanel = document.getElementById("panel-settings");
 
-    const gameOverScreen = document.getElementById('game-over-screen');
-    const noLivesScreen = document.getElementById('no-lives-screen');
-    const fakeAdScreen = document.getElementById('fake-ad-screen');
+  const shopList = document.getElementById("shop-list");
+  const skinsList = document.getElementById("skins-list");
+  const mapsList = document.getElementById("maps-list");
+  const modesList = document.getElementById("modes-list");
+  const missionsList = document.getElementById("missions-list");
 
-    const finalScoreEl = document.getElementById('final-score');
-    const bestScoreEl = document.getElementById('best-score');
-    const livesLeftLabel = document.getElementById('lives-left-label');
+  const settingsAdsStatus = document.getElementById("settings-ads-status");
+  const dailyStatus = document.getElementById("daily-status");
+  const claimDailyBtn = document.getElementById("btn-claim-daily");
 
-    const restartBtn = document.getElementById('restart-btn');
-    const backMenuBtn = document.getElementById('back-menu-btn');
-    const backFromNoLivesBtn = document.getElementById('back-from-nolives-btn');
-    const watchAdBtn = document.getElementById('watch-ad-btn');
-    const fakeAdBar = document.getElementById('fake-ad-bar');
-    const fakeAdTimer = document.getElementById('fake-ad-timer');
+  const gameOverScreen = document.getElementById("game-over-screen");
+  const noLivesScreen = document.getElementById("no-lives-screen");
+  const fakeAdScreen = document.getElementById("fake-ad-screen");
+  const fakeAdBar = document.getElementById("fake-ad-bar");
+  const fakeAdTimer = document.getElementById("fake-ad-timer");
 
-    const btnPlay = document.getElementById('btn-play');
-    const btnModes = document.getElementById('btn-modes');
-    const btnSkins = document.getElementById('btn-skins');
-    const btnMaps = document.getElementById('btn-maps');
-    const btnShop = document.getElementById('btn-shop');
-    const btnSettings = document.getElementById('btn-settings');
+  const finalScoreEl = document.getElementById("final-score");
+  const bestScoreEl = document.getElementById("best-score");
+  const livesLeftLabel = document.getElementById("lives-left-label");
 
-    /* ======= META STATE ======= */
-    const MAX_LIVES = 5;
-    const REGEN_TIME = 60 * 60 * 1000; // 1 hour
-    const BASE_COIN_REWARD = 1;
+  const btnPlay = document.getElementById("btn-play");
+  const btnModes = document.getElementById("btn-modes");
+  const btnSkins = document.getElementById("btn-skins");
+  const btnMaps = document.getElementById("btn-maps");
+  const btnShop = document.getElementById("btn-shop");
+  const btnMissions = document.getElementById("btn-missions");
+  const btnDaily = document.getElementById("btn-daily");
+  const btnSettings = document.getElementById("btn-settings");
+  const btnRemoveAds = document.getElementById("btn-remove-ads");
 
-    let livesStored = localStorage.getItem('ww_lives');
-    let lives;
-    if (livesStored === null) {
-        lives = MAX_LIVES;
-        localStorage.setItem('ww_lives', String(MAX_LIVES));
+  const restartBtn = document.getElementById("restart-btn");
+  const backMenuBtn = document.getElementById("back-menu-btn");
+  const backFromNoLivesBtn = document.getElementById("back-from-nolives-btn");
+  const watchAdBtn = document.getElementById("watch-ad-btn");
+
+  /* META STATE (storage) */
+  let lives = parseInt(localStorage.getItem("ww_lives") || String(MAX_LIVES), 10);
+  if (Number.isNaN(lives) || lives < 0 || lives > MAX_LIVES) lives = MAX_LIVES;
+
+  let lastLifeTimestamp = parseInt(
+    localStorage.getItem("ww_lastLife") || String(Date.now()),
+    10
+  );
+  if (Number.isNaN(lastLifeTimestamp)) lastLifeTimestamp = Date.now();
+
+  let coins = parseInt(localStorage.getItem("ww_coins") || "0", 10);
+  if (Number.isNaN(coins)) coins = 0;
+
+  let highScore = parseInt(localStorage.getItem("waddleHighScore") || "0", 10);
+  if (Number.isNaN(highScore)) highScore = 0;
+
+  let removeAds = localStorage.getItem("ww_removeAds") === "true";
+
+  let lastDaily = localStorage.getItem("ww_lastDaily") || "";
+
+  /* COSMETIC / MODES DATA */
+  const SKINS = [
+    {
+      id: "classic",
+      name: "Classic Penguin",
+      desc: "Standard blue & white hero.",
+      cost: 0,
+      body: "#2C3E50",
+      wing: "#34495E",
+      beak: "#FF9800",
+    },
+    {
+      id: "red",
+      name: "Red Rebel",
+      desc: "Looks faster. Is not.",
+      cost: 40,
+      body: "#C0392B",
+      wing: "#922B21",
+      beak: "#FFB74D",
+    },
+    {
+      id: "gold",
+      name: "Golden Waddle",
+      desc: "Shiny flex skin.",
+      cost: 100,
+      body: "#D4AF37",
+      wing: "#B08A2E",
+      beak: "#FFE082",
+    },
+  ];
+
+  const MAPS = [
+    {
+      id: "day",
+      name: "Snowfield Day",
+      desc: "Bright sky and soft snow.",
+      cost: 0,
+      gradient: ["#87CEEB", "#E0F7FA"],
+    },
+    {
+      id: "night",
+      name: "Polar Night",
+      desc: "Dark arctic sky with stars.",
+      cost: 40,
+      gradient: ["#001c3d", "#00335c"],
+    },
+    {
+      id: "blizzard",
+      name: "Blizzard",
+      desc: "Stormy white-out challenge.",
+      cost: 60,
+      gradient: ["#546E7A", "#ECEFF1"],
+    },
+  ];
+
+  const MODES = [
+    { id: "easy", name: "Easy", desc: "Slower pipes, big gaps.", speed: 2.4, gap: 190 },
+    { id: "normal", name: "Normal", desc: "Standard challenge.", speed: 3.0, gap: 160 },
+    { id: "hard", name: "Hard", desc: "Faster pipes, tighter gaps.", speed: 3.6, gap: 140 },
+    { id: "extreme", name: "Extreme", desc: "Chaos mode, no mercy.", speed: 4.4, gap: 120 },
+  ];
+
+  // Missions: simple demo
+  const MISSIONS = [
+    {
+      id: "score10",
+      name: "First Steps",
+      desc: "Reach a score of 10 in one run.",
+      type: "bestScoreAtLeast",
+      target: 10,
+      rewardCoins: 20,
+    },
+    {
+      id: "score25",
+      name: "Getting Good",
+      desc: "Reach a score of 25 in one run.",
+      type: "bestScoreAtLeast",
+      target: 25,
+      rewardCoins: 40,
+    },
+    {
+      id: "runs3",
+      name: "Committed",
+      desc: "Play 3 runs today.",
+      type: "runsToday",
+      target: 3,
+      rewardCoins: 15,
+    },
+  ];
+
+  let missionState = JSON.parse(localStorage.getItem("ww_missions") || "{}");
+  let runsToday = 0;
+  let runsTodayDate = localStorage.getItem("ww_runsTodayDate") || "";
+
+  function todayStr() {
+    const d = new Date();
+    return d.toISOString().slice(0, 10); // YYYY-MM-DD
+  }
+
+  // reset daily runs if day changed
+  if (runsTodayDate !== todayStr()) {
+    runsToday = 0;
+    runsTodayDate = todayStr();
+    localStorage.setItem("ww_runsTodayDate", runsTodayDate);
+    localStorage.setItem("ww_runsToday", String(runsToday));
+  } else {
+    runsToday = parseInt(localStorage.getItem("ww_runsToday") || "0", 10);
+    if (Number.isNaN(runsToday)) runsToday = 0;
+  }
+
+  /* Ownership */
+  let ownedSkins = JSON.parse(localStorage.getItem("ww_ownedSkins") || '["classic"]');
+  if (!ownedSkins.includes("classic")) ownedSkins.push("classic");
+
+  let ownedMaps = JSON.parse(localStorage.getItem("ww_ownedMaps") || '["day"]');
+  if (!ownedMaps.includes("day")) ownedMaps.push("day");
+
+  let equippedSkinId = localStorage.getItem("ww_skin") || "classic";
+  let equippedMapId = localStorage.getItem("ww_map") || "day";
+  let modeId = localStorage.getItem("ww_mode") || "normal";
+
+  function saveMeta() {
+    localStorage.setItem("ww_lives", String(lives));
+    localStorage.setItem("ww_lastLife", String(lastLifeTimestamp));
+    localStorage.setItem("ww_coins", String(coins));
+    localStorage.setItem("waddleHighScore", String(highScore));
+    localStorage.setItem("ww_removeAds", String(removeAds));
+    localStorage.setItem("ww_lastDaily", lastDaily);
+    localStorage.setItem("ww_missions", JSON.stringify(missionState));
+    localStorage.setItem("ww_runsToday", String(runsToday));
+    localStorage.setItem("ww_runsTodayDate", runsTodayDate);
+  }
+
+  function saveCosmetics() {
+    localStorage.setItem("ww_ownedSkins", JSON.stringify(ownedSkins));
+    localStorage.setItem("ww_ownedMaps", JSON.stringify(ownedMaps));
+    localStorage.setItem("ww_skin", equippedSkinId);
+    localStorage.setItem("ww_map", equippedMapId);
+    localStorage.setItem("ww_mode", modeId);
+  }
+
+  function getEquippedSkin() {
+    return SKINS.find(s => s.id === equippedSkinId) || SKINS[0];
+  }
+
+  function getEquippedMap() {
+    return MAPS.find(m => m.id === equippedMapId) || MAPS[0];
+  }
+
+  function getSelectedMode() {
+    return MODES.find(m => m.id === modeId) || MODES[1];
+  }
+
+  /* Lives, coins, ads UI */
+  function updateLivesUI() {
+    livesEl.textContent = "♥ " + lives;
+  }
+
+  function updateCoinsUI() {
+    coinsEl.textContent = "💰 " + coins;
+  }
+
+  function updateAdsStatusUI() {
+    settingsAdsStatus.textContent = removeAds
+      ? "Ads currently: OFF (dev 'Remove Ads' enabled)"
+      : "Ads currently: ON (rewarded only)";
+    watchAdBtn.textContent = removeAds ? "GET BONUS LIFE" : "WATCH AD";
+  }
+
+  function regenLives() {
+    const now = Date.now();
+    if (lives >= MAX_LIVES) {
+      lastLifeTimestamp = now;
+      localStorage.setItem("ww_lastLife", String(lastLifeTimestamp));
+      return;
+    }
+    const elapsed = now - lastLifeTimestamp;
+    const regained = Math.floor(elapsed / REGEN_TIME);
+    if (regained > 0) {
+      lives = Math.min(MAX_LIVES, lives + regained);
+      lastLifeTimestamp = now;
+      saveMeta();
+      updateLivesUI();
+    }
+  }
+
+  regenLives();
+  updateLivesUI();
+  updateCoinsUI();
+  updateAdsStatusUI();
+  setInterval(regenLives, 30 * 1000);
+
+  /* Daily reward */
+  function updateDailyPanel() {
+    const today = todayStr();
+    if (lastDaily === today) {
+      dailyStatus.textContent = "Already claimed today. Come back tomorrow.";
+      claimDailyBtn.disabled = true;
+      claimDailyBtn.style.opacity = "0.5";
     } else {
-        lives = parseInt(livesStored, 10);
-        if (Number.isNaN(lives) || lives < 0 || lives > MAX_LIVES) {
-            lives = MAX_LIVES;
-            localStorage.setItem('ww_lives', String(MAX_LIVES));
-        }
+      dailyStatus.textContent = `Available: +${DAILY_REWARD_COINS} coins.`;
+      claimDailyBtn.disabled = false;
+      claimDailyBtn.style.opacity = "1";
     }
+  }
 
-    let lastLifeTimestampStored = localStorage.getItem('ww_lastLife');
-    let lastLifeTimestamp;
-    if (lastLifeTimestampStored === null) {
-        lastLifeTimestamp = Date.now();
-        localStorage.setItem('ww_lastLife', String(lastLifeTimestamp));
-    } else {
-        lastLifeTimestamp = parseInt(lastLifeTimestampStored, 10);
-        if (Number.isNaN(lastLifeTimestamp)) {
-            lastLifeTimestamp = Date.now();
-            localStorage.setItem('ww_lastLife', String(lastLifeTimestamp));
-        }
+  claimDailyBtn.addEventListener("click", () => {
+    const today = todayStr();
+    if (lastDaily === today) {
+      alert("Already claimed today.");
+      return;
     }
+    lastDaily = today;
+    coins += DAILY_REWARD_COINS;
+    saveMeta();
+    updateCoinsUI();
+    updateDailyPanel();
+    alert(`Daily reward claimed: +${DAILY_REWARD_COINS} coins.`);
+  });
 
-    let coins = parseInt(localStorage.getItem('ww_coins') || '0', 10);
-    let highScore = parseInt(localStorage.getItem('waddleHighScore') || '0', 10);
-    let removeAds = localStorage.getItem('ww_removeAds') === 'true';
+  /* Missions */
+  function missionProgress(mission) {
+    if (mission.type === "bestScoreAtLeast") {
+      return { current: highScore, target: mission.target };
+    }
+    if (mission.type === "runsToday") {
+      return { current: runsToday, target: mission.target };
+    }
+    return { current: 0, target: mission.target };
+  }
 
-    function saveMeta() {
-        localStorage.setItem('ww_lives', String(lives));
-        localStorage.setItem('ww_lastLife', String(lastLifeTimestamp));
-        localStorage.setItem('ww_coins', String(coins));
-        localStorage.setItem('waddleHighScore', String(highScore));
-        localStorage.setItem('ww_removeAds', String(removeAds));
-    }
+  function checkMissionsCompletion() {
+    MISSIONS.forEach(m => {
+      const state = missionState[m.id] || { completed: false, claimed: false };
+      if (state.completed) return;
+      const prog = missionProgress(m);
+      if (prog.current >= m.target) {
+        state.completed = true;
+        missionState[m.id] = state;
+      }
+    });
+  }
 
-    function updateLivesUI() {
-        livesEl.textContent = '♥ ' + lives;
-    }
-    function updateCoinsUI() {
-        coinsEl.textContent = '💰 ' + coins;
-    }
-    function updateAdsStatusUI() {
-        settingsAdsStatus.textContent = removeAds
-            ? 'Ads currently: OFF (dev “Remove Ads” enabled)'
-            : 'Ads currently: ON (rewarded only)';
-        watchAdBtn.textContent = removeAds ? 'GET BONUS LIFE' : 'WATCH AD';
-    }
+  function renderMissionsPanel() {
+    missionsList.innerHTML = "";
+    MISSIONS.forEach(m => {
+      const state = missionState[m.id] || { completed: false, claimed: false };
+      const li = document.createElement("li");
+      li.className = "list-item";
 
-    function regenLives() {
-        const now = Date.now();
-        if (lives >= MAX_LIVES) {
-            lastLifeTimestamp = now;
-            localStorage.setItem('ww_lastLife', String(lastLifeTimestamp));
+      const label = document.createElement("div");
+      label.className = "list-label";
+      const title = document.createElement("span");
+      title.textContent = m.name;
+      const prog = missionProgress(m);
+      const desc = document.createElement("span");
+      desc.textContent = `${m.desc} (${prog.current}/${m.target}) • Reward: ${m.rewardCoins} coins`;
+      label.appendChild(title);
+      label.appendChild(desc);
+
+      const right = document.createElement("div");
+      const tag = document.createElement("span");
+      tag.className = "tag";
+
+      if (!state.completed) {
+        tag.textContent = "In progress";
+      } else if (state.completed && !state.claimed) {
+        tag.textContent = "Ready";
+      } else {
+        tag.textContent = "Claimed";
+      }
+
+      right.appendChild(tag);
+
+      if (state.completed && !state.claimed) {
+        const btn = document.createElement("button");
+        btn.className = "small-btn";
+        btn.textContent = "Claim";
+        btn.onclick = () => {
+          coins += m.rewardCoins;
+          state.claimed = true;
+          missionState[m.id] = state;
+          saveMeta();
+          updateCoinsUI();
+          renderMissionsPanel();
+        };
+        right.appendChild(btn);
+      }
+
+      li.appendChild(label);
+      li.appendChild(right);
+      missionsList.appendChild(li);
+    });
+  }
+
+  /* Panels: skins, maps, modes, shop */
+  function renderSkinsPanel() {
+    skinsList.innerHTML = "";
+    SKINS.forEach(skin => {
+      const li = document.createElement("li");
+      li.className = "list-item";
+      const label = document.createElement("div");
+      label.className = "list-label";
+
+      const title = document.createElement("span");
+      title.textContent = skin.name;
+      const desc = document.createElement("span");
+      desc.textContent = skin.desc;
+
+      label.appendChild(title);
+      label.appendChild(desc);
+
+      const right = document.createElement("div");
+      const owned = ownedSkins.includes(skin.id);
+      if (!owned && skin.cost > 0) {
+        const costSpan = document.createElement("span");
+        costSpan.textContent = `${skin.cost} coins`;
+        costSpan.style.fontSize = "0.8rem";
+        costSpan.style.marginRight = "6px";
+        right.appendChild(costSpan);
+
+        const btn = document.createElement("button");
+        btn.className = "small-btn";
+        btn.textContent = "Buy";
+        btn.onclick = () => {
+          if (coins < skin.cost) {
+            alert("Not enough coins.");
             return;
+          }
+          coins -= skin.cost;
+          ownedSkins.push(skin.id);
+          equippedSkinId = skin.id;
+          saveMeta();
+          saveCosmetics();
+          updateCoinsUI();
+          renderSkinsPanel();
+          renderShopPanel();
+          updateHubView();
+        };
+        right.appendChild(btn);
+      } else {
+        const tag = document.createElement("span");
+        tag.className = "tag";
+        tag.textContent = skin.id === equippedSkinId ? "Equipped" : "Owned";
+        right.appendChild(tag);
+
+        if (skin.id !== equippedSkinId) {
+          const btn = document.createElement("button");
+          btn.className = "small-btn";
+          btn.textContent = "Equip";
+          btn.onclick = () => {
+            equippedSkinId = skin.id;
+            saveCosmetics();
+            renderSkinsPanel();
+            updateHubView();
+          };
+          right.appendChild(btn);
         }
-        const elapsed = now - lastLifeTimestamp;
-        const regained = Math.floor(elapsed / REGEN_TIME);
-        if (regained > 0) {
-            lives = Math.min(MAX_LIVES, lives + regained);
-            lastLifeTimestamp = now;
-            saveMeta();
-            updateLivesUI();
+      }
+
+      li.appendChild(label);
+      li.appendChild(right);
+      skinsList.appendChild(li);
+    });
+  }
+
+  function renderMapsPanel() {
+    mapsList.innerHTML = "";
+    MAPS.forEach(map => {
+      const li = document.createElement("li");
+      li.className = "list-item";
+      const label = document.createElement("div");
+      label.className = "list-label";
+
+      const title = document.createElement("span");
+      title.textContent = map.name;
+      const desc = document.createElement("span");
+      desc.textContent = map.desc;
+
+      label.appendChild(title);
+      label.appendChild(desc);
+
+      const right = document.createElement("div");
+      const owned = ownedMaps.includes(map.id);
+      if (!owned && map.cost > 0) {
+        const costSpan = document.createElement("span");
+        costSpan.textContent = `${map.cost} coins`;
+        costSpan.style.fontSize = "0.8rem";
+        costSpan.style.marginRight = "6px";
+        right.appendChild(costSpan);
+
+        const btn = document.createElement("button");
+        btn.className = "small-btn";
+        btn.textContent = "Buy";
+        btn.onclick = () => {
+          if (coins < map.cost) {
+            alert("Not enough coins.");
+            return;
+          }
+          coins -= map.cost;
+          ownedMaps.push(map.id);
+          equippedMapId = map.id;
+          saveMeta();
+          saveCosmetics();
+          updateCoinsUI();
+          renderMapsPanel();
+          renderShopPanel();
+          updateHubView();
+        };
+        right.appendChild(btn);
+      } else {
+        const tag = document.createElement("span");
+        tag.className = "tag";
+        tag.textContent = map.id === equippedMapId ? "Equipped" : "Owned";
+        right.appendChild(tag);
+
+        if (map.id !== equippedMapId) {
+          const btn = document.createElement("button");
+          btn.className = "small-btn";
+          btn.textContent = "Equip";
+          btn.onclick = () => {
+            equippedMapId = map.id;
+            saveCosmetics();
+            renderMapsPanel();
+            updateHubView();
+          };
+          right.appendChild(btn);
         }
-    }
-    regenLives();
+      }
+
+      li.appendChild(label);
+      li.appendChild(right);
+      mapsList.appendChild(li);
+    });
+  }
+
+  function renderModesPanel() {
+    modesList.innerHTML = "";
+    MODES.forEach(mode => {
+      const li = document.createElement("li");
+      li.className = "list-item";
+      const label = document.createElement("div");
+      label.className = "list-label";
+
+      const title = document.createElement("span");
+      title.textContent = mode.name;
+      const desc = document.createElement("span");
+      desc.textContent = mode.desc;
+
+      label.appendChild(title);
+      label.appendChild(desc);
+
+      const right = document.createElement("div");
+      const tag = document.createElement("span");
+      tag.className = "tag";
+      tag.textContent = mode.id === modeId ? "Selected" : "";
+      right.appendChild(tag);
+
+      if (mode.id !== modeId) {
+        const btn = document.createElement("button");
+        btn.className = "small-btn";
+        btn.textContent = "Set";
+        btn.onclick = () => {
+          modeId = mode.id;
+          saveCosmetics();
+          renderModesPanel();
+          updateHubView();
+        };
+        right.appendChild(btn);
+      }
+
+      li.appendChild(label);
+      li.appendChild(right);
+      modesList.appendChild(li);
+    });
+  }
+
+  function renderShopPanel() {
+    shopList.innerHTML = "";
+    SKINS.forEach(skin => {
+      if (skin.cost <= 0) return;
+      const li = document.createElement("li");
+      li.className = "list-item";
+      const label = document.createElement("div");
+      label.className = "list-label";
+      const title = document.createElement("span");
+      title.textContent = "Skin: " + skin.name;
+      const desc = document.createElement("span");
+      desc.textContent = `Unlock for ${skin.cost} coins.`;
+      label.appendChild(title);
+      label.appendChild(desc);
+
+      const right = document.createElement("div");
+      const owned = ownedSkins.includes(skin.id);
+      const costSpan = document.createElement("span");
+      costSpan.textContent = `${skin.cost} coins`;
+      costSpan.style.fontSize = "0.8rem";
+      costSpan.style.marginRight = "6px";
+      right.appendChild(costSpan);
+
+      const btn = document.createElement("button");
+      btn.className = "small-btn";
+      btn.textContent = owned ? "Owned" : "Buy";
+      if (!owned) {
+        btn.onclick = () => {
+          if (coins < skin.cost) {
+            alert("Not enough coins.");
+            return;
+          }
+          coins -= skin.cost;
+          ownedSkins.push(skin.id);
+          equippedSkinId = skin.id;
+          saveMeta();
+          saveCosmetics();
+          updateCoinsUI();
+          renderShopPanel();
+          renderSkinsPanel();
+          updateHubView();
+        };
+      } else {
+        btn.disabled = true;
+        btn.style.opacity = "0.6";
+      }
+
+      right.appendChild(btn);
+      li.appendChild(label);
+      li.appendChild(right);
+      shopList.appendChild(li);
+    });
+
+    MAPS.forEach(map => {
+      if (map.cost <= 0) return;
+      const li = document.createElement("li");
+      li.className = "list-item";
+      const label = document.createElement("div");
+      label.className = "list-label";
+      const title = document.createElement("span");
+      title.textContent = "Map: " + map.name;
+      const desc = document.createElement("span");
+      desc.textContent = `Unlock for ${map.cost} coins.`;
+      label.appendChild(title);
+      label.appendChild(desc);
+
+      const right = document.createElement("div");
+      const owned = ownedMaps.includes(map.id);
+      const costSpan = document.createElement("span");
+      costSpan.textContent = `${map.cost} coins`;
+      costSpan.style.fontSize = "0.8rem";
+      costSpan.style.marginRight = "6px";
+      right.appendChild(costSpan);
+
+      const btn = document.createElement("button");
+      btn.className = "small-btn";
+      btn.textContent = owned ? "Owned" : "Buy";
+      if (!owned) {
+        btn.onclick = () => {
+          if (coins < map.cost) {
+            alert("Not enough coins.");
+            return;
+          }
+          coins -= map.cost;
+          ownedMaps.push(map.id);
+          equippedMapId = map.id;
+          saveMeta();
+          saveCosmetics();
+          updateCoinsUI();
+          renderShopPanel();
+          renderMapsPanel();
+          updateHubView();
+        };
+      } else {
+        btn.disabled = true;
+        btn.style.opacity = "0.6";
+      }
+
+      right.appendChild(btn);
+      li.appendChild(label);
+      li.appendChild(right);
+      shopList.appendChild(li);
+    });
+  }
+
+  /* Podium character */
+  function drawPodiumCharacter() {
+    const skin = getEquippedSkin();
+    podiumCtx.clearRect(0, 0, podiumCanvas.width, podiumCanvas.height);
+    podiumCtx.save();
+    podiumCtx.translate(podiumCanvas.width / 2, podiumCanvas.height / 2 + 8);
+
+    podiumCtx.fillStyle = skin.body;
+    podiumCtx.beginPath();
+    podiumCtx.ellipse(0, 0, 18, 22, 0, 0, Math.PI * 2);
+    podiumCtx.fill();
+
+    podiumCtx.fillStyle = "#ffffff";
+    podiumCtx.beginPath();
+    podiumCtx.ellipse(-1, 2, 12, 16, 0, 0, Math.PI * 2);
+    podiumCtx.fill();
+
+    podiumCtx.fillStyle = "white";
+    podiumCtx.beginPath();
+    podiumCtx.arc(5, -7, 5, 0, Math.PI * 2);
+    podiumCtx.fill();
+    podiumCtx.fillStyle = "black";
+    podiumCtx.beginPath();
+    podiumCtx.arc(6.5, -7, 2, 0, Math.PI * 2);
+    podiumCtx.fill();
+
+    podiumCtx.fillStyle = skin.beak;
+    podiumCtx.beginPath();
+    podiumCtx.moveTo(8, -2);
+    podiumCtx.lineTo(18, 1);
+    podiumCtx.lineTo(8, 4);
+    podiumCtx.fill();
+
+    podiumCtx.fillStyle = skin.wing;
+    podiumCtx.beginPath();
+    podiumCtx.ellipse(-5, 4, 7, 12, -0.4, 0, Math.PI * 2);
+    podiumCtx.fill();
+
+    podiumCtx.fillStyle = skin.beak;
+    podiumCtx.beginPath();
+    podiumCtx.ellipse(-4, 19, 5, 3, 0, 0, Math.PI * 2);
+    podiumCtx.fill();
+
+    podiumCtx.restore();
+  }
+
+  function updateHubView() {
+    const skin = getEquippedSkin();
+    const mode = getSelectedMode();
+    podiumLabel.textContent = skin.name;
+    hubModeLabel.textContent = "Mode: " + mode.name;
+    drawPodiumCharacter();
     updateLivesUI();
     updateCoinsUI();
-    updateAdsStatusUI();
-    setInterval(() => { regenLives(); }, 30 * 1000);
+  }
 
-    /* ======= SKINS / MAPS / MODES DATA ======= */
-    const SKINS = [
-        {
-            id: 'classic',
-            name: 'Classic Penguin',
-            desc: 'Standard blue & white hero.',
-            cost: 0,
-            body: '#2C3E50',
-            wing: '#34495E',
-            beak: '#FF9800'
-        },
-        {
-            id: 'red',
-            name: 'Red Rebel',
-            desc: 'Spicy red body, looks faster.',
-            cost: 40,
-            body: '#C0392B',
-            wing: '#922B21',
-            beak: '#FFB74D'
-        },
-        {
-            id: 'gold',
-            name: 'Golden Waddle',
-            desc: 'Shiny golden penguin for show-offs.',
-            cost: 100,
-            body: '#D4AF37',
-            wing: '#B08A2E',
-            beak: '#FFE082'
-        }
-    ];
+  /* GAME STATE */
+  let frames = 0;
+  let score = 0;
+  let isRunning = false;
+  let isGameOver = false;
 
-    const MAPS = [
-        {
-            id: 'day',
-            name: 'Snowfield Day',
-            desc: 'Bright blue sky & soft snow.',
-            cost: 0,
-            gradient: ['#87CEEB', '#E0F7FA']
-        },
-        {
-            id: 'night',
-            name: 'Polar Night',
-            desc: 'Dark, starry arctic sky.',
-            cost: 40,
-            gradient: ['#001c3d', '#00335c']
-        },
-        {
-            id: 'blizzard',
-            name: 'Blizzard',
-            desc: 'Stormy, intense snowstorm.',
-            cost: 60,
-            gradient: ['#546E7A', '#ECEFF1']
-        }
-    ];
-
-    const MODES = [
-        { id: 'easy', name: 'Easy', desc: 'Slower pipes, bigger gaps.', speed: 2.4, gap: 190 },
-        { id: 'normal', name: 'Normal', desc: 'Default challenge.', speed: 3.0, gap: 160 },
-        { id: 'hard', name: 'Hard', desc: 'Faster pipes, tighter gaps.', speed: 3.6, gap: 140 },
-        { id: 'extreme', name: 'Extreme', desc: 'Chaos mode. Don’t cry.', speed: 4.4, gap: 120 }
-    ];
-
-    // Ownership / selection
-    let ownedSkins = JSON.parse(localStorage.getItem('ww_ownedSkins') || '["classic"]');
-    let equippedSkinId = localStorage.getItem('ww_skin') || 'classic';
-    if (!ownedSkins.includes('classic')) ownedSkins.push('classic');
-
-    let ownedMaps = JSON.parse(localStorage.getItem('ww_ownedMaps') || '["day"]');
-    let equippedMapId = localStorage.getItem('ww_map') || 'day';
-    if (!ownedMaps.includes('day')) ownedMaps.push('day');
-
-    let modeId = localStorage.getItem('ww_mode') || 'normal';
-
-    function saveCosmetics() {
-        localStorage.setItem('ww_ownedSkins', JSON.stringify(ownedSkins));
-        localStorage.setItem('ww_ownedMaps', JSON.stringify(ownedMaps));
-        localStorage.setItem('ww_skin', equippedSkinId);
-        localStorage.setItem('ww_map', equippedMapId);
-        localStorage.setItem('ww_mode', modeId);
+  const snowflakes = [];
+  function initSnow() {
+    snowflakes.length = 0;
+    for (let i = 0; i < 50; i++) {
+      snowflakes.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 2 + 1,
+        speed: Math.random() * 1 + 0.5,
+      });
     }
+  }
+  initSnow();
 
-    function getEquippedSkin() {
-        return SKINS.find(s => s.id === equippedSkinId) || SKINS[0];
-    }
-    function getEquippedMap() {
-        return MAPS.find(m => m.id === equippedMapId) || MAPS[0];
-    }
-    function getSelectedMode() {
-        return MODES.find(m => m.id === modeId) || MODES[1];
-    }
+  const penguin = {
+    x: 0,
+    y: 0,
+    radius: 18,
+    velocity: 0,
+    rotation: 0,
 
-    /* ======= RENDER PANELS ======= */
-    function renderSkinsPanel() {
-        skinsList.innerHTML = '';
-        SKINS.forEach(skin => {
-            const li = document.createElement('li');
-            li.className = 'list-item';
-            const label = document.createElement('div');
-            label.className = 'list-label';
-            const title = document.createElement('span');
-            title.textContent = skin.name;
-            const desc = document.createElement('span');
-            desc.textContent = skin.desc;
-            label.appendChild(title);
-            label.appendChild(desc);
+    draw() {
+      const skin = getEquippedSkin();
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      const rot = this.velocity * 0.1;
+      this.rotation = Math.min(Math.PI / 4, Math.max(-Math.PI / 4, rot));
+      ctx.rotate(this.rotation);
 
-            const right = document.createElement('div');
-            if (!ownedSkins.includes(skin.id)) {
-                const costSpan = document.createElement('span');
-                costSpan.textContent = `${skin.cost} coins`;
-                costSpan.style.fontSize = '0.8rem';
-                costSpan.style.marginRight = '6px';
-                right.appendChild(costSpan);
+      ctx.fillStyle = skin.body;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 20, 25, 0, 0, Math.PI * 2);
+      ctx.fill();
 
-                const btn = document.createElement('button');
-                btn.className = 'small-btn';
-                btn.textContent = 'Buy';
-                btn.onclick = () => {
-                    if (coins < skin.cost) {
-                        alert('Not enough coins.');
-                        return;
-                    }
-                    coins -= skin.cost;
-                    ownedSkins.push(skin.id);
-                    equippedSkinId = skin.id;
-                    saveMeta();
-                    saveCosmetics();
-                    updateCoinsUI();
-                    renderSkinsPanel();
-                    renderShopPanel();
-                    updateHubView();
-                };
-                right.appendChild(btn);
-            } else {
-                const tag = document.createElement('span');
-                tag.className = 'tag';
-                tag.textContent = skin.id === equippedSkinId ? 'Equipped' : 'Owned';
-                right.appendChild(tag);
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.ellipse(-2, 2, 14, 18, 0, 0, Math.PI * 2);
+      ctx.fill();
 
-                if (skin.id !== equippedSkinId) {
-                    const btn = document.createElement('button');
-                    btn.className = 'small-btn';
-                    btn.textContent = 'Equip';
-                    btn.onclick = () => {
-                        equippedSkinId = skin.id;
-                        saveCosmetics();
-                        renderSkinsPanel();
-                        updateHubView();
-                    };
-                    right.appendChild(btn);
-                }
-            }
+      ctx.fillStyle = "white";
+      ctx.beginPath();
+      ctx.arc(6, -8, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "black";
+      ctx.beginPath();
+      ctx.arc(8, -8, 2, 0, Math.PI * 2);
+      ctx.fill();
 
-            li.appendChild(label);
-            li.appendChild(right);
-            skinsList.appendChild(li);
-        });
-    }
+      ctx.fillStyle = skin.beak;
+      ctx.beginPath();
+      ctx.moveTo(10, -2);
+      ctx.lineTo(24, 2);
+      ctx.lineTo(10, 6);
+      ctx.fill();
 
-    function renderMapsPanel() {
-        mapsList.innerHTML = '';
-        MAPS.forEach(map => {
-            const li = document.createElement('li');
-            li.className = 'list-item';
-            const label = document.createElement('div');
-            label.className = 'list-label';
-            const title = document.createElement('span');
-            title.textContent = map.name;
-            const desc = document.createElement('span');
-            desc.textContent = map.desc;
-            label.appendChild(title);
-            label.appendChild(desc);
+      ctx.fillStyle = skin.wing;
+      ctx.beginPath();
+      const wingY = Math.sin(frames * 0.25) * 3;
+      ctx.ellipse(-5, 5 + wingY, 8, 14, -0.5, 0, Math.PI * 2);
+      ctx.fill();
 
-            const right = document.createElement('div');
-            if (!ownedMaps.includes(map.id)) {
-                const costSpan = document.createElement('span');
-                costSpan.textContent = `${map.cost} coins`;
-                costSpan.style.fontSize = '0.8rem';
-                costSpan.style.marginRight = '6px';
-                right.appendChild(costSpan);
+      ctx.fillStyle = skin.beak;
+      ctx.beginPath();
+      ctx.ellipse(-5, 22, 6, 4, 0, 0, Math.PI * 2);
+      ctx.fill();
 
-                const btn = document.createElement('button');
-                btn.className = 'small-btn';
-                btn.textContent = 'Buy';
-                btn.onclick = () => {
-                    if (coins < map.cost) {
-                        alert('Not enough coins.');
-                        return;
-                    }
-                    coins -= map.cost;
-                    ownedMaps.push(map.id);
-                    equippedMapId = map.id;
-                    saveMeta();
-                    saveCosmetics();
-                    updateCoinsUI();
-                    renderMapsPanel();
-                    renderShopPanel();
-                    updateHubView();
-                };
-                right.appendChild(btn);
-            } else {
-                const tag = document.createElement('span');
-                tag.className = 'tag';
-                tag.textContent = map.id === equippedMapId ? 'Equipped' : 'Owned';
-                right.appendChild(tag);
+      ctx.restore();
+    },
 
-                if (map.id !== equippedMapId) {
-                    const btn = document.createElement('button');
-                    btn.className = 'small-btn';
-                    btn.textContent = 'Equip';
-                    btn.onclick = () => {
-                        equippedMapId = map.id;
-                        saveCosmetics();
-                        renderMapsPanel();
-                        updateHubView();
-                    };
-                    right.appendChild(btn);
-                }
-            }
+    update() {
+      this.velocity += GRAVITY;
+      this.y += this.velocity;
 
-            li.appendChild(label);
-            li.appendChild(right);
-            mapsList.appendChild(li);
-        });
-    }
+      if (this.y + this.radius >= canvas.height) {
+        this.y = canvas.height - this.radius;
+        triggerGameOver();
+      }
+      if (this.y - this.radius <= 0) {
+        this.y = this.radius;
+        this.velocity = 0;
+      }
+    },
 
-    function renderModesPanel() {
-        modesList.innerHTML = '';
-        MODES.forEach(mode => {
-            const li = document.createElement('li');
-            li.className = 'list-item';
-            const label = document.createElement('div');
-            label.className = 'list-label';
-            const title = document.createElement('span');
-            title.textContent = mode.name;
-            const desc = document.createElement('span');
-            desc.textContent = mode.desc;
-            label.appendChild(title);
-            label.appendChild(desc);
+    flap() {
+      this.velocity = FLAP_STRENGTH;
+    },
 
-            const right = document.createElement('div');
-            const tag = document.createElement('span');
-            tag.className = 'tag';
-            tag.textContent = mode.id === modeId ? 'Selected' : '';
-            right.appendChild(tag);
+    reset() {
+      this.x = canvas.width * 0.2;
+      this.y = canvas.height / 2;
+      this.velocity = 0;
+      this.rotation = 0;
+    },
+  };
 
-            if (mode.id !== modeId) {
-                const btn = document.createElement('button');
-                btn.className = 'small-btn';
-                btn.textContent = 'Set';
-                btn.onclick = () => {
-                    modeId = mode.id;
-                    saveCosmetics();
-                    renderModesPanel();
-                    updateHubView();
-                };
-                right.appendChild(btn);
-            }
+  const pipes = {
+    items: [],
+    reset() { this.items = []; },
 
-            li.appendChild(label);
-            li.appendChild(right);
-            modesList.appendChild(li);
-        });
-    }
+    update() {
+      const mode = getSelectedMode();
+      if (frames % 100 === 0) {
+        const minLen = 50;
+        const maxPos = canvas.height - minLen - mode.gap;
+        const minPos = minLen;
+        const topY = Math.floor(Math.random() * (maxPos - minPos + 1)) + minPos;
+        this.items.push({ x: canvas.width, y: topY, passed: false });
+      }
 
-    function renderShopPanel() {
-        shopList.innerHTML = '';
-        // simple shop: skins + maps in one list
-        SKINS.forEach(skin => {
-            if (skin.cost === 0) return;
-            const li = document.createElement('li');
-            li.className = 'list-item';
-            const label = document.createElement('div');
-            label.className = 'list-label';
-            const title = document.createElement('span');
-            title.textContent = `Skin: ${skin.name}`;
-            const desc = document.createElement('span');
-            desc.textContent = `Unlock this skin for ${skin.cost} coins.`;
-            label.appendChild(title);
-            label.appendChild(desc);
-
-            const right = document.createElement('div');
-            const owned = ownedSkins.includes(skin.id);
-            const costSpan = document.createElement('span');
-            costSpan.textContent = `${skin.cost} coins`;
-            costSpan.style.fontSize = '0.8rem';
-            costSpan.style.marginRight = '6px';
-            right.appendChild(costSpan);
-
-            const btn = document.createElement('button');
-            btn.className = 'small-btn';
-            btn.textContent = owned ? 'Owned' : 'Buy';
-            if (!owned) {
-                btn.onclick = () => {
-                    if (coins < skin.cost) {
-                        alert('Not enough coins.');
-                        return;
-                    }
-                    coins -= skin.cost;
-                    ownedSkins.push(skin.id);
-                    equippedSkinId = skin.id;
-                    saveMeta();
-                    saveCosmetics();
-                    updateCoinsUI();
-                    renderShopPanel();
-                    renderSkinsPanel();
-                    updateHubView();
-                };
-            } else {
-                btn.disabled = true;
-                btn.style.opacity = '0.6';
-            }
-
-            right.appendChild(btn);
-            li.appendChild(label);
-            li.appendChild(right);
-            shopList.appendChild(li);
-        });
-
-        MAPS.forEach(map => {
-            if (map.cost === 0) return;
-            const li = document.createElement('li');
-            li.className = 'list-item';
-            const label = document.createElement('div');
-            label.className = 'list-label';
-            const title = document.createElement('span');
-            title.textContent = `Map: ${map.name}`;
-            const desc = document.createElement('span');
-            desc.textContent = `Unlock this map for ${map.cost} coins.`;
-            label.appendChild(title);
-            label.appendChild(desc);
-
-            const right = document.createElement('div');
-            const owned = ownedMaps.includes(map.id);
-            const costSpan = document.createElement('span');
-            costSpan.textContent = `${map.cost} coins`;
-            costSpan.style.fontSize = '0.8rem';
-            costSpan.style.marginRight = '6px';
-            right.appendChild(costSpan);
-
-            const btn = document.createElement('button');
-            btn.className = 'small-btn';
-            btn.textContent = owned ? 'Owned' : 'Buy';
-            if (!owned) {
-                btn.onclick = () => {
-                    if (coins < map.cost) {
-                        alert('Not enough coins.');
-                        return;
-                    }
-                    coins -= map.cost;
-                    ownedMaps.push(map.id);
-                    equippedMapId = map.id;
-                    saveMeta();
-                    saveCosmetics();
-                    updateCoinsUI();
-                    renderShopPanel();
-                    renderMapsPanel();
-                    updateHubView();
-                };
-            } else {
-                btn.disabled = true;
-                btn.style.opacity = '0.6';
-            }
-
-            right.appendChild(btn);
-            li.appendChild(label);
-            li.appendChild(right);
-            shopList.appendChild(li);
-        });
-    }
-
-    /* ======= HUB CHARACTER PREVIEW ======= */
-    function drawPodiumCharacter() {
-        const skin = getEquippedSkin();
-        podiumCtx.clearRect(0, 0, podiumCanvas.width, podiumCanvas.height);
-
-        podiumCtx.save();
-        podiumCtx.translate(podiumCanvas.width/2, podiumCanvas.height/2 + 8);
-
-        // Body
-        podiumCtx.fillStyle = skin.body;
-        podiumCtx.beginPath();
-        podiumCtx.ellipse(0, 0, 18, 22, 0, 0, Math.PI * 2);
-        podiumCtx.fill();
-
-        // Belly
-        podiumCtx.fillStyle = '#FFFFFF';
-        podiumCtx.beginPath();
-        podiumCtx.ellipse(-1, 2, 12, 16, 0, 0, Math.PI * 2);
-        podiumCtx.fill();
-
-        // Eye
-        podiumCtx.fillStyle = 'white';
-        podiumCtx.beginPath();
-        podiumCtx.arc(5, -7, 5, 0, Math.PI * 2);
-        podiumCtx.fill();
-
-        podiumCtx.fillStyle = 'black';
-        podiumCtx.beginPath();
-        podiumCtx.arc(6.5, -7, 2, 0, Math.PI * 2);
-        podiumCtx.fill();
-
-        // Beak
-        podiumCtx.fillStyle = skin.beak;
-        podiumCtx.beginPath();
-        podiumCtx.moveTo(8, -2);
-        podiumCtx.lineTo(18, 1);
-        podiumCtx.lineTo(8, 4);
-        podiumCtx.fill();
-
-        // Wing
-        podiumCtx.fillStyle = skin.wing;
-        podiumCtx.beginPath();
-        podiumCtx.ellipse(-5, 4, 7, 12, -0.4, 0, Math.PI * 2);
-        podiumCtx.fill();
-
-        // Feet
-        podiumCtx.fillStyle = skin.beak;
-        podiumCtx.beginPath();
-        podiumCtx.ellipse(-4, 19, 5, 3, 0, 0, Math.PI * 2);
-        podiumCtx.fill();
-
-        podiumCtx.restore();
-    }
-
-    function updateHubView() {
-        const skin = getEquippedSkin();
+      for (let i = 0; i < this.items.length; i++) {
+        const p = this.items[i];
         const mode = getSelectedMode();
-        podiumLabel.textContent = skin.name;
-        hubModeLabel.textContent = 'Mode: ' + mode.name;
-        drawPodiumCharacter();
-        updateLivesUI();
-        updateCoinsUI();
-    }
+        p.x -= mode.speed;
 
-    /* ======= GAME CORE ======= */
-    let frames = 0;
-    let score = 0;
-    let isRunning = false;
-    let isGameOver = false;
+        const pipeWidth = 60;
+        const pLeft = penguin.x - penguin.radius;
+        const pRight = penguin.x + penguin.radius;
+        const pTop = penguin.y - penguin.radius;
+        const pBottom = penguin.y + penguin.radius;
 
-    const snowflakes = [];
-    function initSnow() {
-        snowflakes.length = 0;
-        for (let i = 0; i < 50; i++) {
-            snowflakes.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                r: Math.random() * 2 + 1,
-                speed: Math.random() * 1 + 0.5
-            });
-        }
-    }
-    initSnow();
-
-    const penguin = {
-        x: 0,
-        y: 0,
-        radius: 18,
-        velocity: 0,
-        rotation: 0,
-
-        draw() {
-            const skin = getEquippedSkin();
-            ctx.save();
-            ctx.translate(this.x, this.y);
-            const rot = this.velocity * 0.1;
-            this.rotation = Math.min(Math.PI / 4, Math.max(-Math.PI / 4, rot));
-            ctx.rotate(this.rotation);
-
-            ctx.fillStyle = skin.body;
-            ctx.beginPath();
-            ctx.ellipse(0, 0, 20, 25, 0, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.fillStyle = '#FFFFFF';
-            ctx.beginPath();
-            ctx.ellipse(-2, 2, 14, 18, 0, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.fillStyle = 'white';
-            ctx.beginPath();
-            ctx.arc(6, -8, 6, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.fillStyle = 'black';
-            ctx.beginPath();
-            ctx.arc(8, -8, 2, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.fillStyle = skin.beak;
-            ctx.beginPath();
-            ctx.moveTo(10, -2);
-            ctx.lineTo(24, 2);
-            ctx.lineTo(10, 6);
-            ctx.fill();
-
-            ctx.fillStyle = skin.wing;
-            ctx.beginPath();
-            const wingY = Math.sin(frames * 0.25) * 3;
-            ctx.ellipse(-5, 5 + wingY, 8, 14, -0.5, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.fillStyle = skin.beak;
-            ctx.beginPath();
-            ctx.ellipse(-5, 22, 6, 4, 0, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.restore();
-        },
-
-        update() {
-            this.velocity += GRAVITY;
-            this.y += this.velocity;
-
-            if (this.y + this.radius >= canvas.height) {
-                this.y = canvas.height - this.radius;
-                triggerGameOver();
-            }
-
-            if (this.y - this.radius <= 0) {
-                this.y = this.radius;
-                this.velocity = 0;
-            }
-        },
-
-        flap() {
-            this.velocity = FLAP_STRENGTH;
-        },
-
-        reset() {
-            this.x = canvas.width * 0.2;
-            this.y = canvas.height / 2;
-            this.velocity = 0;
-            this.rotation = 0;
-        }
-    };
-
-    const pipes = {
-        items: [],
-        reset() { this.items = []; },
-
-        update() {
-            const mode = getSelectedMode();
-            if (frames % 100 === 0) {
-                const minPipeLen = 50;
-                const maxPos = canvas.height - minPipeLen - mode.gap;
-                const minPos = minPipeLen;
-                const topY = Math.floor(Math.random() * (maxPos - minPos + 1)) + minPos;
-                this.items.push({ x: canvas.width, y: topY, passed: false });
-            }
-
-            for (let i = 0; i < this.items.length; i++) {
-                const p = this.items[i];
-                p.x -= mode.speed;
-
-                const pipeWidth = 60;
-                const pLeft = penguin.x - penguin.radius;
-                const pRight = penguin.x + penguin.radius;
-                const pTop = penguin.y - penguin.radius;
-                const pBottom = penguin.y + penguin.radius;
-
-                if (pRight > p.x && pLeft < p.x + pipeWidth) {
-                    if (pTop < p.y || pBottom > p.y + mode.gap) {
-                        triggerGameOver();
-                    }
-                }
-
-                if (p.x + pipeWidth < penguin.x && !p.passed) {
-                    p.passed = true;
-                    score++;
-                    coins += BASE_COIN_REWARD;
-                    scoreEl.textContent = score;
-                    updateCoinsUI();
-                    saveMeta();
-                }
-
-                if (p.x + pipeWidth < 0) {
-                    this.items.shift();
-                    i--;
-                }
-            }
-        },
-
-        draw() {
-            const map = getEquippedMap();
-            const [topCol, botCol] = map.gradient;
-
-            for (let i = 0; i < this.items.length; i++) {
-                const p = this.items[i];
-                const pipeWidth = 60;
-
-                const gradTop = ctx.createLinearGradient(p.x, 0, p.x + pipeWidth, 0);
-                gradTop.addColorStop(0, topCol);
-                gradTop.addColorStop(0.5, botCol);
-                gradTop.addColorStop(1, topCol);
-
-                const gradBot = ctx.createLinearGradient(p.x, 0, p.x + pipeWidth, 0);
-                gradBot.addColorStop(0, topCol);
-                gradBot.addColorStop(0.5, botCol);
-                gradBot.addColorStop(1, topCol);
-
-                // top
-                ctx.fillStyle = gradTop;
-                ctx.fillRect(p.x, 0, pipeWidth, p.y);
-                ctx.fillStyle = '#E0FFFF';
-                ctx.beginPath();
-                ctx.moveTo(p.x + 10, p.y);
-                ctx.lineTo(p.x + 30, p.y + 20);
-                ctx.lineTo(p.x + 50, p.y);
-                ctx.fill();
-
-                // bottom
-                ctx.fillStyle = gradBot;
-                ctx.fillRect(
-                    p.x,
-                    p.y + getSelectedMode().gap,
-                    pipeWidth,
-                    canvas.height - (p.y + getSelectedMode().gap)
-                );
-                ctx.fillStyle = '#E0FFFF';
-                ctx.beginPath();
-                ctx.moveTo(p.x + 10, p.y + getSelectedMode().gap);
-                ctx.lineTo(p.x + 30, p.y + getSelectedMode().gap - 20);
-                ctx.lineTo(p.x + 50, p.y + getSelectedMode().gap);
-                ctx.fill();
-
-                ctx.strokeStyle = '#5DBCD2';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(p.x, -2, pipeWidth, p.y + 2);
-                ctx.strokeRect(p.x, p.y + getSelectedMode().gap, pipeWidth, canvas.height);
-            }
-        }
-    };
-
-    function drawBackground() {
-        const map = getEquippedMap();
-        const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-        grad.addColorStop(0, map.gradient[0]);
-        grad.addColorStop(1, map.gradient[1]);
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // snow
-        ctx.fillStyle = 'rgba(255,255,255,0.7)';
-        snowflakes.forEach(flake => {
-            ctx.beginPath();
-            ctx.arc(flake.x, flake.y, flake.r, 0, Math.PI * 2);
-            ctx.fill();
-
-            flake.y += flake.speed;
-            flake.x += Math.sin((flake.y + performance.now() * 0.002)) * 0.2;
-
-            if (flake.y > canvas.height) {
-                flake.y = -5;
-                flake.x = Math.random() * canvas.width;
-            }
-        });
-    }
-
-    function loop() {
-        if (!isRunning) return;
-
-        penguin.update();
-        pipes.update();
-        frames++;
-
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        drawBackground();
-        pipes.draw();
-        penguin.draw();
-
-        if (!isGameOver) requestAnimationFrame(loop);
-    }
-
-    function triggerGameOver() {
-        if (isGameOver) return;
-        isGameOver = true;
-        isRunning = false;
-
-        lives = Math.max(0, lives - 1);
-        lastLifeTimestamp = Date.now();
-        saveMeta();
-        updateLivesUI();
-
-        finalScoreEl.textContent = score;
-        if (score > highScore) {
-            highScore = score;
-            localStorage.setItem('waddleHighScore', String(highScore));
-        }
-        bestScoreEl.textContent = highScore;
-        livesLeftLabel.textContent = lives;
-
-        gameOverScreen.classList.remove('hidden');
-    }
-
-    function startRun() {
-        regenLives();
-        updateLivesUI();
-        if (lives <= 0) {
-            hubOverlay.classList.remove('hidden');
-            noLivesScreen.classList.remove('hidden');
-            return;
+        if (pRight > p.x && pLeft < p.x + pipeWidth) {
+          if (pTop < p.y || pBottom > p.y + mode.gap) {
+            triggerGameOver();
+          }
         }
 
-        hubOverlay.classList.add('hidden');
-        gameOverScreen.classList.add('hidden');
-        noLivesScreen.classList.add('hidden');
-        fakeAdScreen.classList.add('hidden');
-
-        isGameOver = false;
-        isRunning = true;
-        score = 0;
-        frames = 0;
-        scoreEl.textContent = score;
-        penguin.reset();
-        pipes.reset();
-        initSnow();
-        loop();
-    }
-
-    function handleInput(e) {
-        if (e && e.type === 'keydown' && e.code === 'Space') {
-            e.preventDefault();
+        if (p.x + pipeWidth < penguin.x && !p.passed) {
+          p.passed = true;
+          score++;
+          coins += 1; // 1 coin per pipe passed
+          scoreEl.textContent = score;
+          updateCoinsUI();
+          saveMeta();
         }
-        if (!isRunning || isGameOver) return;
-        penguin.flap();
-    }
 
-    window.addEventListener('keydown', e => {
-        if (e.code === 'Space') {
-            if (!isRunning && hubOverlay.classList.contains('hidden') && gameOverScreen.classList.contains('hidden')) {
-                // ignore – only flap in-game
-            } else if (!isRunning && hubOverlay.classList.contains('hidden') && gameOverScreen.classList.contains('hidden')) {
-                // nothing
-            }
-            handleInput(e);
+        if (p.x + pipeWidth < 0) {
+          this.items.shift();
+          i--;
         }
+      }
+    },
+
+    draw() {
+      const map = getEquippedMap();
+      for (let i = 0; i < this.items.length; i++) {
+        const p = this.items[i];
+        const pipeWidth = 60;
+        const mode = getSelectedMode();
+
+        const gradTop = ctx.createLinearGradient(p.x, 0, p.x + pipeWidth, 0);
+        gradTop.addColorStop(0, map.gradient[0]);
+        gradTop.addColorStop(0.5, map.gradient[1]);
+        gradTop.addColorStop(1, map.gradient[0]);
+
+        const gradBot = ctx.createLinearGradient(p.x, 0, p.x + pipeWidth, 0);
+        gradBot.addColorStop(0, map.gradient[0]);
+        gradBot.addColorStop(0.5, map.gradient[1]);
+        gradBot.addColorStop(1, map.gradient[0]);
+
+        ctx.fillStyle = gradTop;
+        ctx.fillRect(p.x, 0, pipeWidth, p.y);
+        ctx.fillStyle = "#E0FFFF";
+        ctx.beginPath();
+        ctx.moveTo(p.x + 10, p.y);
+        ctx.lineTo(p.x + 30, p.y + 20);
+        ctx.lineTo(p.x + 50, p.y);
+        ctx.fill();
+
+        ctx.fillStyle = gradBot;
+        ctx.fillRect(
+          p.x,
+          p.y + mode.gap,
+          pipeWidth,
+          canvas.height - (p.y + mode.gap)
+        );
+        ctx.beginPath();
+        ctx.moveTo(p.x + 10, p.y + mode.gap);
+        ctx.lineTo(p.x + 30, p.y + mode.gap - 20);
+        ctx.lineTo(p.x + 50, p.y + mode.gap);
+        ctx.fill();
+
+        ctx.strokeStyle = "#5DBCD2";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(p.x, -2, pipeWidth, p.y + 2);
+        ctx.strokeRect(p.x, p.y + mode.gap, pipeWidth, canvas.height);
+      }
+    },
+  };
+
+  function drawBackground() {
+    const map = getEquippedMap();
+    const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    grad.addColorStop(0, map.gradient[0]);
+    grad.addColorStop(1, map.gradient[1]);
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = "rgba(255,255,255,0.7)";
+    snowflakes.forEach(f => {
+      ctx.beginPath();
+      ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+      ctx.fill();
+
+      f.y += f.speed;
+      f.x += Math.sin((f.y + performance.now() * 0.002)) * 0.2;
+
+      if (f.y > canvas.height) {
+        f.y = -5;
+        f.x = Math.random() * canvas.width;
+      }
     });
+  }
 
-    canvas.addEventListener('mousedown', handleInput);
-    canvas.addEventListener('touchstart', e => {
-        e.preventDefault();
-        handleInput(e);
-    }, { passive: false });
+  function loop() {
+    if (!isRunning) return;
 
-    /* ======= HUB BUTTONS ======= */
-    btnPlay.addEventListener('click', () => startRun());
-    btnSkins.addEventListener('click', () => { renderSkinsPanel(); skinsPanel.classList.remove('hidden'); });
-    btnMaps.addEventListener('click', () => { renderMapsPanel(); mapsPanel.classList.remove('hidden'); });
-    btnModes.addEventListener('click', () => { renderModesPanel(); modesPanel.classList.remove('hidden'); });
-    btnShop.addEventListener('click', () => { renderShopPanel(); shopPanel.classList.remove('hidden'); });
-    btnSettings.addEventListener('click', () => { settingsPanel.classList.remove('hidden'); });
+    penguin.update();
+    pipes.update();
+    frames++;
 
-    document.querySelectorAll('[data-panel-close]').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const id = btn.getAttribute('data-panel-close');
-            const panel = document.getElementById(id);
-            if (panel) panel.classList.add('hidden');
-        });
-    });
-
-    restartBtn.addEventListener('click', () => {
-        if (lives <= 0) {
-            gameOverScreen.classList.add('hidden');
-            noLivesScreen.classList.remove('hidden');
-        } else {
-            startRun();
-        }
-    });
-
-    backMenuBtn.addEventListener('click', () => {
-        gameOverScreen.classList.add('hidden');
-        hubOverlay.classList.remove('hidden');
-    });
-
-    backFromNoLivesBtn.addEventListener('click', () => {
-        noLivesScreen.classList.add('hidden');
-        hubOverlay.classList.remove('hidden');
-    });
-
-    /* ======= REMOVE ADS DEV TOGGLE ======= */
-    removeAdsBtn.addEventListener('click', () => {
-        removeAds = !removeAds;
-        saveMeta();
-        updateAdsStatusUI();
-        alert(removeAds
-            ? 'Dev: Ads removed. In real app this would be a £4.99 purchase.'
-            : 'Dev: Ads turned back ON.');
-    });
-
-    /* ======= FAKE REWARDED AD ======= */
-    watchAdBtn.addEventListener('click', () => {
-        noLivesScreen.classList.add('hidden');
-        if (removeAds) {
-            // In a real paid build you wouldn’t even show ads.
-            // Here, just grant a life directly.
-            lives = Math.min(MAX_LIVES, lives + 1);
-            lastLifeTimestamp = Date.now();
-            saveMeta();
-            updateLivesUI();
-            alert('Ad-free user: +1 bonus life granted.');
-            hubOverlay.classList.remove('hidden');
-            return;
-        }
-
-        fakeAdScreen.classList.remove('hidden');
-        runFakeAd();
-    });
-
-    function runFakeAd() {
-        let duration = 5;
-        let remaining = duration;
-        fakeAdBar.style.width = '0%';
-        fakeAdTimer.textContent = `${remaining}s remaining`;
-
-        const interval = setInterval(() => {
-            remaining--;
-            const pct = ((duration - remaining) / duration) * 100;
-            fakeAdBar.style.width = pct + '%';
-            fakeAdTimer.textContent = `${Math.max(remaining,0)}s remaining`;
-
-            if (remaining <= 0) {
-                clearInterval(interval);
-                setTimeout(() => {
-                    fakeAdScreen.classList.add('hidden');
-                    lives = Math.min(MAX_LIVES, lives + 1);
-                    lastLifeTimestamp = Date.now();
-                    saveMeta();
-                    updateLivesUI();
-                    alert('Thanks for watching! +1 life added.');
-                    hubOverlay.classList.remove('hidden');
-                }, 300);
-            }
-        }, 1000);
-    }
-
-    /* ======= INITIAL RENDER ======= */
-    updateHubView();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBackground();
-    penguin.reset();
+    pipes.draw();
     penguin.draw();
 
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js').catch(() => {});
-        });
+    if (!isGameOver) requestAnimationFrame(loop);
+  }
+
+  function triggerGameOver() {
+    if (isGameOver) return;
+    isGameOver = true;
+    isRunning = false;
+
+    lives = Math.max(0, lives - 1);
+    lastLifeTimestamp = Date.now();
+    runsToday += 1;
+    runsTodayDate = todayStr();
+    saveMeta();
+    updateLivesUI();
+
+    finalScoreEl.textContent = score;
+    if (score > highScore) {
+      highScore = score;
+      localStorage.setItem("waddleHighScore", String(highScore));
     }
+    bestScoreEl.textContent = highScore;
+    livesLeftLabel.textContent = lives;
+
+    checkMissionsCompletion();
+    saveMeta();
+
+    gameOverScreen.classList.remove("hidden");
+  }
+
+  function startRun() {
+    regenLives();
+    updateLivesUI();
+
+    if (lives <= 0) {
+      noLivesScreen.classList.remove("hidden");
+      return;
+    }
+
+    // start run – don't deduct life at start, only on death (Option B)
+    hubOverlay.classList.add("hidden");
+    gameOverScreen.classList.add("hidden");
+    noLivesScreen.classList.add("hidden");
+    fakeAdScreen.classList.add("hidden");
+
+    isGameOver = false;
+    isRunning = true;
+    score = 0;
+    frames = 0;
+    scoreEl.textContent = score;
+    penguin.reset();
+    pipes.reset();
+    initSnow();
+    loop();
+  }
+
+  function handleFlapInput(e) {
+    if (e && e.type === "keydown" && e.code === "Space") {
+      e.preventDefault();
+    }
+    if (!isRunning || isGameOver) return;
+    penguin.flap();
+  }
+
+  window.addEventListener("keydown", e => {
+    if (e.code === "Space") handleFlapInput(e);
+  });
+
+  canvas.addEventListener("mousedown", handleFlapInput);
+  canvas.addEventListener("touchstart", e => {
+    e.preventDefault();
+    handleFlapInput(e);
+  }, { passive: false });
+
+  /* HUB BUTTONS & PANELS */
+  btnPlay.addEventListener("click", () => startRun());
+  btnSkins.addEventListener("click", () => { renderSkinsPanel(); skinsPanel.classList.remove("hidden"); });
+  btnMaps.addEventListener("click", () => { renderMapsPanel(); mapsPanel.classList.remove("hidden"); });
+  btnModes.addEventListener("click", () => { renderModesPanel(); modesPanel.classList.remove("hidden"); });
+  btnShop.addEventListener("click", () => { renderShopPanel(); shopPanel.classList.remove("hidden"); });
+  btnSettings.addEventListener("click", () => { settingsPanel.classList.remove("hidden"); });
+  btnMissions.addEventListener("click", () => { checkMissionsCompletion(); renderMissionsPanel(); missionsPanel.classList.remove("hidden"); });
+  btnDaily.addEventListener("click", () => { updateDailyPanel(); dailyPanel.classList.remove("hidden"); });
+
+  document.querySelectorAll("[data-panel-close]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-panel-close");
+      const panel = document.getElementById(id);
+      if (panel) panel.classList.add("hidden");
+    });
+  });
+
+  restartBtn.addEventListener("click", () => {
+    if (lives <= 0) {
+      gameOverScreen.classList.add("hidden");
+      noLivesScreen.classList.remove("hidden");
+    } else {
+      gameOverScreen.classList.add("hidden");
+      startRun();
+    }
+  });
+
+  backMenuBtn.addEventListener("click", () => {
+    gameOverScreen.classList.add("hidden");
+    hubOverlay.classList.remove("hidden");
+  });
+
+  backFromNoLivesBtn.addEventListener("click", () => {
+    noLivesScreen.classList.add("hidden");
+    hubOverlay.classList.remove("hidden");
+  });
+
+  btnRemoveAds.addEventListener("click", () => {
+    removeAds = !removeAds;
+    saveMeta();
+    updateAdsStatusUI();
+    alert(removeAds
+      ? "Dev: Remove Ads enabled. In real app this would be a £4.99 purchase."
+      : "Dev: Ads turned back on.");
+  });
+
+  /* Fake rewarded ad / bonus life */
+  watchAdBtn.addEventListener("click", () => {
+    if (removeAds) {
+      // Ad-free build: just give the life
+      lives = Math.min(MAX_LIVES, lives + 1);
+      lastLifeTimestamp = Date.now();
+      saveMeta();
+      updateLivesUI();
+      alert("Ad-free user: +1 bonus life.");
+      noLivesScreen.classList.add("hidden");
+      hubOverlay.classList.remove("hidden");
+      return;
+    }
+
+    noLivesScreen.classList.add("hidden");
+    fakeAdScreen.classList.remove("hidden");
+    runFakeAd();
+  });
+
+  function runFakeAd() {
+    let duration = 5;
+    let remaining = duration;
+    fakeAdBar.style.width = "0%";
+    fakeAdTimer.textContent = `${remaining}s remaining`;
+
+    const interval = setInterval(() => {
+      remaining--;
+      const pct = ((duration - remaining) / duration) * 100;
+      fakeAdBar.style.width = pct + "%";
+      fakeAdTimer.textContent = `${Math.max(remaining, 0)}s remaining`;
+
+      if (remaining <= 0) {
+        clearInterval(interval);
+        setTimeout(() => {
+          fakeAdScreen.classList.add("hidden");
+          lives = Math.min(MAX_LIVES, lives + 1);
+          lastLifeTimestamp = Date.now();
+          saveMeta();
+          updateLivesUI();
+          alert("Thanks for watching! +1 life added.");
+          hubOverlay.classList.remove("hidden");
+        }, 300);
+      }
+    }, 1000);
+  }
+
+  /* FIRST RENDER */
+  updateHubView();
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawBackground();
+  penguin.reset();
+  penguin.draw();
+
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./sw.js").catch(() => {});
+    });
+  }
 </script>
 </body>
-</html>
+    </html>
