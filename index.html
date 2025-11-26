@@ -426,7 +426,7 @@
       color: #555;
     }
 
-    /* POWERUP HUD */
+    /* POWERUP HUD (ACTIVE TIMERS) */
     #powerup-hud {
       position: absolute;
       bottom: 6px;
@@ -457,6 +457,45 @@
       font-size: 0.6rem;
     }
 
+    /* IN-GAME POWERUP BUTTONS (RIGHT SIDE) */
+    #powerup-buttons {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: auto;
+    }
+
+    .powerup-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.8);
+      background: rgba(0,0,0,0.6);
+      color: #fff;
+      font-size: 0.75rem;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+
+    .powerup-btn.disabled {
+      opacity: 0.35;
+      cursor: default;
+      box-shadow: none;
+    }
+
+    .powerup-btn:active:not(.disabled) {
+      transform: translateY(1px);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.7);
+    }
+
     .hidden { display: none !important; }
   </style>
 </head>
@@ -472,7 +511,18 @@
         <div id="lives-display">♥ 5</div>
       </div>
     </div>
+
+    <!-- Active powerup HUD (timers) -->
     <div id="powerup-hud"></div>
+
+    <!-- In-run powerup buttons (round icons, right side) -->
+    <div id="powerup-buttons">
+      <button class="powerup-btn" data-powerup="god" title="God Mode (10s)">G</button>
+      <button class="powerup-btn" data-powerup="autopilot" title="Auto-Pilot (5s)">A</button>
+      <button class="powerup-btn" data-powerup="slow" title="Slow Motion (6s)">S</button>
+      <button class="powerup-btn" data-powerup="double" title="Double Coins (20s)">2x</button>
+      <button class="powerup-btn" data-powerup="shrink" title="Shrink Hitbox (12s)">H</button>
+    </div>
   </div>
 
   <!-- HUB MENU -->
@@ -810,6 +860,7 @@
   const purchaseSuccessOk = document.getElementById("purchase-success-ok");
 
   const powerupHud = document.getElementById("powerup-hud");
+  const powerupButtonsEls = document.querySelectorAll(".powerup-btn");
 
   /* META STATE */
   let lives = parseInt(localStorage.getItem("ww_lives") || String(MAX_LIVES), 10);
@@ -829,7 +880,7 @@
 
   let removeAds = localStorage.getItem("ww_removeAds") === "true";
   let ultraLives = localStorage.getItem("ww_ultraLives") === "true";
-  let doubleCoins = localStorage.getItem("ww_doubleCoins") === "true";
+  let doubleCoins = localStorage.getItem("ww_doubleCoins") === "true"; // permanent upgrade
   let ultimatePack = localStorage.getItem("ww_ultimatePack") === "true";
 
   let lastDaily = localStorage.getItem("ww_lastDaily") || "";
@@ -842,7 +893,7 @@
   let vibrateOn = localStorage.getItem("ww_vibrateOn");
   if (vibrateOn === null) vibrateOn = "true";
 
-  /* POWERUP TOKENS */
+  /* POWERUP TOKENS (INVENTORY) */
   function getToken(key) {
     const val = parseInt(localStorage.getItem(key) || "0", 10);
     return Number.isNaN(val) ? 0 : val;
@@ -850,14 +901,13 @@
   function setToken(key, val) {
     localStorage.setItem(key, String(val));
   }
+
   const TOKENS = {
     god: "ww_tok_god",
     autopilot: "ww_tok_autopilot",
     slow: "ww_tok_slow",
-    magnet: "ww_tok_magnet",
-    shrink: "ww_tok_shrink",
-    clone: "ww_tok_clone",
-    cont: "ww_tok_continue"
+    double: "ww_tok_double",
+    shrink: "ww_tok_shrink"
   };
 
   /* COSMETICS / MODES */
@@ -1166,7 +1216,7 @@
 
       const right = document.createElement("div");
       const tag = document.createElement("span");
-      tag.className = "tag";
+      tag.className = "small-tag";
       tag.textContent = !state.completed ? "In progress" :
                         !state.claimed ? "Ready" : "Claimed";
       right.appendChild(tag);
@@ -1352,26 +1402,24 @@
   /* SIMPLE STORE RENDERING */
 
   const POWERUP_DEFS = [
-    { id: "god", name: "God Mode (10s)", desc: "Invincible for 10 seconds.", tokenKey: TOKENS.god, priceCoins: 40 },
-    { id: "autopilot", name: "Auto-Pilot", desc: "AI flies until death.", tokenKey: TOKENS.autopilot, priceCoins: 50 },
-    { id: "slow", name: "Slow Motion (5s)", desc: "Pipes move slower.", tokenKey: TOKENS.slow, priceCoins: 30 },
-    { id: "magnet", name: "Coin Magnet (10s)", desc: "Coins get pulled in.", tokenKey: TOKENS.magnet, priceCoins: 30 },
-    { id: "shrink", name: "Shrink (5s)", desc: "Smaller hitbox for a bit.", tokenKey: TOKENS.shrink, priceCoins: 25 },
-    { id: "clone", name: "Shadow Clone (10s)", desc: "Ghost doubles coins.", tokenKey: TOKENS.clone, priceCoins: 35 },
-    { id: "cont", name: "Continue Token", desc: "Resume once after death.", tokenKey: TOKENS.cont, priceCoins: 40 },
+    { id: "god",       name: "God Mode (10s)",     desc: "Invincible for 10 seconds.",         tokenKey: TOKENS.god,       priceCoins: 40, duration: 10 },
+    { id: "autopilot", name: "Auto-Pilot (5s)",    desc: "AI flies for a short time.",        tokenKey: TOKENS.autopilot, priceCoins: 50, duration: 5  },
+    { id: "slow",      name: "Slow Motion (6s)",   desc: "Pipes move slower.",                tokenKey: TOKENS.slow,      priceCoins: 30, duration: 6  },
+    { id: "double",    name: "Double Coins (20s)", desc: "All coins earned are doubled.",     tokenKey: TOKENS.double,    priceCoins: 35, duration: 20 },
+    { id: "shrink",    name: "Shrink (12s)",       desc: "Smaller hitbox, easier dodging.",   tokenKey: TOKENS.shrink,    priceCoins: 25, duration: 12 }
   ];
 
   const PREMIUM_ITEMS = [
-    { id: "ultraLives", name: "Unlimited Lives Forever", desc: "Never run out of lives again.", priceLabel: "£19.99" },
-    { id: "removeAds", name: "Remove Ads Forever", desc: "No ads, ever.", priceLabel: "£4.99" },
-    { id: "doubleCoins", name: "Double Coins Forever", desc: "All coins & rewards x2.", priceLabel: "£4.99" },
-    { id: "ultimate", name: "Ultimate Penguin Pack", desc: "Unlimited Lives + Remove Ads + Double Coins + bonus cosmetics.", priceLabel: "£29.99" },
+    { id: "ultraLives", name: "Unlimited Lives Forever", desc: "Never run out of lives again.",  priceLabel: "£19.99" },
+    { id: "removeAds",  name: "Remove Ads Forever",      desc: "No ads, ever.",                  priceLabel: "£4.99" },
+    { id: "doubleCoins",name: "Double Coins Forever",    desc: "All coins & rewards x2.",        priceLabel: "£4.99" },
+    { id: "ultimate",   name: "Ultimate Penguin Pack",   desc: "Unlimited Lives + Remove Ads + Double Coins + bonus cosmetics.", priceLabel: "£29.99" },
   ];
 
   const CURRENCY_PACKS = [
-    { id: "coins-small", name: "Small Coin Pack", desc: "+100 coins.", amount: 100, priceLabel: "£0.99" },
-    { id: "coins-med", name: "Medium Coin Pack", desc: "+300 coins.", amount: 300, priceLabel: "£2.49" },
-    { id: "coins-big", name: "Big Coin Pack", desc: "+800 coins.", amount: 800, priceLabel: "£4.99" },
+    { id: "coins-small", name: "Small Coin Pack",   desc: "+100 coins.", amount: 100, priceLabel: "£0.99" },
+    { id: "coins-med",   name: "Medium Coin Pack",  desc: "+300 coins.", amount: 300, priceLabel: "£2.49" },
+    { id: "coins-big",   name: "Big Coin Pack",     desc: "+800 coins.", amount: 800, priceLabel: "£4.99" },
   ];
 
   let currentPurchase = null; // { label, onComplete }
@@ -1412,7 +1460,7 @@
     closePurchaseUI();
   });
 
-  /* STORE: COSMETICS SECTION (SINGLE LIST, TOGGLE STYLE) */
+  /* STORE: COSMETICS SECTION (SINGLE LIST) */
   function renderStoreCosmetics() {
     storeCosmeticsList.innerHTML = "";
 
@@ -1566,6 +1614,7 @@
         saveMeta();
         updateCoinsUI();
         renderStorePowerups();
+        refreshPowerupButtons();
       };
 
       li.appendChild(label);
@@ -1840,7 +1889,7 @@
 
     update() {
       const mode = getSelectedMode();
-      if (frames % 100 === 0) {
+      if (frames % 100 === 0 && startedFlight) {
         const minLen = 50;
         const maxPos = canvas.height - minLen - mode.gap;
         const minPos = minLen;
@@ -1853,6 +1902,7 @@
         const m = getSelectedMode();
         let speed = m.speed;
 
+        // Difficulty ramp & erratic behaviour
         if (score >= 50) speed *= 1.1;
         if (score >= 100) {
           speed *= 1.25;
@@ -1872,8 +1922,15 @@
           const topLimit = p.y;
           const bottomLimit = p.y + gap;
           let hit = false;
-          if (pTop < topLimit) hit = true;
-          if (pBottom > bottomLimit) hit = true;
+          let effectiveRadius = penguin.radius;
+          if (activeEffects.shrink > 0) {
+            effectiveRadius = penguin.radius * 0.6;
+          }
+          const adjTop = penguin.y - effectiveRadius;
+          const adjBottom = penguin.y + effectiveRadius;
+
+          if (adjTop < topLimit) hit = true;
+          if (adjBottom > bottomLimit) hit = true;
 
           if (hit && !activeEffects.god) {
             triggerGameOver();
@@ -1884,10 +1941,10 @@
           p.passed = true;
           score++;
           let coinGain = 1;
-          if (doubleCoins) coinGain *= 2;
-          if (activeEffects.clone > 0) coinGain *= 2;
-          coins += coinGain;
+          if (doubleCoins) coinGain *= 2;       // permanent upgrade
+          if (activeEffects.double > 0) coinGain *= 2; // temporary powerup
           scoreEl.textContent = score;
+          coins += coinGain;
           updateCoinsUI();
           playSfx(sfxCoin);
           saveMeta();
@@ -1972,14 +2029,13 @@
     });
   }
 
-  /* POWERUPS IN-RUN */
+  /* POWERUPS IN-RUN (EFFECTS) */
   const activeEffects = {
     god: 0,
     slow: 0,
-    magnet: 0,
+    double: 0,     // temporary double coins
     shrink: 0,
-    clone: 0,
-    autopilot: false,
+    autopilot: 0,  // >0 = active
   };
 
   function useToken(id) {
@@ -1994,35 +2050,34 @@
   }
 
   function activatePowerup(id) {
+    const def = POWERUP_DEFS.find(p => p.id === id);
+    if (!def) return;
+
     if (id === "god") {
-      activeEffects.god = 10;
+      activeEffects.god = def.duration;
+    } else if (id === "slow") {
+      activeEffects.slow = def.duration;
+    } else if (id === "double") {
+      activeEffects.double = def.duration;
+    } else if (id === "shrink") {
+      activeEffects.shrink = def.duration;
+    } else if (id === "autopilot") {
+      activeEffects.autopilot = def.duration;
     }
-    if (id === "slow") {
-      activeEffects.slow = 5;
-    }
-    if (id === "magnet") {
-      activeEffects.magnet = 10;
-    }
-    if (id === "shrink") {
-      activeEffects.shrink = 5;
-    }
-    if (id === "clone") {
-      activeEffects.clone = 10;
-    }
-    if (id === "autopilot") {
-      activeEffects.autopilot = true;
-    }
+
     tryVibrate(30);
     updatePowerupHud();
   }
 
   function updatePowerupTimers(deltaSec) {
-    if (activeEffects.god > 0) activeEffects.god = Math.max(0, activeEffects.god - deltaSec);
-    if (activeEffects.slow > 0) activeEffects.slow = Math.max(0, activeEffects.slow - deltaSec);
-    if (activeEffects.magnet > 0) activeEffects.magnet = Math.max(0, activeEffects.magnet - deltaSec);
-    if (activeEffects.shrink > 0) activeEffects.shrink = Math.max(0, activeEffects.shrink - deltaSec);
-    if (activeEffects.clone > 0) activeEffects.clone = Math.max(0, activeEffects.clone - deltaSec);
-    if (activeEffects.autopilot && isGameOver) activeEffects.autopilot = false;
+    if (activeEffects.god > 0)       activeEffects.god       = Math.max(0, activeEffects.god - deltaSec);
+    if (activeEffects.slow > 0)      activeEffects.slow      = Math.max(0, activeEffects.slow - deltaSec);
+    if (activeEffects.double > 0)    activeEffects.double    = Math.max(0, activeEffects.double - deltaSec);
+    if (activeEffects.shrink > 0)    activeEffects.shrink    = Math.max(0, activeEffects.shrink - deltaSec);
+    if (activeEffects.autopilot > 0) activeEffects.autopilot = Math.max(0, activeEffects.autopilot - deltaSec);
+    if (isGameOver) {
+      activeEffects.autopilot = 0;
+    }
     updatePowerupHud();
   }
 
@@ -2038,13 +2093,65 @@
       div.appendChild(timer);
       powerupHud.appendChild(div);
     }
-    if (activeEffects.god > 0) addIcon("G", activeEffects.god);
-    if (activeEffects.slow > 0) addIcon("S", activeEffects.slow);
-    if (activeEffects.magnet > 0) addIcon("M", activeEffects.magnet);
-    if (activeEffects.shrink > 0) addIcon("H", activeEffects.shrink);
-    if (activeEffects.clone > 0) addIcon("C", activeEffects.clone);
-    if (activeEffects.autopilot) addIcon("A", 0);
+    if (activeEffects.god > 0)       addIcon("G",  activeEffects.god);
+    if (activeEffects.autopilot > 0) addIcon("A",  activeEffects.autopilot);
+    if (activeEffects.slow > 0)      addIcon("S",  activeEffects.slow);
+    if (activeEffects.double > 0)    addIcon("2x", activeEffects.double);
+    if (activeEffects.shrink > 0)    addIcon("H",  activeEffects.shrink);
   }
+
+  /* IN-RUN POWERUP BUTTONS (RIGHT SIDE) */
+  const powerupButtons = {};
+  powerupButtonsEls.forEach(btn => {
+    const id = btn.getAttribute("data-powerup");
+    powerupButtons[id] = btn;
+  });
+
+  function isPowerupActive(id) {
+    if (id === "god")       return activeEffects.god > 0;
+    if (id === "slow")      return activeEffects.slow > 0;
+    if (id === "double")    return activeEffects.double > 0;
+    if (id === "shrink")    return activeEffects.shrink > 0;
+    if (id === "autopilot") return activeEffects.autopilot > 0;
+    return false;
+  }
+
+  function refreshPowerupButtons() {
+    Object.keys(powerupButtons).forEach(id => {
+      const btn = powerupButtons[id];
+      if (!btn) return;
+      const tokenKey = TOKENS[id];
+      const ownedCount = tokenKey ? getToken(tokenKey) : 0;
+      const disabled =
+        !isRunning ||
+        isGameOver ||
+        !tokenKey ||
+        ownedCount <= 0;
+
+      if (disabled) {
+        btn.classList.add("disabled");
+      } else {
+        btn.classList.remove("disabled");
+      }
+    });
+  }
+
+  Object.keys(powerupButtons).forEach(id => {
+    const btn = powerupButtons[id];
+    btn.addEventListener("click", () => {
+      if (!isRunning || isGameOver) return;
+      const def = POWERUP_DEFS.find(p => p.id === id);
+      if (!def) return;
+      if (isPowerupActive(id) && id !== "double") {
+        // ignore spam for currently active (except stacking double is blocked too)
+        return;
+      }
+      if (!useToken(id)) return;
+      activatePowerup(id);
+      refreshPowerupButtons();
+      renderStorePowerups(); // update counts in shop
+    });
+  });
 
   let lastFrameTime = performance.now();
 
@@ -2064,7 +2171,8 @@
     if (!startedFlight) {
       penguin.y = canvas.height / 2 + Math.sin(frames * 0.08) * 10;
       penguin.velocity = 0;
-    } else if (activeEffects.autopilot && !isGameOver) {
+    } else if (activeEffects.autopilot > 0 && !isGameOver) {
+      // simple autopilot: gentle sine-wave path
       penguin.velocity = Math.sin(frames * 0.15) * -4;
       penguin.y += penguin.velocity;
       if (penguin.y < penguin.radius) penguin.y = penguin.radius;
@@ -2126,6 +2234,7 @@
     checkMissionsCompletion();
     saveMeta();
 
+    refreshPowerupButtons();
     gameOverScreen.classList.remove("hidden");
   }
 
@@ -2146,6 +2255,14 @@
     isGameOver = false;
     isRunning = true;
     startedFlight = false; // reset hover state
+    // reset active powerups
+    activeEffects.god = 0;
+    activeEffects.slow = 0;
+    activeEffects.double = 0;
+    activeEffects.shrink = 0;
+    activeEffects.autopilot = 0;
+    updatePowerupHud();
+
     score = 0;
     frames = 0;
     scoreEl.textContent = score;
@@ -2154,6 +2271,7 @@
     initSnow();
     ensureMusicPlaying();
     lastFrameTime = performance.now();
+    refreshPowerupButtons();
     requestAnimationFrame(loop);
   }
 
@@ -2171,10 +2289,10 @@
       return;
     }
 
-    if (!activeEffects.autopilot) {
-      penguin.flap();
-      playSfx(sfxFlap);
-    }
+    if (activeEffects.autopilot > 0) return;
+
+    penguin.flap();
+    playSfx(sfxFlap);
   }
 
   window.addEventListener("keydown", e => {
@@ -2229,12 +2347,18 @@
     gameOverScreen.classList.add("hidden");
     hubOverlay.classList.remove("hidden");
     stopMusic();
+    isRunning = false;
+    isGameOver = false;
+    refreshPowerupButtons();
   });
 
   backFromNoLivesBtn.addEventListener("click", () => {
     noLivesScreen.classList.add("hidden");
     hubOverlay.classList.remove("hidden");
     stopMusic();
+    isRunning = false;
+    isGameOver = false;
+    refreshPowerupButtons();
   });
 
   /* AUDIO TOGGLES */
@@ -2268,6 +2392,9 @@
       alert("Ad-free user: +1 bonus life.");
       noLivesScreen.classList.add("hidden");
       hubOverlay.classList.remove("hidden");
+      isRunning = false;
+      isGameOver = false;
+      refreshPowerupButtons();
       return;
     }
 
@@ -2298,6 +2425,9 @@
           updateLivesUI();
           alert("Thanks for watching! +1 life added.");
           hubOverlay.classList.remove("hidden");
+          isRunning = false;
+          isGameOver = false;
+          refreshPowerupButtons();
         }, 300);
       }
     }, 1000);
@@ -2310,6 +2440,7 @@
   penguin.reset();
   penguin.draw();
   updateAudioStatusUI();
+  refreshPowerupButtons();
 
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
@@ -2318,4 +2449,5 @@
   }
 </script>
 </body>
-  </html>
+</html>
+```0
