@@ -2,17 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Waddle Wings: Flappy Penguin</title>
 
-    <!-- PWA hook (keep your existing manifest + sw.js) -->
+    <!-- PWA bits (used by TWA / app builder) -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2C3E50">
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap');
-
-        * { box-sizing: border-box; }
 
         body {
             margin: 0;
@@ -48,81 +47,68 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-        }
-
-        #top-bar {
             display: flex;
+            flex-direction: column;
             justify-content: space-between;
-            align-items: center;
-            padding: 10px 12px;
-            color: #fff;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
-            font-size: 1.1rem;
         }
 
         #score-display {
-            font-size: 2.5rem;
+            text-align: center;
+            font-size: 4rem;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+            margin-top: 20px;
+            pointer-events: none;
         }
 
         #lives-display {
-            font-size: 1.2rem;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 2rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+            pointer-events: none;
         }
 
-        #coins-display {
-            font-size: 1.2rem;
-        }
-
-        #pause-btn {
-            pointer-events: auto;
-            background: rgba(0,0,0,0.35);
-            border-radius: 999px;
-            padding: 6px 14px;
-            border: 0;
-            color: #fff;
-            font-family: inherit;
-            font-size: 0.9rem;
-            cursor: pointer;
-        }
-
-        .center-card {
+        #start-screen, #game-over-screen {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             text-align: center;
-            background: rgba(255, 255, 255, 0.94);
-            padding: 26px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
             border-radius: 20px;
             border: 4px solid #2C3E50;
             pointer-events: auto;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
-            min-width: 260px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            min-width: 250px;
         }
 
         h1 {
             color: #2C3E50;
             margin: 0 0 10px 0;
-            font-size: 1.9rem;
+            font-size: 2rem;
         }
 
         p {
             color: #555;
-            font-size: 1rem;
-            margin: 8px 0 14px 0;
+            font-size: 1.2rem;
+            margin: 10px 0 20px 0;
         }
 
         button {
             background: #FF6B6B;
             color: white;
             border: none;
-            padding: 12px 30px;
-            font-size: 1.1rem;
-            border-radius: 40px;
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            border-radius: 50px;
             cursor: pointer;
             font-family: 'Fredoka One', cursive;
             transition: transform 0.1s, background 0.2s;
             box-shadow: 0 4px 0 #C44D4D;
-            margin: 6px 4px;
         }
 
         button:active {
@@ -134,73 +120,35 @@
             background: #FF5252;
         }
 
-        .small-btn {
-            padding: 6px 16px;
-            font-size: 0.85rem;
-            box-shadow: 0 3px 0 #C44D4D;
-        }
-
-        .toggle-row {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 8px;
-            flex-wrap: wrap;
-        }
-
-        label {
-            font-size: 0.9rem;
-            color: #444;
-        }
-
-        input[type="checkbox"] {
-            transform: scale(1.1);
-            margin-left: 4px;
-        }
-
         .hidden {
             display: none !important;
         }
 
-        #store-list, #achievements-list, #leaderboard-list {
-            text-align: left;
-            font-size: 0.9rem;
-            max-height: 200px;
-            overflow-y: auto;
-            padding: 0;
-            margin: 10px 0;
-            list-style: none;
+        /* “No lives” popup */
+        #no-lives {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background: rgba(255,255,255,0.95);
+            padding: 25px;
+            border-radius: 20px;
+            border: 4px solid #2C3E50;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            min-width: 260px;
+            pointer-events: auto;
         }
 
-        #store-list li,
-        #achievements-list li,
-        #leaderboard-list li {
-            margin-bottom: 6px;
+        #no-lives h2 {
+            margin-top: 0;
+            color: #2C3E50;
         }
 
-        #fake-ad-progress {
-            width: 100%;
-            height: 10px;
-            border-radius: 999px;
-            background: #eee;
-            overflow: hidden;
+        #no-lives small {
+            display: block;
             margin-top: 10px;
-        }
-
-        #fake-ad-bar {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg,#FF6B6B,#FFD66B);
-        }
-
-        .badge {
-            display: inline-block;
-            background: #2C3E50;
-            color:#fff;
-            border-radius: 999px;
-            padding: 2px 8px;
-            font-size: 0.7rem;
-            margin-left: 4px;
+            color: #777;
         }
     </style>
 </head>
@@ -210,50 +158,466 @@
     <canvas id="gameCanvas"></canvas>
 
     <div id="ui-layer">
-        <div id="top-bar">
-            <div>
-                <div id="score-display">0</div>
-            </div>
-            <div>
-                <div id="lives-display">♥ 5</div>
-                <div id="coins-display">💰 0</div>
-            </div>
-            <button id="pause-btn">II</button>
-        </div>
+        <div id="score-display">0</div>
+        <div id="lives-display">♥ 5</div>
     </div>
 
-    <!-- Start screen -->
-    <div id="start-screen" class="center-card">
+    <div id="start-screen">
         <h1>WADDLE WINGS</h1>
-        <p>Tap, click or spacebar to fly between icy pipes.</p>
+        <p>Tap, Click, or Spacebar to Fly!</p>
         <button id="start-btn">PLAY</button>
-        <div class="toggle-row">
-            <label>Hard mode
-                <input type="checkbox" id="hard-toggle">
-            </label>
-            <label>Sound
-                <input type="checkbox" id="sound-toggle" checked>
-            </label>
-        </div>
-        <div class="toggle-row">
-            <button id="store-btn" class="small-btn">Store</button>
-            <button id="achievements-btn" class="small-btn">Achievements</button>
-        </div>
-        <div style="margin-top:8px;">
-            <button id="daily-btn" class="small-btn">Daily Reward</button>
-        </div>
     </div>
 
-    <!-- Game over -->
-    <div id="game-over-screen" class="center-card hidden">
+    <div id="game-over-screen" class="hidden">
         <h1>OOF!</h1>
         <p>Score: <span id="final-score">0</span></p>
         <p>Best: <span id="best-score">0</span></p>
         <button id="restart-btn">TRY AGAIN</button>
-        <h3 style="margin-top:14px;margin-bottom:6px;color:#2C3E50;font-size:1.1rem;">Leaderboard</h3>
-        <ul id="leaderboard-list"></ul>
     </div>
 
-    <!-- Out of lives -->
-    <div id="no-lives" class="center-card hidden">
-        <h1>NO LIVES</h1>
+    <div id="no-lives" class="hidden">
+        <h2>No lives!</h2>
+        <p>You’re out of energy.</p>
+        <p>Lives regenerate over time. Come back later or watch an ad to get +1 life.</p>
+        <button id="watch-ad-btn">WATCH AD</button>
+        <small>(Ad not wired up yet – this is just the front-end.)</small>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const scoreEl = document.getElementById('score-display');
+    const livesEl = document.getElementById('lives-display');
+    const startScreen = document.getElementById('start-screen');
+    const gameOverScreen = document.getElementById('game-over-screen');
+    const noLivesScreen = document.getElementById('no-lives');
+
+    const finalScoreEl = document.getElementById('final-score');
+    const bestScoreEl = document.getElementById('best-score');
+
+    const startBtn = document.getElementById('start-btn');
+    const restartBtn = document.getElementById('restart-btn');
+    const watchAdBtn = document.getElementById('watch-ad-btn');
+
+    // Responsive canvas
+    function resizeCanvas() {
+        const maxWidth = 480;
+        const maxHeight = 800;
+
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+
+        if (width > maxWidth) {
+            width = maxWidth;
+            height = Math.min(window.innerHeight, maxHeight);
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // Game constants
+    const GRAVITY = 0.25;
+    const FLAP_STRENGTH = -5.5;
+    const PIPE_SPEED = 3;
+    const PIPE_SPAWN_RATE = 100;
+    const PIPE_GAP = 160;
+
+    // Lives / energy system
+    const MAX_LIVES = 5;
+    const REGEN_TIME = 60 * 60 * 1000; // 1 hour per life
+
+    let lives = parseInt(localStorage.getItem('ww_lives') || MAX_LIVES, 10);
+    let lastLifeTimestamp = parseInt(
+        localStorage.getItem('ww_lastLife') || Date.now().toString(),
+        10
+    );
+
+    function regenLives() {
+        const now = Date.now();
+
+        if (lives >= MAX_LIVES) {
+            lastLifeTimestamp = now;
+            localStorage.setItem('ww_lastLife', lastLifeTimestamp.toString());
+            return;
+        }
+
+        const elapsed = now - lastLifeTimestamp;
+        const regained = Math.floor(elapsed / REGEN_TIME);
+
+        if (regained > 0) {
+            lives = Math.min(MAX_LIVES, lives + regained);
+            lastLifeTimestamp = now;
+            localStorage.setItem('ww_lives', lives.toString());
+            localStorage.setItem('ww_lastLife', lastLifeTimestamp.toString());
+            updateLivesUI();
+        }
+    }
+
+    function updateLivesUI() {
+        livesEl.textContent = '♥ ' + lives;
+    }
+
+    // Call once on load, then check every 30 seconds
+    regenLives();
+    updateLivesUI();
+    setInterval(regenLives, 30 * 1000);
+
+    // Snowflakes
+    const snowflakes = [];
+    for (let i = 0; i < 50; i++) {
+        snowflakes.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            r: Math.random() * 2 + 1,
+            speed: Math.random() * 1 + 0.5
+        });
+    }
+
+    // Game state
+    let frames = 0;
+    let score = 0;
+    let highScore = parseInt(localStorage.getItem('waddleHighScore') || '0', 10);
+    let isRunning = false;
+    let isGameOver = false;
+
+    // Penguin
+    const penguin = {
+        x: 0,
+        y: 0,
+        radius: 18,
+        velocity: 0,
+        rotation: 0,
+
+        draw() {
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            const rot = this.velocity * 0.1;
+            this.rotation = Math.min(Math.PI / 4, Math.max(-Math.PI / 4, rot));
+            ctx.rotate(this.rotation);
+
+            // Body
+            ctx.fillStyle = '#2C3E50';
+            ctx.beginPath();
+            ctx.ellipse(0, 0, 20, 25, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Belly
+            ctx.fillStyle = '#FFFFFF';
+            ctx.beginPath();
+            ctx.ellipse(-2, 2, 14, 18, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Eye
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.arc(6, -8, 6, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = 'black';
+            ctx.beginPath();
+            ctx.arc(8, -8, 2, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Beak
+            ctx.fillStyle = '#FF9800';
+            ctx.beginPath();
+            ctx.moveTo(10, -2);
+            ctx.lineTo(24, 2);
+            ctx.lineTo(10, 6);
+            ctx.fill();
+
+            // Wing
+            ctx.fillStyle = '#34495E';
+            ctx.beginPath();
+            const wingY = Math.sin(frames * 0.2) * 3;
+            ctx.ellipse(-5, 5 + wingY, 8, 14, -0.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Feet
+            ctx.fillStyle = '#FF9800';
+            ctx.beginPath();
+            ctx.ellipse(-5, 22, 6, 4, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        },
+
+        update() {
+            this.velocity += GRAVITY;
+            this.y += this.velocity;
+
+            // Floor
+            if (this.y + this.radius >= canvas.height) {
+                this.y = canvas.height - this.radius;
+                gameOver();
+            }
+
+            // Ceiling
+            if (this.y - this.radius <= 0) {
+                this.y = this.radius;
+                this.velocity = 0;
+            }
+        },
+
+        flap() {
+            this.velocity = FLAP_STRENGTH;
+        },
+
+        reset() {
+            this.x = canvas.width * 0.2;
+            this.y = canvas.height / 2;
+            this.velocity = 0;
+            this.rotation = 0;
+        }
+    };
+
+    // Pipes
+    const pipes = {
+        items: [],
+
+        reset() {
+            this.items = [];
+        },
+
+        update() {
+            if (frames % PIPE_SPAWN_RATE === 0) {
+                const minPipeLen = 50;
+                const maxPos = canvas.height - minPipeLen - PIPE_GAP;
+                const minPos = minPipeLen;
+                const topY = Math.floor(Math.random() * (maxPos - minPos + 1)) + minPos;
+
+                this.items.push({
+                    x: canvas.width,
+                    y: topY,
+                    passed: false
+                });
+            }
+
+            for (let i = 0; i < this.items.length; i++) {
+                const p = this.items[i];
+                p.x -= PIPE_SPEED;
+
+                const pipeWidth = 60;
+                const pLeft = penguin.x - penguin.radius;
+                const pRight = penguin.x + penguin.radius;
+                const pTop = penguin.y - penguin.radius;
+                const pBottom = penguin.y + penguin.radius;
+
+                if (pRight > p.x && pLeft < p.x + pipeWidth) {
+                    if (pTop < p.y || pBottom > p.y + PIPE_GAP) {
+                        gameOver();
+                    }
+                }
+
+                if (p.x + pipeWidth < penguin.x && !p.passed) {
+                    score++;
+                    scoreEl.textContent = score;
+                    p.passed = true;
+                }
+
+                if (p.x + pipeWidth < 0) {
+                    this.items.shift();
+                    i--;
+                }
+            }
+        },
+
+        draw() {
+            for (let i = 0; i < this.items.length; i++) {
+                const p = this.items[i];
+                const pipeWidth = 60;
+
+                const gradTop = ctx.createLinearGradient(p.x, 0, p.x + pipeWidth, 0);
+                gradTop.addColorStop(0, '#A5F2F3');
+                gradTop.addColorStop(0.5, '#E0FFFF');
+                gradTop.addColorStop(1, '#A5F2F3');
+
+                ctx.fillStyle = gradTop;
+                ctx.fillRect(p.x, 0, pipeWidth, p.y);
+
+                ctx.fillStyle = '#E0FFFF';
+                ctx.beginPath();
+                ctx.moveTo(p.x + 10, p.y);
+                ctx.lineTo(p.x + 30, p.y + 20);
+                ctx.lineTo(p.x + 50, p.y);
+                ctx.fill();
+
+                const gradBot = ctx.createLinearGradient(p.x, 0, p.x + pipeWidth, 0);
+                gradBot.addColorStop(0, '#A5F2F3');
+                gradBot.addColorStop(0.5, '#E0FFFF');
+                gradBot.addColorStop(1, '#A5F2F3');
+
+                ctx.fillStyle = gradBot;
+                ctx.fillRect(
+                    p.x,
+                    p.y + PIPE_GAP,
+                    pipeWidth,
+                    canvas.height - (p.y + PIPE_GAP)
+                );
+
+                ctx.fillStyle = '#E0FFFF';
+                ctx.beginPath();
+                ctx.moveTo(p.x + 10, p.y + PIPE_GAP);
+                ctx.lineTo(p.x + 30, p.y + PIPE_GAP - 20);
+                ctx.lineTo(p.x + 50, p.y + PIPE_GAP);
+                ctx.fill();
+
+                ctx.strokeStyle = '#5DBCD2';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(p.x, -2, pipeWidth, p.y + 2);
+                ctx.strokeRect(p.x, p.y + PIPE_GAP, pipeWidth, canvas.height);
+            }
+        }
+    };
+
+    function drawBackground() {
+        ctx.fillStyle = 'rgba(255,255,255,0.6)';
+        snowflakes.forEach(flake => {
+            ctx.beginPath();
+            ctx.arc(flake.x, flake.y, flake.r, 0, Math.PI * 2);
+            ctx.fill();
+
+            flake.y += flake.speed;
+            flake.x += Math.sin(frames * 0.01 + flake.y) * 0.5;
+
+            if (flake.y > canvas.height) {
+                flake.y = -5;
+                flake.x = Math.random() * canvas.width;
+            }
+        });
+    }
+
+    function loop() {
+        if (!isRunning) return;
+
+        penguin.update();
+        pipes.update();
+        frames++;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawBackground();
+        pipes.draw();
+        penguin.draw();
+
+        if (!isGameOver) {
+            requestAnimationFrame(loop);
+        }
+    }
+
+    function startGame() {
+        regenLives();
+        if (lives <= 0) {
+            // No lives – show popup
+            noLivesScreen.classList.remove('hidden');
+            startScreen.classList.add('hidden');
+            gameOverScreen.classList.add('hidden');
+            return;
+        }
+
+        // Spend 1 life at start
+        lives--;
+        localStorage.setItem('ww_lives', lives.toString());
+        lastLifeTimestamp = Date.now();
+        localStorage.setItem('ww_lastLife', lastLifeTimestamp.toString());
+        updateLivesUI();
+
+        penguin.reset();
+        pipes.reset();
+        score = 0;
+        frames = 0;
+        scoreEl.textContent = score;
+
+        startScreen.classList.add('hidden');
+        gameOverScreen.classList.add('hidden');
+        noLivesScreen.classList.add('hidden');
+
+        isRunning = true;
+        isGameOver = false;
+
+        resizeCanvas();
+        loop();
+    }
+
+    function gameOver() {
+        if (isGameOver) return;
+        isRunning = false;
+        isGameOver = true;
+
+        finalScoreEl.textContent = score;
+        if (score > highScore) {
+            highScore = score;
+            localStorage.setItem('waddleHighScore', highScore.toString());
+        }
+        bestScoreEl.textContent = highScore;
+        gameOverScreen.classList.remove('hidden');
+    }
+
+    function handleInput(e) {
+        if (e.type === 'keydown' && e.code === 'Space') {
+            e.preventDefault();
+        }
+        if (isGameOver) return;
+        if (isRunning) penguin.flap();
+    }
+
+    // Buttons
+    startBtn.addEventListener('click', startGame);
+    restartBtn.addEventListener('click', startGame);
+
+    // Fake “watch ad” – just grants one life for now
+    watchAdBtn.addEventListener('click', () => {
+        lives = Math.min(MAX_LIVES, lives + 1);
+        localStorage.setItem('ww_lives', lives.toString());
+        lastLifeTimestamp = Date.now();
+        localStorage.setItem('ww_lastLife', lastLifeTimestamp.toString());
+        updateLivesUI();
+        noLivesScreen.classList.add('hidden');
+    });
+
+    // Keyboard
+    window.addEventListener('keydown', e => {
+        if (e.code === 'Space') {
+            if (!isRunning &&
+                (!startScreen.classList.contains('hidden') ||
+                 !gameOverScreen.classList.contains('hidden'))
+            ) {
+                startGame();
+            } else {
+                handleInput(e);
+            }
+        }
+    });
+
+    // Touch / mouse
+    canvas.addEventListener('mousedown', handleInput);
+    canvas.addEventListener('touchstart', e => {
+        e.preventDefault();
+        if (!isRunning &&
+            (!startScreen.classList.contains('hidden') ||
+             !gameOverScreen.classList.contains('hidden'))
+        ) {
+            startGame();
+        } else {
+            handleInput(e);
+        }
+    }, { passive: false });
+
+    // Service worker (for PWA)
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .catch(err => console.log('SW registration failed', err));
+        });
+    }
+
+    // Initial draw
+    penguin.reset();
+    drawBackground();
+    penguin.draw();
+</script>
+</body>
+</html>
