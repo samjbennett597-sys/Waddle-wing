@@ -24,7 +24,7 @@
     body {
       margin: 0;
       padding: 0;
-      background: #02040a;
+      background: #111;
       color: #fff;
       font-family: "Fredoka One", cursive;
       overflow: hidden;
@@ -40,8 +40,8 @@
       position: relative;
       max-width: 100%;
       max-height: 100%;
-      box-shadow: 0 0 25px rgba(0, 0, 0, 0.7);
-      border-radius: 18px;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.6);
+      border-radius: 16px;
       overflow: hidden;
       background: #000;
     }
@@ -64,7 +64,6 @@
       font-size: 0.9rem;
       color: #fff;
       text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
-      pointer-events: none;
     }
 
     #score-display {
@@ -83,7 +82,7 @@
     #hub-overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(160deg, rgba(0,0,0,0.35), rgba(3,9,25,0.9));
+      background: linear-gradient(150deg, rgba(0,0,0,0.7), rgba(10,20,40,0.95));
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -97,12 +96,12 @@
     }
 
     #hub-header {
-      padding: 12px 14px 2px;
+      padding: 10px 14px 4px;
       text-align: center;
     }
 
     #hub-title {
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       letter-spacing: 1px;
     }
 
@@ -122,28 +121,28 @@
       width: 100%;
       display: flex;
       justify-content: center;
-      margin-bottom: 6px;
+      margin-bottom: 10px;
     }
 
     #podium {
       position: relative;
-      width: 70%;
+      width: 72%;
       max-width: 260px;
-      height: 110px;
-      background: radial-gradient(circle at 50% 0%, rgba(255,255,255,0.18), transparent 65%);
+      height: 160px;
+      background: radial-gradient(circle at 50% 10%, rgba(255,255,255,0.28), transparent 60%);
       border-radius: 20px;
       border: 2px solid rgba(255,255,255,0.16);
-      box-shadow: inset 0 0 22px rgba(0,0,0,0.7);
+      box-shadow: inset 0 0 22px rgba(0,0,0,0.6);
       overflow: hidden;
     }
 
     #podium-platform {
       position: absolute;
-      bottom: 16px;
+      bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
       width: 72%;
-      height: 26px;
+      height: 28px;
       background: linear-gradient(90deg,#374b67,#223044);
       border-radius: 999px;
       box-shadow: 0 6px 12px rgba(0,0,0,0.7);
@@ -151,7 +150,7 @@
 
     #podium-label {
       position: absolute;
-      bottom: 2px;
+      bottom: 3px;
       left: 50%;
       transform: translateX(-50%);
       font-size: 0.8rem;
@@ -160,82 +159,57 @@
 
     #podium-character {
       position: absolute;
-      bottom: 32px;
+      bottom: 35px;
       left: 50%;
       transform: translateX(-50%);
     }
 
     #hub-buttons {
       width: 100%;
-      max-width: 360px;
-      display: flex;
-      flex-direction: column;
+      max-width: 380px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 8px;
-      margin-top: 10px;
+      margin-bottom: 6px;
     }
 
-    .hub-main-btn {
-      border-radius: 999px;
-      background: linear-gradient(180deg, #ffb547, #ff7b3a);
+    .hub-btn {
+      border-radius: 12px;
+      background: linear-gradient(180deg, #ff7676, #ff5252);
       border: none;
       color: #fff;
-      padding: 12px 8px;
+      padding: 10px 8px;
       font-family: "Fredoka One", cursive;
-      font-size: 1.2rem;
-      box-shadow: 0 4px 0 #c45a24;
+      font-size: 1rem;
+      box-shadow: 0 4px 0 #c04444;
       cursor: pointer;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
-      letter-spacing: 1px;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
     }
 
-    .hub-main-btn.secondary {
+    .hub-btn.secondary {
       background: linear-gradient(180deg,#6078ea,#364fc7);
       box-shadow: 0 4px 0 #243369;
     }
 
-    .hub-main-btn:active {
+    .hub-btn.ghost {
+      background: rgba(255,255,255,0.08);
+      box-shadow: none;
+      border: 1px solid rgba(255,255,255,0.25);
+      font-size: 0.9rem;
+    }
+
+    .hub-btn:active {
       transform: translateY(3px);
       box-shadow: 0 1px 0 rgba(0,0,0,0.7);
     }
 
     #hub-footer {
-      padding: 4px 10px 8px;
+      padding: 6px 12px 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       font-size: 0.8rem;
       color: #ccc;
-    }
-
-    #hub-mode-label {
-      font-size: 0.85rem;
-    }
-
-    /* ICON BAR */
-    #hub-icon-bar {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-    }
-
-    .icon-btn {
-      width: 30px;
-      height: 30px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.4);
-      background: rgba(5,10,30,0.8);
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.9rem;
-      cursor: pointer;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.6);
-    }
-
-    .icon-btn:active {
-      transform: translateY(2px);
-      box-shadow: 0 1px 2px rgba(0,0,0,0.7);
     }
 
     /* PANELS */
@@ -312,7 +286,6 @@
     .list-label {
       display: flex;
       flex-direction: column;
-      max-width: 70%;
     }
 
     .list-label span:first-child {
@@ -345,9 +318,20 @@
       text-align: center;
     }
 
+    .small-btn.off {
+      background: rgba(255,255,255,0.1);
+      box-shadow: none;
+      border: 1px solid rgba(255,255,255,0.25);
+    }
+
     .small-btn.equipped {
       background: #4caf50;
       box-shadow: 0 3px 0 #2e7d32;
+    }
+
+    .small-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #c04444;
     }
 
     .small-btn.disabled {
@@ -356,9 +340,13 @@
       box-shadow: none;
     }
 
-    .small-btn:active {
-      transform: translateY(2px);
-      box-shadow: 0 1px 0 #c04444;
+    .tag {
+      display: inline-block;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.12);
+      padding: 2px 8px;
+      font-size: 0.7rem;
+      margin-left: 4px;
     }
 
     /* CENTER CARDS */
@@ -426,25 +414,35 @@
       box-shadow: 0 1px 0 #243369;
     }
 
-    #fake-ad-progress {
-      width: 100%;
-      height: 10px;
-      border-radius: 999px;
-      background: #eee;
-      overflow: hidden;
-      margin-top: 10px;
+    /* POWERUP HUD */
+    #powerup-hud {
+      position: absolute;
+      bottom: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 6px;
+      pointer-events: none;
     }
 
-    #fake-ad-bar {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg,#ff6b6b,#ffd66b);
+    .powerup-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.8);
+      background: rgba(0,0,0,0.4);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 0.7rem;
+      color: #fff;
+      position: relative;
     }
 
-    #fake-ad-timer {
-      font-size: 0.85rem;
-      margin-top: 6px;
-      color: #555;
+    .powerup-timer {
+      position: absolute;
+      bottom: -10px;
+      font-size: 0.6rem;
     }
 
     .hidden { display: none !important; }
@@ -462,13 +460,14 @@
         <div id="lives-display">♥ 5</div>
       </div>
     </div>
+    <div id="powerup-hud"></div>
   </div>
 
-  <!-- HUB MENU (floating over live game) -->
+  <!-- HUB MENU -->
   <div id="hub-overlay">
     <div id="hub-header">
       <div id="hub-title">WADDLE WINGS UNIVERSE</div>
-      <div id="hub-subtitle">Tap • Dodge • Grind • Unlock</div>
+      <div id="hub-subtitle">Play • Store • Missions • Daily • Settings</div>
     </div>
 
     <div id="hub-main">
@@ -481,18 +480,20 @@
       </div>
 
       <div id="hub-buttons">
-        <button class="hub-main-btn" id="btn-play">PLAY</button>
-        <button class="hub-main-btn secondary" id="btn-store">STORE</button>
+        <button class="hub-btn" id="btn-play">PLAY</button>
+        <button class="hub-btn secondary" id="btn-store">STORE</button>
+        <button class="hub-btn ghost" id="btn-modes">MODES</button>
+        <button class="hub-btn ghost" id="btn-skins">SKINS</button>
+        <button class="hub-btn ghost" id="btn-maps">MAPS</button>
+        <button class="hub-btn ghost" id="btn-missions">MISSIONS</button>
+        <button class="hub-btn ghost" id="btn-daily">DAILY</button>
+        <button class="hub-btn ghost" id="btn-settings">⚙</button>
       </div>
     </div>
 
     <div id="hub-footer">
       <span id="hub-mode-label">Mode: Normal</span>
-      <div id="hub-icon-bar">
-        <button class="icon-btn" id="icon-missions" title="Missions">★</button>
-        <button class="icon-btn" id="icon-daily" title="Daily Reward">🎁</button>
-        <button class="icon-btn" id="icon-settings" title="Settings">⚙</button>
-      </div>
+      <span>v3.2 – Dev Build</span>
     </div>
   </div>
 
@@ -550,7 +551,7 @@
       </div>
       <div class="panel-body">
         <p style="font-size:0.8rem; color:#ddd;">
-          Audio & comfort options. In a real Play Store build, purchases would go through Google Play Billing.
+          Audio & comfort. In a real build, purchases & ads run via Google Play Billing + AdMob.
         </p>
         <ul class="list">
           <li class="list-item">
@@ -570,7 +571,7 @@
           <li class="list-item">
             <div class="list-label">
               <span>Vibration</span>
-              <span>Haptics on hit and purchases (where supported).</span>
+              <span>Haptics on hit, rewards, purchases (where supported).</span>
             </div>
             <button class="small-btn" id="btn-toggle-vibrate">Toggle</button>
           </li>
@@ -625,17 +626,35 @@
         <button class="panel-close" data-panel-close="panel-store">×</button>
       </div>
       <div class="panel-body">
-        <div class="section-label">Skins</div>
-        <ul class="list" id="store-skins"></ul>
+        <div class="section-label">Skins & Maps</div>
+        <ul class="list" id="store-cosmetics"></ul>
 
-        <div class="section-label">Maps</div>
-        <ul class="list" id="store-maps"></ul>
+        <div class="section-label">Powerups (consumables)</div>
+        <ul class="list" id="store-powerups"></ul>
 
         <div class="section-label">Premium Upgrades</div>
         <ul class="list" id="store-premium"></ul>
 
         <div class="section-label">Coins</div>
         <ul class="list" id="store-currency"></ul>
+
+        <div class="section-label">Data / Safety</div>
+        <ul class="list">
+          <li class="list-item">
+            <div class="list-label">
+              <span>Reset Progress</span>
+              <span>Clears coins, skins, maps, stats & settings. Cannot be undone.</span>
+            </div>
+            <button class="small-btn" id="btn-reset-progress">Reset</button>
+          </li>
+          <li class="list-item">
+            <div class="list-label">
+              <span>Restore Purchases</span>
+              <span>Re-sync premium items from Play Store (for real build).</span>
+            </div>
+            <button class="small-btn" id="btn-restore-purchases">Restore</button>
+          </li>
+        </ul>
       </div>
       <div class="panel-footer">
         <button class="small-btn" data-panel-close="panel-store">Close</button>
@@ -681,18 +700,13 @@
     <button id="watch-ad-btn" class="main-btn">WATCH AD</button>
     <button id="back-from-nolives-btn" class="secondary-btn">BACK TO HUB</button>
   </div>
-
-  <div id="fake-ad-screen" class="center-card hidden">
-    <h1>Ad playing…</h1>
-    <p style="font-size:0.9rem;">Pretend this is some cheesy mobile game trailer.</p>
-    <div id="fake-ad-progress">
-      <div id="fake-ad-bar"></div>
-    </div>
-    <div id="fake-ad-timer">5s remaining</div>
-  </div>
 </div>
 
 <script>
+  /* ===== AdMob TEST IDs – swap for real later ===== */
+  const ADMOB_REWARDED_ID = "ca-app-pub-3940256099942544/5224354917";   // TEST
+  const ADMOB_INTERSTITIAL_ID = "ca-app-pub-3940256099942544/1033173712"; // TEST
+
   /* BASIC SETUP */
   const canvas = document.getElementById("gameCanvas");
   const ctx = canvas.getContext("2d");
@@ -716,8 +730,26 @@
   const GRAVITY = 0.25;
   const FLAP_STRENGTH = -5.5;
   const MAX_LIVES = 5;
-  const REGEN_TIME = 60 * 60 * 1000; // 1 hour
+  const REGEN_TIME = 60 * 60 * 1000;
   const DAILY_REWARD_COINS = 20;
+
+  /* AD LOGIC (stubbed) */
+  let gamesSinceInterstitial = 0;
+  const INTERSTITIAL_FREQUENCY = 3;
+
+  function showInterstitialAd(context) {
+    gamesSinceInterstitial++;
+    if (gamesSinceInterstitial % INTERSTITIAL_FREQUENCY !== 0) return;
+    console.log("Interstitial ad would show here:", context, ADMOB_INTERSTITIAL_ID);
+    // REAL APP: call AdMob interstitial show here
+  }
+
+  function showRewardedAd(reason, onReward) {
+    console.log("Rewarded ad would show here:", reason, ADMOB_REWARDED_ID);
+    // REAL APP: call AdMob rewarded, then call onReward() in reward callback
+    const ok = confirm("Simulated rewarded ad finished.\nGrant reward?");
+    if (ok && typeof onReward === "function") onReward();
+  }
 
   /* AUDIO ELEMENTS */
   const bgm = document.getElementById("bgm");
@@ -750,8 +782,8 @@
   const modesList = document.getElementById("modes-list");
   const missionsList = document.getElementById("missions-list");
 
-  const storeSkinsList = document.getElementById("store-skins");
-  const storeMapsList = document.getElementById("store-maps");
+  const storeCosmeticsList = document.getElementById("store-cosmetics");
+  const storePowerupsList = document.getElementById("store-powerups");
   const storePremiumList = document.getElementById("store-premium");
   const storeCurrencyList = document.getElementById("store-currency");
 
@@ -761,19 +793,19 @@
 
   const gameOverScreen = document.getElementById("game-over-screen");
   const noLivesScreen = document.getElementById("no-lives-screen");
-  const fakeAdScreen = document.getElementById("fake-ad-screen");
-  const fakeAdBar = document.getElementById("fake-ad-bar");
-  const fakeAdTimer = document.getElementById("fake-ad-timer");
 
   const finalScoreEl = document.getElementById("final-score");
   const bestScoreEl = document.getElementById("best-score");
   const livesLeftLabel = document.getElementById("lives-left-label");
 
   const btnPlay = document.getElementById("btn-play");
+  const btnModes = document.getElementById("btn-modes");
+  const btnSkins = document.getElementById("btn-skins");
+  const btnMaps = document.getElementById("btn-maps");
   const btnStore = document.getElementById("btn-store");
-  const iconMissions = document.getElementById("icon-missions");
-  const iconDaily = document.getElementById("icon-daily");
-  const iconSettings = document.getElementById("icon-settings");
+  const btnMissions = document.getElementById("btn-missions");
+  const btnDaily = document.getElementById("btn-daily");
+  const btnSettings = document.getElementById("btn-settings");
 
   const restartBtn = document.getElementById("restart-btn");
   const backMenuBtn = document.getElementById("back-menu-btn");
@@ -792,6 +824,11 @@
   const purchaseConfirmYes = document.getElementById("purchase-confirm-yes");
   const purchaseConfirmNo = document.getElementById("purchase-confirm-no");
   const purchaseSuccessOk = document.getElementById("purchase-success-ok");
+
+  const powerupHud = document.getElementById("powerup-hud");
+
+  const btnResetProgress = document.getElementById("btn-reset-progress");
+  const btnRestorePurchases = document.getElementById("btn-restore-purchases");
 
   /* META STATE */
   let lives = parseInt(localStorage.getItem("ww_lives") || String(MAX_LIVES), 10);
@@ -823,6 +860,24 @@
   if (sfxOn === null) sfxOn = "true";
   let vibrateOn = localStorage.getItem("ww_vibrateOn");
   if (vibrateOn === null) vibrateOn = "true";
+
+  /* POWERUP TOKENS */
+  function getToken(key) {
+    const val = parseInt(localStorage.getItem(key) || "0", 10);
+    return Number.isNaN(val) ? 0 : val;
+  }
+  function setToken(key, val) {
+    localStorage.setItem(key, String(val));
+  }
+  const TOKENS = {
+    god: "ww_tok_god",
+    autopilot: "ww_tok_autopilot",
+    slow: "ww_tok_slow",
+    magnet: "ww_tok_magnet",
+    shrink: "ww_tok_shrink",
+    clone: "ww_tok_clone",
+    cont: "ww_tok_continue"
+  };
 
   /* COSMETICS / MODES */
   const SKINS = [
@@ -896,17 +951,17 @@
   ];
 
   const MODES = [
-    { id: "easy",   name: "Easy",    desc: "Slower pipes, big gaps.",    speed: 2.4, gap: 190 },
-    { id: "normal", name: "Normal",  desc: "Standard challenge.",        speed: 3.0, gap: 160 },
-    { id: "hard",   name: "Hard",    desc: "Faster pipes, tighter gaps.",speed: 3.6, gap: 140 },
-    { id: "extreme",name: "Extreme", desc: "Chaos mode, no mercy.",      speed: 4.4, gap: 120 },
+    { id: "easy", name: "Easy", desc: "Slower pipes, big gaps.", speed: 2.4, gap: 190 },
+    { id: "normal", name: "Normal", desc: "Standard challenge.", speed: 3.0, gap: 160 },
+    { id: "hard", name: "Hard", desc: "Faster pipes, tighter gaps.", speed: 3.6, gap: 140 },
+    { id: "extreme", name: "Extreme", desc: "Chaos mode, no mercy.", speed: 4.4, gap: 120 },
   ];
 
   /* MISSIONS */
   const MISSIONS = [
-    { id: "score10", name: "First Steps",   desc: "Reach score 10.", type: "bestScoreAtLeast", target: 10, rewardCoins: 20 },
-    { id: "score25", name: "Getting Good",  desc: "Reach score 25.", type: "bestScoreAtLeast", target: 25, rewardCoins: 40 },
-    { id: "runs3",   name: "Committed",     desc: "Play 3 runs today.", type: "runsToday", target: 3, rewardCoins: 15 },
+    { id: "score10", name: "First Steps", desc: "Reach score 10.", type: "bestScoreAtLeast", target: 10, rewardCoins: 20 },
+    { id: "score25", name: "Getting Good", desc: "Reach score 25.", type: "bestScoreAtLeast", target: 25, rewardCoins: 40 },
+    { id: "runs3", name: "Committed", desc: "Play 3 runs today.", type: "runsToday", target: 3, rewardCoins: 15 },
   ];
   let missionState = JSON.parse(localStorage.getItem("ww_missions") || "{}");
   let runsToday = 0;
@@ -1130,10 +1185,7 @@
 
       const right = document.createElement("div");
       const tag = document.createElement("span");
-      tag.style.fontSize = "0.7rem";
-      tag.style.borderRadius = "999px";
-      tag.style.padding = "2px 8px";
-      tag.style.background = "rgba(255,255,255,0.12)";
+      tag.className = "tag";
       tag.textContent = !state.completed ? "In progress" :
                         !state.claimed ? "Ready" : "Claimed";
       right.appendChild(tag);
@@ -1195,7 +1247,7 @@
           saveCosmetics();
           updateCoinsUI();
           renderSkinsPanel();
-          renderStoreSkins();
+          renderStoreCosmetics();
           updateHubView();
         };
       } else {
@@ -1209,7 +1261,7 @@
             equippedSkinId = skin.id;
             saveCosmetics();
             renderSkinsPanel();
-            renderStoreSkins();
+            renderStoreCosmetics();
             updateHubView();
           };
         }
@@ -1254,7 +1306,7 @@
           saveCosmetics();
           updateCoinsUI();
           renderMapsPanel();
-          renderStoreMaps();
+          renderStoreCosmetics();
           updateHubView();
         };
       } else {
@@ -1268,7 +1320,7 @@
             equippedMapId = map.id;
             saveCosmetics();
             renderMapsPanel();
-            renderStoreMaps();
+            renderStoreCosmetics();
             updateHubView();
           };
         }
@@ -1316,13 +1368,22 @@
     });
   }
 
-  /* STORE DATA */
+  /* STORE POWERUPS / PREMIUM / CURRENCY */
+  const POWERUP_DEFS = [
+    { id: "god",       name: "God Mode (10s)",    desc: "Invincible for 10 seconds.",         tokenKey: TOKENS.god,       priceCoins: 40 },
+    { id: "autopilot", name: "Auto-Pilot",        desc: "AI flies until death.",              tokenKey: TOKENS.autopilot, priceCoins: 50 },
+    { id: "slow",      name: "Slow Motion (5s)",  desc: "Pipes move slower.",                 tokenKey: TOKENS.slow,      priceCoins: 30 },
+    { id: "magnet",    name: "Coin Magnet (10s)", desc: "Coins get pulled in.",               tokenKey: TOKENS.magnet,    priceCoins: 30 },
+    { id: "shrink",    name: "Shrink (5s)",       desc: "Smaller hitbox for a bit.",          tokenKey: TOKENS.shrink,    priceCoins: 25 },
+    { id: "clone",     name: "Shadow Clone (10s)",desc: "Ghost doubles coins from pipes.",    tokenKey: TOKENS.clone,     priceCoins: 35 },
+    { id: "cont",      name: "Continue Token",    desc: "Resume once after death.",           tokenKey: TOKENS.cont,      priceCoins: 40 },
+  ];
 
   const PREMIUM_ITEMS = [
     { id: "ultraLives", name: "Unlimited Lives Forever", desc: "Never run out of lives again.", priceLabel: "£19.99" },
-    { id: "removeAds",  name: "Remove Ads Forever",      desc: "No ads, ever.",               priceLabel: "£4.99" },
-    { id: "doubleCoins",name: "Double Coins Forever",    desc: "All coins & rewards x2.",     priceLabel: "£4.99" },
-    { id: "ultimate",   name: "Ultimate Penguin Pack",   desc: "Unlimited Lives + Remove Ads + Double Coins + bonus cosmetics.", priceLabel: "£29.99" },
+    { id: "removeAds",  name: "Remove Ads Forever",      desc: "No forced ads, ever.",          priceLabel: "£4.99" },
+    { id: "doubleCoins",name: "Double Coins Forever",    desc: "All coins & rewards x2.",       priceLabel: "£4.99" },
+    { id: "ultimate",   name: "Ultimate Penguin Pack",   desc: "Unlimited Lives + No Ads + Double Coins + bonus cosmetics.", priceLabel: "£29.99" },
   ];
 
   const CURRENCY_PACKS = [
@@ -1331,7 +1392,7 @@
     { id: "coins-big",   name: "Big Coin Pack",    desc: "+800 coins.", amount: 800, priceLabel: "£4.99" },
   ];
 
-  let currentPurchase = null; // { label, onComplete }
+  let currentPurchase = null;
 
   function openPurchaseConfirm(label, onComplete) {
     currentPurchase = { label, onComplete };
@@ -1369,10 +1430,9 @@
     closePurchaseUI();
   });
 
-  /* STORE RENDER HELPERS */
+  function renderStoreCosmetics() {
+    storeCosmeticsList.innerHTML = "";
 
-  function renderStoreSkins() {
-    storeSkinsList.innerHTML = "";
     SKINS.forEach(skin => {
       const li = document.createElement("li");
       li.className = "list-item";
@@ -1380,7 +1440,7 @@
       const label = document.createElement("div");
       label.className = "list-label";
       const title = document.createElement("span");
-      title.textContent = skin.name;
+      title.textContent = `[Skin] ${skin.name}`;
       const owned = ownedSkins.includes(skin.id);
       const desc = document.createElement("span");
       desc.textContent = owned
@@ -1405,8 +1465,8 @@
           saveMeta();
           saveCosmetics();
           updateCoinsUI();
-          renderStoreSkins();
           renderSkinsPanel();
+          renderStoreCosmetics();
           updateHubView();
         };
       } else {
@@ -1419,8 +1479,8 @@
           btn.onclick = () => {
             equippedSkinId = skin.id;
             saveCosmetics();
-            renderStoreSkins();
             renderSkinsPanel();
+            renderStoreCosmetics();
             updateHubView();
           };
         }
@@ -1428,12 +1488,9 @@
 
       li.appendChild(label);
       li.appendChild(btn);
-      storeSkinsList.appendChild(li);
+      storeCosmeticsList.appendChild(li);
     });
-  }
 
-  function renderStoreMaps() {
-    storeMapsList.innerHTML = "";
     MAPS.forEach(map => {
       const li = document.createElement("li");
       li.className = "list-item";
@@ -1441,7 +1498,7 @@
       const label = document.createElement("div");
       label.className = "list-label";
       const title = document.createElement("span");
-      title.textContent = map.name;
+      title.textContent = `[Map] ${map.name}`;
       const owned = ownedMaps.includes(map.id);
       const desc = document.createElement("span");
       desc.textContent = owned
@@ -1466,8 +1523,8 @@
           saveMeta();
           saveCosmetics();
           updateCoinsUI();
-          renderStoreMaps();
           renderMapsPanel();
+          renderStoreCosmetics();
           updateHubView();
         };
       } else {
@@ -1480,8 +1537,8 @@
           btn.onclick = () => {
             equippedMapId = map.id;
             saveCosmetics();
-            renderStoreMaps();
             renderMapsPanel();
+            renderStoreCosmetics();
             updateHubView();
           };
         }
@@ -1489,7 +1546,45 @@
 
       li.appendChild(label);
       li.appendChild(btn);
-      storeMapsList.appendChild(li);
+      storeCosmeticsList.appendChild(li);
+    });
+  }
+
+  function renderStorePowerups() {
+    storePowerupsList.innerHTML = "";
+    POWERUP_DEFS.forEach(p => {
+      const li = document.createElement("li");
+      li.className = "list-item";
+
+      const label = document.createElement("div");
+      label.className = "list-label";
+      const title = document.createElement("span");
+      const count = getToken(p.tokenKey);
+      title.textContent = `${p.name} (x${count})`;
+      const desc = document.createElement("span");
+      desc.textContent = `${p.desc} • ${p.priceCoins} coins each`;
+      label.appendChild(title);
+      label.appendChild(desc);
+
+      const btn = document.createElement("button");
+      btn.className = "small-btn";
+      btn.textContent = `Buy ${p.priceCoins}`;
+      btn.onclick = () => {
+        if (coins < p.priceCoins) {
+          alert("Not enough coins.");
+          return;
+        }
+        coins -= p.priceCoins;
+        const newCount = count + 1;
+        setToken(p.tokenKey, newCount);
+        saveMeta();
+        updateCoinsUI();
+        renderStorePowerups();
+      };
+
+      li.appendChild(label);
+      li.appendChild(btn);
+      storePowerupsList.appendChild(li);
     });
   }
 
@@ -1513,9 +1608,9 @@
 
       let ownedFlag = false;
       if (item.id === "ultraLives") ownedFlag = ultraLives;
-      if (item.id === "removeAds") ownedFlag = removeAds;
-      if (item.id === "doubleCoins") ownedFlag = doubleCoins;
-      if (item.id === "ultimate") ownedFlag = ultimatePack;
+      if (item.id === "removeAds")  ownedFlag = removeAds;
+      if (item.id === "doubleCoins")ownedFlag = doubleCoins;
+      if (item.id === "ultimate")   ownedFlag = ultimatePack;
 
       if (ownedFlag) {
         btn.textContent = "Owned";
@@ -1549,8 +1644,7 @@
             updateLivesUI();
             updateCoinsUI();
             renderStorePremium();
-            renderStoreSkins();
-            renderStoreMaps();
+            renderStoreCosmetics();
           });
         };
       }
@@ -1650,20 +1744,17 @@
     updateCoinsUI();
   }
 
-  /* GAME STATE & CINEMATIC EFFECTS */
+  /* GAME STATE */
   let frames = 0;
   let score = 0;
   let isRunning = false;
   let isGameOver = false;
-  let startedFlight = false; // hover until first tap
+  let startedFlight = false;
 
   const snowflakes = [];
-  const parallaxClouds = [];
-  let bgScroll = 0;
-
   function initSnow() {
     snowflakes.length = 0;
-    for (let i = 0; i < 60; i++) {
+    for (let i = 0; i < 50; i++) {
       snowflakes.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
@@ -1672,49 +1763,7 @@
       });
     }
   }
-
-  function initClouds() {
-    parallaxClouds.length = 0;
-    for (let i = 0; i < 6; i++) {
-      parallaxClouds.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * (canvas.height * 0.4),
-        w: 80 + Math.random() * 60,
-        h: 25 + Math.random() * 15,
-        speed: 0.4 + Math.random() * 0.4,
-        alpha: 0.15 + Math.random() * 0.15
-      });
-    }
-  }
-
   initSnow();
-  initClouds();
-
-  // Shake state
-  let shakeTime = 0;
-  let shakeIntensity = 0;
-
-  function addScreenShake(intensity, duration) {
-    shakeIntensity = Math.max(shakeIntensity, intensity);
-    shakeTime = Math.max(shakeTime, duration);
-  }
-
-  function getDifficulty(score) {
-    // Tiered difficulty: tighter gaps, faster pipes, erratic after higher scores
-    if (score < 15) {
-      return { gap: getSelectedMode().gap + 10, speed: getSelectedMode().speed * 0.95, erratic: 0, tier: 0 };
-    } else if (score < 35) {
-      return { gap: getSelectedMode().gap, speed: getSelectedMode().speed, erratic: 0.5, tier: 1 };
-    } else if (score < 70) {
-      return { gap: getSelectedMode().gap - 10, speed: getSelectedMode().speed * 1.15, erratic: 1.4, tier: 2 };
-    } else if (score < 120) {
-      return { gap: getSelectedMode().gap - 20, speed: getSelectedMode().speed * 1.3, erratic: 2.0, tier: 3 };
-    } else {
-      return { gap: getSelectedMode().gap - 30, speed: getSelectedMode().speed * 1.45, erratic: 2.8, tier: 4 };
-    }
-  }
-
-  let difficulty = getDifficulty(0);
 
   const penguin = {
     x: 0,
@@ -1787,7 +1836,6 @@
 
     flap() {
       this.velocity = FLAP_STRENGTH;
-      addScreenShake(1.2, 0.08);
     },
 
     reset() {
@@ -1800,33 +1848,27 @@
 
   const pipes = {
     items: [],
-    spawnTimer: 0,
+    reset() { this.items = []; },
 
-    reset() {
-      this.items = [];
-      this.spawnTimer = 0;
-    },
-
-    update(dt) {
-      difficulty = getDifficulty(score);
-      const spawnInterval = 1.4 - Math.min(0.7, score * 0.004); // faster spawns with score
-
-      this.spawnTimer += dt;
-      if (this.spawnTimer >= spawnInterval && startedFlight) {
-        this.spawnTimer = 0;
+    update() {
+      const mode = getSelectedMode();
+      if (frames % 100 === 0 && startedFlight) {
         const minLen = 50;
-        const maxGapTop = canvas.height - minLen - difficulty.gap;
-        const minGapTop = minLen;
-        const topY = Math.floor(Math.random() * (maxGapTop - minGapTop + 1)) + minGapTop;
-        this.items.push({ x: canvas.width, y: topY, passed: false, baseY: topY });
+        const maxPos = canvas.height - minLen - mode.gap;
+        const minPos = minLen;
+        const topY = Math.floor(Math.random() * (maxPos - minPos + 1)) + minPos;
+        this.items.push({ x: canvas.width, y: topY, passed: false });
       }
 
       for (let i = 0; i < this.items.length; i++) {
         const p = this.items[i];
-        let speed = difficulty.speed;
+        const m = getSelectedMode();
+        let speed = m.speed;
 
-        if (difficulty.erratic > 0) {
-          p.y = p.baseY + Math.sin(frames * 0.06 + p.x * 0.02) * difficulty.erratic * 4;
+        if (score >= 50) speed *= 1.1;
+        if (score >= 100) {
+          speed *= 1.25;
+          p.y += Math.sin(frames * 0.08 + p.x * 0.02) * 1.5;
         }
 
         p.x -= speed;
@@ -1838,34 +1880,29 @@
         const pBottom = penguin.y + penguin.radius;
 
         if (pRight > p.x && pLeft < p.x + pipeWidth) {
-          const gap = difficulty.gap;
+          const gap = m.gap;
           const topLimit = p.y;
           const bottomLimit = p.y + gap;
           let hit = false;
           if (pTop < topLimit) hit = true;
           if (pBottom > bottomLimit) hit = true;
 
-          if (hit) {
+          if (hit && !activeEffects.god) {
             triggerGameOver();
-          } else {
-            // near miss shake
-            addScreenShake(0.6, 0.04);
           }
         }
 
-        if (!p.passed && p.x + pipeWidth < penguin.x) {
+        if (p.x + pipeWidth < penguin.x && !p.passed) {
           p.passed = true;
           score++;
           let coinGain = 1;
           if (doubleCoins) coinGain *= 2;
+          if (activeEffects.clone > 0) coinGain *= 2;
           coins += coinGain;
           scoreEl.textContent = score;
           updateCoinsUI();
           playSfx(sfxCoin);
           saveMeta();
-
-          // tiny shake on score
-          addScreenShake(0.8, 0.05);
         }
 
         if (p.x + pipeWidth < 0) {
@@ -1880,7 +1917,8 @@
       for (let i = 0; i < this.items.length; i++) {
         const p = this.items[i];
         const pipeWidth = 60;
-        const gap = difficulty.gap;
+        const m = getSelectedMode();
+        const gap = m.gap;
 
         const gradTop = ctx.createLinearGradient(p.x, 0, p.x + pipeWidth, 0);
         gradTop.addColorStop(0, map.gradient[0]);
@@ -1914,7 +1952,7 @@
         ctx.lineTo(p.x + 50, p.y + gap);
         ctx.fill();
 
-        ctx.strokeStyle = "rgba(255,255,255,0.6)";
+        ctx.strokeStyle = "#5DBCD2";
         ctx.lineWidth = 2;
         ctx.strokeRect(p.x, -2, pipeWidth, p.y + 2);
         ctx.strokeRect(p.x, p.y + gap, pipeWidth, canvas.height);
@@ -1922,7 +1960,7 @@
     },
   };
 
-  function drawBackground(dt) {
+  function drawBackground() {
     const map = getEquippedMap();
     const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
     grad.addColorStop(0, map.gradient[0]);
@@ -1930,22 +1968,6 @@
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Parallax clouds
-    parallaxClouds.forEach(c => {
-      c.x -= c.speed;
-      if (c.x + c.w < 0) {
-        c.x = canvas.width + Math.random() * 80;
-        c.y = Math.random() * (canvas.height * 0.4);
-      }
-      ctx.globalAlpha = c.alpha;
-      ctx.fillStyle = "#ffffff";
-      ctx.beginPath();
-      ctx.ellipse(c.x, c.y, c.w, c.h, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.globalAlpha = 1;
-    });
-
-    // Snow
     ctx.fillStyle = "rgba(255,255,255,0.7)";
     snowflakes.forEach(f => {
       ctx.beginPath();
@@ -1960,47 +1982,68 @@
         f.x = Math.random() * canvas.width;
       }
     });
+  }
 
-    bgScroll += (difficulty.speed || getSelectedMode().speed) * dt * 60;
+  /* POWERUPS IN-RUN */
+  const activeEffects = {
+    god: 0,
+    slow: 0,
+    magnet: 0,
+    shrink: 0,
+    clone: 0,
+    autopilot: false,
+  };
 
-    // Warp streaks at high difficulty
-    if (difficulty.tier >= 2) {
-      const streaks = 10 + difficulty.tier * 4;
-      ctx.save();
-      ctx.globalAlpha = 0.12 + 0.04 * difficulty.tier;
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = "white";
-      for (let i = 0; i < streaks; i++) {
-        const x = (bgScroll * 0.8 + i * (canvas.width / streaks)) % (canvas.width + 40) - 20;
-        const y1 = 0;
-        const y2 = canvas.height;
-        ctx.beginPath();
-        ctx.moveTo(x, y1);
-        ctx.lineTo(x + 8, y2);
-        ctx.stroke();
-      }
-      ctx.restore();
+  function useToken(id) {
+    const def = POWERUP_DEFS.find(p => p.id === id);
+    if (!def) return false;
+    const key = def.tokenKey;
+    const current = getToken(key);
+    if (current <= 0) return false;
+    setToken(key, current - 1);
+    saveMeta();
+    return true;
+  }
+
+  function activatePowerup(id) {
+    if (id === "god")       activeEffects.god = 10;
+    if (id === "slow")      activeEffects.slow = 5;
+    if (id === "magnet")    activeEffects.magnet = 10;
+    if (id === "shrink")    activeEffects.shrink = 5;
+    if (id === "clone")     activeEffects.clone = 10;
+    if (id === "autopilot") activeEffects.autopilot = true;
+    tryVibrate(30);
+    updatePowerupHud();
+  }
+
+  function updatePowerupTimers(deltaSec) {
+    if (activeEffects.god > 0)    activeEffects.god    = Math.max(0, activeEffects.god - deltaSec);
+    if (activeEffects.slow > 0)   activeEffects.slow   = Math.max(0, activeEffects.slow - deltaSec);
+    if (activeEffects.magnet > 0) activeEffects.magnet = Math.max(0, activeEffects.magnet - deltaSec);
+    if (activeEffects.shrink > 0) activeEffects.shrink = Math.max(0, activeEffects.shrink - deltaSec);
+    if (activeEffects.clone > 0)  activeEffects.clone  = Math.max(0, activeEffects.clone - deltaSec);
+    if (activeEffects.autopilot && isGameOver) activeEffects.autopilot = false;
+    updatePowerupHud();
+  }
+
+  function updatePowerupHud() {
+    powerupHud.innerHTML = "";
+    function addIcon(label, remaining) {
+      const div = document.createElement("div");
+      div.className = "powerup-icon";
+      div.textContent = label;
+      const timer = document.createElement("div");
+      timer.className = "powerup-timer";
+      timer.textContent = remaining > 0 ? Math.ceil(remaining) : "";
+      div.appendChild(timer);
+      powerupHud.appendChild(div);
     }
-
-    // Glow overlay at very high difficulty
-    if (difficulty.tier >= 3) {
-      ctx.save();
-      const glowAlpha = Math.min(0.25, 0.1 + difficulty.tier * 0.05);
-      ctx.globalAlpha = glowAlpha;
-      const glowGrad = ctx.createRadialGradient(
-        canvas.width * 0.3,
-        canvas.height * 0.3,
-        40,
-        canvas.width * 0.3,
-        canvas.height * 0.3,
-        canvas.width
-      );
-      glowGrad.addColorStop(0, "rgba(255,255,255,0.95)");
-      glowGrad.addColorStop(1, "rgba(255,255,255,0)");
-      ctx.fillStyle = glowGrad;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.restore();
-    }
+    if (activeEffects.god > 0) addIcon("G", activeEffects.god);
+    if (activeEffects.slow > 0) addIcon("S", activeEffects.slow);
+    if (activeEffects.magnet > 0) addIcon("M", activeEffects.magnet);
+    if (activeEffects.shrink > 0) addIcon("H", activeEffects.shrink);
+    if (activeEffects.clone > 0) addIcon("C", activeEffects.clone);
+    if (activeEffects.autopilot) addIcon("A", 0);
   }
 
   let lastFrameTime = performance.now();
@@ -2013,53 +2056,54 @@
     const dt = (now - lastFrameTime) / 1000 || 0;
     lastFrameTime = now;
 
-    // Hover idle until first tap
+    const timeScale = activeEffects.slow > 0 ? 0.4 : 1.0;
+    const effectiveDt = dt * timeScale;
+    updatePowerupTimers(effectiveDt);
+
     if (!startedFlight) {
       penguin.y = canvas.height / 2 + Math.sin(frames * 0.08) * 10;
       penguin.velocity = 0;
+    } else if (activeEffects.autopilot && !isGameOver) {
+      penguin.velocity = Math.sin(frames * 0.15) * -4;
+      penguin.y += penguin.velocity;
+      if (penguin.y < penguin.radius) penguin.y = penguin.radius;
+      if (penguin.y > canvas.height - penguin.radius) penguin.y = canvas.height - penguin.radius;
+      penguin.rotation = penguin.velocity * 0.1;
     } else {
       penguin.update();
-      pipes.update(dt);
+    }
+
+    if (startedFlight) {
+      pipes.update();
     }
 
     frames++;
 
-    // screen shake
-    let shakeX = 0, shakeY = 0;
-    if (shakeTime > 0) {
-      shakeTime -= dt;
-      const power = shakeTime / 0.2;
-      const mag = shakeIntensity * power;
-      shakeX = (Math.random() - 0.5) * mag * 4;
-      shakeY = (Math.random() - 0.5) * mag * 4;
-      if (shakeTime <= 0) {
-        shakeTime = 0;
-        shakeIntensity = 0;
-      }
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawBackground();
+    pipes.draw();
+
+    if (activeEffects.god > 0) {
+      ctx.save();
+      ctx.globalAlpha = 0.25;
+      ctx.fillStyle = "#ffd600";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.restore();
     }
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawBackground(dt);
-
-    ctx.save();
-    ctx.translate(shakeX, shakeY);
-
-    pipes.draw();
     penguin.draw();
-
-    ctx.restore();
 
     if (!isGameOver) requestAnimationFrame(loop);
   }
 
   function triggerGameOver() {
     if (isGameOver) return;
+    if (activeEffects.god > 0) return;
     isGameOver = true;
     isRunning = false;
 
     playSfx(sfxHit);
-    tryVibrate([80, 80, 80]);
-    addScreenShake(4, 0.2);
+    tryVibrate([60, 60, 60]);
 
     if (!ultraLives) {
       lives = Math.max(0, lives - 1);
@@ -2082,6 +2126,10 @@
     saveMeta();
 
     gameOverScreen.classList.remove("hidden");
+
+    if (!removeAds) {
+      showInterstitialAd("game_over");
+    }
   }
 
   function startRun() {
@@ -2096,19 +2144,16 @@
     hubOverlay.classList.add("hidden");
     gameOverScreen.classList.add("hidden");
     noLivesScreen.classList.add("hidden");
-    fakeAdScreen.classList.add("hidden");
 
     isGameOver = false;
     isRunning = true;
     startedFlight = false;
     score = 0;
     frames = 0;
-    difficulty = getDifficulty(0);
     scoreEl.textContent = score;
     penguin.reset();
     pipes.reset();
     initSnow();
-    initClouds();
     ensureMusicPlaying();
     lastFrameTime = performance.now();
     requestAnimationFrame(loop);
@@ -2127,8 +2172,10 @@
       return;
     }
 
-    penguin.flap();
-    playSfx(sfxFlap);
+    if (!activeEffects.autopilot) {
+      penguin.flap();
+      playSfx(sfxFlap);
+    }
   }
 
   window.addEventListener("keydown", e => {
@@ -2143,28 +2190,23 @@
 
   /* HUB BUTTONS & PANELS */
   btnPlay.addEventListener("click", () => startRun());
+  btnSkins.addEventListener("click", () => { renderSkinsPanel(); skinsPanel.classList.remove("hidden"); });
+  btnMaps.addEventListener("click", () => { renderMapsPanel(); mapsPanel.classList.remove("hidden"); });
+  btnModes.addEventListener("click", () => { renderModesPanel(); modesPanel.classList.remove("hidden"); });
   btnStore.addEventListener("click", () => {
-    renderStoreSkins();
-    renderStoreMaps();
+    renderStoreCosmetics();
+    renderStorePowerups();
     renderStorePremium();
     renderStoreCurrency();
     storePanel.classList.remove("hidden");
   });
-
-  iconSettings.addEventListener("click", () => {
-    settingsPanel.classList.remove("hidden");
-  });
-
-  iconMissions.addEventListener("click", () => {
+  btnSettings.addEventListener("click", () => { settingsPanel.classList.remove("hidden"); });
+  btnMissions.addEventListener("click", () => {
     checkMissionsCompletion();
     renderMissionsPanel();
     missionsPanel.classList.remove("hidden");
   });
-
-  iconDaily.addEventListener("click", () => {
-    updateDailyPanel();
-    dailyPanel.classList.remove("hidden");
-  });
+  btnDaily.addEventListener("click", () => { updateDailyPanel(); dailyPanel.classList.remove("hidden"); });
 
   document.querySelectorAll("[data-panel-close]").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -2217,7 +2259,7 @@
     updateAudioStatusUI();
   });
 
-  /* Fake rewarded ad / bonus life */
+  /* WATCH AD FOR LIFE (Rewarded) */
   watchAdBtn.addEventListener("click", () => {
     if (removeAds) {
       lives = Math.min(MAX_LIVES, lives + 1);
@@ -2231,41 +2273,33 @@
     }
 
     noLivesScreen.classList.add("hidden");
-    fakeAdScreen.classList.remove("hidden");
-    runFakeAd();
+
+    showRewardedAd("extra_life_nolives", () => {
+      lives = Math.min(MAX_LIVES, lives + 1);
+      lastLifeTimestamp = Date.now();
+      saveMeta();
+      updateLivesUI();
+      alert("+1 life added.");
+      hubOverlay.classList.remove("hidden");
+    });
   });
 
-  function runFakeAd() {
-    let duration = 5;
-    let remaining = duration;
-    fakeAdBar.style.width = "0%";
-    fakeAdTimer.textContent = `${remaining}s remaining`;
+  /* RESET & RESTORE */
+  btnResetProgress.addEventListener("click", () => {
+    const ok = confirm("Reset ALL progress, coins, skins, maps, stats & settings?\nThis cannot be undone.");
+    if (!ok) return;
+    localStorage.clear();
+    location.reload();
+  });
 
-    const interval = setInterval(() => {
-      remaining--;
-      const pct = ((duration - remaining) / duration) * 100;
-      fakeAdBar.style.width = pct + "%";
-      fakeAdTimer.textContent = `${Math.max(remaining, 0)}s remaining`;
-
-      if (remaining <= 0) {
-        clearInterval(interval);
-        setTimeout(() => {
-          fakeAdScreen.classList.add("hidden");
-          lives = Math.min(MAX_LIVES, lives + 1);
-          lastLifeTimestamp = Date.now();
-          saveMeta();
-          updateLivesUI();
-          alert("Thanks for watching! +1 life added.");
-          hubOverlay.classList.remove("hidden");
-        }, 300);
-      }
-    }, 1000);
-  }
+  btnRestorePurchases.addEventListener("click", () => {
+    alert("In a real Play Store build, this would ask Google Play to restore past purchases.\nThis test build doesn’t talk to Play Store yet.");
+  });
 
   /* FIRST RENDER */
   updateHubView();
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawBackground(0);
+  drawBackground();
   penguin.reset();
   penguin.draw();
   updateAudioStatusUI();
