@@ -4,224 +4,237 @@
   <meta charset="UTF-8" />
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Waddle Wings: Arcade</title>
+  <title>Waddle Wings Arcade</title>
 
+  <!-- OPTIONAL PWA BITS -->
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#150030" />
+  <meta name="theme-color" content="#120621" />
 
-  <!-- AUDIO (PUT REAL FILES IN ./audio/) -->
-  <audio id="bgm" src="audio/bgm_arcade.mp3" loop preload="auto"></audio>
+  <!-- AUDIO (add real files in these paths) -->
+  <audio id="bgm" src="audio/arcade_theme.mp3" loop preload="auto"></audio>
   <audio id="sfx-flap" src="audio/flap.wav" preload="auto"></audio>
-  <audio id="sfx-coin" src="audio/coin.wav" preload="auto"></audio>
+  <audio id="sfx-score" src="audio/coin.wav" preload="auto"></audio>
   <audio id="sfx-hit" src="audio/hit.wav" preload="auto"></audio>
-  <audio id="sfx-ui" src="audio/ui_click.wav" preload="auto"></audio>
+  <audio id="sfx-ui" src="audio/ui.wav" preload="auto"></audio>
+  <audio id="sfx-purchase" src="audio/purchase.wav" preload="auto"></audio>
 
   <style>
     @import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
 
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
       padding: 0;
-      background: radial-gradient(circle at top, #2b005a, #05000f);
+      background: #000;
       color: #fff;
-      font-family: "Press Start 2P", system-ui, sans-serif;
+      font-family: "Press Start 2P", system-ui, monospace;
       overflow: hidden;
-      touch-action: none;
       display: flex;
       align-items: center;
       justify-content: center;
       height: 100vh;
       width: 100vw;
+      touch-action: none;
     }
 
     #game-container {
       position: relative;
-      width: min(480px, 100vw);
-      height: min(850px, 100vh);
-      border-radius: 24px;
-      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      max-width: 480px;
+      max-height: 860px;
       background: #000;
-      box-shadow:
-        0 0 0 3px #ff00ff55,
-        0 22px 45px rgba(0, 0, 0, 0.9);
+      overflow: hidden;
+      border-radius: 18px;
+      box-shadow: 0 0 35px rgba(0, 0, 0, 0.9);
     }
 
     canvas {
       display: block;
       width: 100%;
       height: 100%;
-      image-rendering: pixelated;
     }
+
+    /* CRT / ARCADE OVERLAY */
+    #crt-overlay {
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      mix-blend-mode: soft-light;
+      opacity: 0.18;
+      background-image:
+        repeating-linear-gradient(
+          to bottom,
+          rgba(255,255,255,0.35),
+          rgba(255,255,255,0.35) 1px,
+          transparent 1px,
+          transparent 3px
+        );
+    }
+
+    #vignette {
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      box-shadow: inset 0 0 120px rgba(0,0,0,0.85);
+    }
+
+    /* UI LAYER */
 
     #ui-layer {
       position: absolute;
       inset: 0;
       pointer-events: none;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
     }
 
-    /* TOP BAR */
     #top-bar {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      right: 8px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 8px 10px;
-      font-size: 9px;
+      font-size: 10px;
       text-shadow: 0 0 4px #000;
+      pointer-events: none;
+      z-index: 5;
     }
 
     #score-display {
       font-size: 18px;
-      color: #ffec6b;
+      color: #ffe66d;
     }
 
     #meta-right {
       text-align: right;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
+      font-size: 10px;
+      line-height: 1.4;
     }
 
-    #coins-display,
+    #coins-display {
+      color: #ffd93d;
+    }
+
     #lives-display {
-      font-size: 9px;
+      color: #ff6b6b;
     }
 
-    /* HUB OVERLAY */
+    /* HUB (MAIN MENU) */
+
     #hub-overlay {
       position: absolute;
       inset: 0;
+      background: radial-gradient(circle at top, rgba(255,255,255,0.18), rgba(0,0,0,0.92));
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      padding: 12px;
+      justify-content: center;
+      align-items: center;
       pointer-events: auto;
-      background: radial-gradient(circle at top, rgba(30, 0, 70, 0.8), rgba(4, 0, 10, 0.94));
-      backdrop-filter: blur(6px);
-      animation: hubFade 0.25s ease-out;
+      z-index: 10;
+      animation: hubFadeIn 0.25s ease-out;
     }
 
-    @keyframes hubFade {
+    @keyframes hubFadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    #hub-header {
+    #hub-card {
+      background: rgba(6, 0, 25, 0.96);
+      border-radius: 18px;
+      border: 2px solid rgba(255,255,255,0.16);
+      padding: 16px 14px 18px;
+      width: 90%;
+      max-width: 360px;
       text-align: center;
-      margin-top: 4px;
+      box-shadow: 0 14px 30px rgba(0,0,0,0.9);
     }
 
     #hub-title {
-      font-size: 14px;
-      color: #ff66ff;
-      text-shadow:
-        0 0 4px #ff00ff,
-        0 0 8px #ff00ffaa;
+      font-size: 15px;
+      color: #ff6bcb;
+      text-shadow: 0 0 8px rgba(255,107,203,0.8);
+      margin-bottom: 6px;
     }
 
     #hub-subtitle {
-      font-size: 7px;
-      margin-top: 4px;
-      color: #c7b7ff;
+      font-size: 9px;
+      color: #c3e8ff;
+      margin-bottom: 12px;
     }
 
-    #hub-main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 18px;
+    #hub-podium {
+      margin: 0 auto 12px;
+      width: 140px;
+      height: 120px;
+      border-radius: 14px;
+      border: 2px solid rgba(255,255,255,0.18);
+      background: radial-gradient(circle at 50% 0, rgba(255,255,255,0.28), rgba(0,0,0,0.85));
+      position: relative;
+      overflow: hidden;
     }
 
-    /* FLOATING LOGO + HOVERING BIRD PREVIEW */
-    #logo-preview {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
+    #hub-podium-label {
+      position: absolute;
+      bottom: 4px;
+      left: 0;
+      right: 0;
+      font-size: 8px;
+      color: #e2f3ff;
+      text-shadow: 0 0 4px #000;
     }
 
-    #logo-text {
-      font-size: 11px;
-      color: #00ffd0;
-      text-shadow:
-        0 0 4px #00ffd0,
-        0 0 10px #00ffd055;
-      letter-spacing: 1px;
+    #podium-character {
+      position: absolute;
+      left: 50%;
+      top: 55%;
+      transform: translate(-50%, -50%);
     }
 
-    #preview-canvas {
-      width: 120px;
-      height: 80px;
-      border-radius: 16px;
-      border: 2px solid #ffffff33;
-      box-shadow:
-        0 0 12px #000000aa,
-        0 0 16px #00e5ff44;
-      background: radial-gradient(circle at top, #1b2a4a, #050814);
-    }
-
-    /* BIG BUTTONS */
-    #primary-buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      width: 100%;
-      max-width: 260px;
+    #hub-main-buttons {
       margin-top: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
 
-    .main-btn {
+    .big-btn {
       pointer-events: auto;
       border: none;
+      outline: none;
+      width: 100%;
+      padding: 10px 8px;
       border-radius: 999px;
-      padding: 14px 10px;
-      font-family: "Press Start 2P", system-ui, sans-serif;
-      font-size: 11px;
-      text-transform: uppercase;
+      font-family: "Press Start 2P", monospace;
+      font-size: 12px;
       cursor: pointer;
-      text-shadow: 0 0 4px #000;
-      box-shadow:
-        0 8px 0 #5c002f,
-        0 16px 24px rgba(0, 0, 0, 0.8);
-      transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.1s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #fff;
+      text-shadow: 0 0 4px rgba(0,0,0,0.7);
+      box-shadow: 0 5px 0 rgba(0,0,0,0.8);
     }
 
-    .main-btn.primary {
-      background: linear-gradient(135deg, #ff5c97, #ffcc67);
-      color: #1a0022;
+    #btn-play {
+      background: linear-gradient(135deg, #2af598, #009efd);
     }
 
-    .main-btn.secondary {
-      background: linear-gradient(135deg, #4c6fff, #00e5ff);
-      color: #050014;
-      box-shadow:
-        0 8px 0 #1b2a5a,
-        0 16px 24px rgba(0, 0, 0, 0.8);
+    #btn-store {
+      background: linear-gradient(135deg, #ff6b6b, #fddb92);
     }
 
-    .main-btn:active {
+    .big-btn:active {
       transform: translateY(3px);
-      box-shadow:
-        0 3px 0 #2a0022,
-        0 8px 14px rgba(0, 0, 0, 0.9);
-      filter: brightness(0.95);
+      box-shadow: 0 2px 0 rgba(0,0,0,0.9);
     }
 
-    /* ICON ROW */
-    #icon-row {
+    #hub-icon-row {
+      margin-top: 12px;
       display: flex;
       justify-content: center;
-      gap: 12px;
-      margin-top: 8px;
+      gap: 10px;
     }
 
     .icon-btn {
@@ -229,223 +242,197 @@
       width: 34px;
       height: 34px;
       border-radius: 50%;
-      border: 2px solid #ffffff33;
-      background: radial-gradient(circle at 30% 20%, #ffffff33, #110422);
+      border: 1px solid rgba(255,255,255,0.4);
+      background: radial-gradient(circle at 30% 0, rgba(255,255,255,0.4), rgba(0,0,0,0.9));
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 14px;
-      color: #ffec6b;
+      font-size: 13px;
+      color: #fff;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.9);
+      box-shadow: 0 3px 0 rgba(0,0,0,0.8);
     }
 
     .icon-btn:active {
       transform: translateY(2px);
-      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.9);
+      box-shadow: 0 1px 0 rgba(0,0,0,0.9);
     }
 
-    #hub-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 7px;
-      color: #a0a0ff;
-      text-shadow: 0 0 4px #000;
-      padding: 4px 4px 6px;
+    #hub-footer-text {
+      margin-top: 10px;
+      font-size: 8px;
+      color: #9fa8ff;
+      opacity: 0.8;
     }
 
-    #hub-mode-label {
-      max-width: 60%;
-    }
+    /* PANELS (STORE / SETTINGS / INFO / GAME OVER / NO LIVES / AD) */
 
-    /* PANELS */
     .panel {
       position: absolute;
       inset: 0;
-      display: none;
-      align-items: center;
+      background: rgba(0,0,0,0.75);
+      display: flex;
       justify-content: center;
-      background: radial-gradient(circle at top, rgba(8, 0, 18, 0.95), rgba(0, 0, 0, 0.96));
+      align-items: center;
+      z-index: 20;
       pointer-events: auto;
-      z-index: 5;
     }
 
-    .panel.visible {
-      display: flex;
+    .hidden {
+      display: none !important;
     }
 
     .panel-card {
+      background: rgba(6, 0, 25, 0.98);
+      padding: 14px 12px 16px;
+      border-radius: 14px;
+      border: 2px solid rgba(255,255,255,0.18);
       width: 92%;
       max-width: 420px;
-      max-height: 80%;
-      background: radial-gradient(circle at top, #1c0033, #050009);
-      border-radius: 18px;
-      border: 2px solid #ff00ff55;
-      padding: 16px;
-      box-shadow:
-        0 18px 30px rgba(0, 0, 0, 1),
-        0 0 20px #ff00ff55;
-      display: flex;
-      flex-direction: column;
       font-size: 9px;
+      box-shadow: 0 14px 30px rgba(0,0,0,0.9);
+      animation: slideUp 0.2s ease-out;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(12px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
 
     .panel-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     .panel-title {
-      font-size: 12px;
-      color: #ffec6b;
-      text-shadow: 0 0 4px #000;
+      font-size: 11px;
+      color: #ffd93d;
     }
 
     .panel-close {
       border: none;
       background: transparent;
       color: #fff;
-      font-size: 18px;
+      font-size: 16px;
       cursor: pointer;
     }
 
     .panel-body {
-      flex: 1;
+      max-height: 300px;
       overflow-y: auto;
       padding-right: 4px;
     }
 
     .panel-footer {
       text-align: right;
-      margin-top: 10px;
+      margin-top: 8px;
     }
 
     .small-btn {
+      pointer-events: auto;
       border: none;
+      outline: none;
+      padding: 6px 14px;
       border-radius: 999px;
-      padding: 8px 14px;
-      font-family: "Press Start 2P", system-ui, sans-serif;
+      background: #ff6b6b;
+      color: #fff;
+      font-family: "Press Start 2P", monospace;
       font-size: 8px;
       cursor: pointer;
-      background: linear-gradient(135deg, #ff5c97, #ffcc67);
-      color: #210017;
-      box-shadow: 0 4px 0 #4b0024;
+      text-transform: uppercase;
+      box-shadow: 0 3px 0 rgba(0,0,0,0.8);
+    }
+
+    .small-btn.secondary {
+      background: #3b82f6;
+    }
+
+    .small-btn.ghost {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.4);
+      box-shadow: none;
     }
 
     .small-btn:active {
       transform: translateY(2px);
-      box-shadow: 0 1px 0 #4b0024;
+      box-shadow: 0 1px 0 rgba(0,0,0,0.9);
     }
 
-    .small-btn.secondary {
-      background: linear-gradient(135deg, #4c6fff, #00e5ff);
-      box-shadow: 0 4px 0 #122863;
-      color: #050014;
+    .small-btn.disabled {
+      opacity: 0.5;
+      cursor: default;
+      box-shadow: none;
+    }
+
+    /* LISTS */
+
+    .section-label {
+      font-size: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #9fa8ff;
+      margin: 8px 0 3px;
     }
 
     .list {
       list-style: none;
-      padding: 0;
       margin: 0;
+      padding: 0;
     }
 
     .list-item {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
-      gap: 6px;
+      align-items: center;
       padding: 6px 0;
-      border-bottom: 1px solid #ffffff22;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      gap: 8px;
     }
 
     .list-label {
-      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
     }
 
     .list-label span:first-child {
-      display: block;
       font-size: 9px;
-      margin-bottom: 2px;
-      color: #ffec6b;
+      color: #eaf4ff;
     }
 
     .list-label span:last-child {
-      display: block;
       font-size: 8px;
-      color: #c7b7ff;
+      color: #c0c7ff;
     }
 
-    .section-label {
-      text-transform: uppercase;
-      font-size: 7px;
-      letter-spacing: 1px;
-      color: #9b7cff;
-      margin: 8px 0 2px;
-    }
+    /* CENTER CARDS (GAME OVER, NO LIVES, FAKE AD, PURCHASE STATES) */
 
-    .pill-tag {
-      display: inline-block;
-      border-radius: 999px;
-      border: 1px solid #ffffff44;
-      padding: 2px 6px;
-      font-size: 7px;
-      color: #ffffffaa;
-      margin-left: 4px;
-    }
-
-    .toggle-indicator {
-      display: inline-block;
-      margin-left: 4px;
-      font-size: 7px;
-      color: #7dffb7;
-    }
-
-    .small-btn.disabled {
-      opacity: 0.55;
-      cursor: default;
-      box-shadow: none;
-    }
-
-    .small-btn.equipped {
-      background: linear-gradient(135deg, #7dffb7, #00e676);
-      color: #041610;
-      box-shadow: 0 4px 0 #00693b;
-    }
-
-    /* CENTER CARDS (GAME OVER / NO LIVES / ADS / CONFIRM) */
     .center-card {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      min-width: 230px;
-      max-width: 320px;
-      background: radial-gradient(circle at top, #2a003f, #050006);
-      border-radius: 18px;
-      border: 2px solid #ff00ffaa;
+      background: rgba(6, 0, 25, 0.98);
+      border-radius: 16px;
       padding: 18px 14px 16px;
-      box-shadow:
-        0 18px 30px rgba(0, 0, 0, 1),
-        0 0 20px #ff00ff55;
+      border: 2px solid rgba(255,255,255,0.18);
+      width: 80%;
+      max-width: 320px;
       text-align: center;
+      z-index: 25;
       font-size: 9px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.92);
+      animation: slideUp 0.2s ease-out;
       pointer-events: auto;
-      z-index: 10;
-      display: none;
-    }
-
-    .center-card.visible {
-      display: block;
     }
 
     .center-card h1 {
-      margin: 0 0 10px;
-      font-size: 16px;
-      color: #ffec6b;
-      text-shadow: 0 0 4px #000;
+      margin: 0 0 8px;
+      font-size: 14px;
+      color: #ff6b6b;
+      text-shadow: 0 0 6px rgba(255,107,107,0.7);
     }
 
     .center-card p {
@@ -454,736 +441,1035 @@
 
     #fake-ad-progress {
       width: 100%;
-      height: 10px;
+      height: 8px;
       border-radius: 999px;
+      background: rgba(255,255,255,0.1);
       overflow: hidden;
-      background: #16001f;
       margin-top: 8px;
-      border: 1px solid #ffffff44;
     }
 
     #fake-ad-bar {
-      height: 100%;
       width: 0%;
-      background: linear-gradient(90deg, #ff5c97, #ffcc67);
+      height: 100%;
+      background: linear-gradient(90deg, #ff6b6b, #ffd93d);
     }
 
     #fake-ad-timer {
       font-size: 8px;
       margin-top: 6px;
-      color: #c7b7ff;
+      color: #eaf4ff;
     }
 
-    /* BOTTOM HINT */
-    #bottom-hint {
-      position: absolute;
-      bottom: 4px;
-      left: 0;
-      right: 0;
-      text-align: center;
+    /* UTILS */
+    .tag {
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.4);
       font-size: 7px;
-      color: #ffffffaa;
-      text-shadow: 0 0 4px #000;
-      pointer-events: none;
-    }
-
-    .hidden {
-      display: none !important;
+      text-transform: uppercase;
     }
   </style>
 </head>
 <body>
 <div id="game-container">
   <canvas id="gameCanvas"></canvas>
+  <div id="crt-overlay"></div>
+  <div id="vignette"></div>
 
   <div id="ui-layer">
     <div id="top-bar">
       <div id="score-display">0</div>
       <div id="meta-right">
-        <div id="coins-display">💰 0</div>
-        <div id="lives-display">♥ 5</div>
+        <div id="coins-display">COINS: 0</div>
+        <div id="lives-display">LIVES: 5</div>
       </div>
     </div>
-    <div id="bottom-hint">TAP OR PRESS SPACE TO FLAP</div>
   </div>
 
-  <!-- HUB MENU -->
+  <!-- HUB (MENU) -->
   <div id="hub-overlay">
-    <div id="hub-header">
-      <div id="hub-title">WADDLE WINGS: ARCADE</div>
-      <div id="hub-subtitle">Tap to flap • Dodge pipes • Stack coins • Unlock skins & maps</div>
-    </div>
+    <div id="hub-card">
+      <div id="hub-title">WADDLE WINGS</div>
+      <div id="hub-subtitle">ARCADE EDITION</div>
 
-    <div id="hub-main">
-      <div id="logo-preview">
-        <div id="logo-text">INSERT COIN TO START</div>
-        <canvas id="preview-canvas" width="120" height="80"></canvas>
+      <div id="hub-podium">
+        <canvas id="podium-character" width="110" height="90"></canvas>
+        <div id="hub-podium-label">CLASSIC PENGUIN</div>
       </div>
 
-      <div id="primary-buttons">
-        <button id="btn-play" class="main-btn primary">▶ PLAY</button>
-        <button id="btn-store" class="main-btn secondary">★ STORE</button>
+      <div id="hub-main-buttons">
+        <button id="btn-play" class="big-btn">PLAY</button>
+        <button id="btn-store" class="big-btn">STORE</button>
       </div>
 
-      <div id="icon-row">
-        <button class="icon-btn" id="icon-settings" title="Settings">⚙</button>
-        <button class="icon-btn" id="icon-maps" title="Maps">🗺</button>
-        <button class="icon-btn" id="icon-skins" title="Skins">👾</button>
-        <button class="icon-btn" id="icon-daily" title="Daily Bonus">🎁</button>
-        <button class="icon-btn" id="icon-reset" title="Reset Data">🗑</button>
-        <button class="icon-btn" id="icon-restore" title="Restore Purchases">⟳</button>
+      <div id="hub-icon-row">
+        <button id="btn-settings" class="icon-btn" title="Settings">⚙</button>
+        <button id="btn-info" class="icon-btn" title="Info">?</button>
       </div>
-    </div>
 
-    <div id="hub-footer">
-      <span id="hub-mode-label">Difficulty: Normal</span>
-      <span>v4.0 – Arcade Build</span>
+      <div id="hub-footer-text">
+        TAP TO FLAP • UNLOCK SKINS & MAPS • BEAT YOUR BEST
+      </div>
     </div>
   </div>
 
-  <!-- PANELS -->
-  <div id="panel-store" class="panel">
+  <!-- STORE PANEL -->
+  <div id="panel-store" class="panel hidden">
     <div class="panel-card">
       <div class="panel-header">
-        <div class="panel-title">Arcade Store</div>
+        <div class="panel-title">ARCADE STORE</div>
         <button class="panel-close" data-panel-close="panel-store">×</button>
       </div>
       <div class="panel-body">
         <div class="section-label">Skins</div>
-        <ul class="list" id="store-skins"></ul>
+        <ul id="store-skins" class="list"></ul>
 
         <div class="section-label">Maps</div>
-        <ul class="list" id="store-maps"></ul>
+        <ul id="store-maps" class="list"></ul>
 
-        <div class="section-label">Upgrades</div>
-        <ul class="list" id="store-upgrades"></ul>
+        <div class="section-label">Coins</div>
+        <ul id="store-coins" class="list"></ul>
 
-        <div class="section-label">Coin Packs</div>
-        <ul class="list" id="store-coins"></ul>
+        <div class="section-label">Premium</div>
+        <ul id="store-premium" class="list"></ul>
       </div>
       <div class="panel-footer">
-        <button class="small-btn secondary" data-panel-close="panel-store">Close</button>
+        <button class="small-btn ghost" id="btn-store-reset">RESET PROGRESS</button>
+        <button class="small-btn secondary" data-panel-close="panel-store">CLOSE</button>
       </div>
     </div>
   </div>
 
-  <div id="panel-settings" class="panel">
+  <!-- SETTINGS PANEL -->
+  <div id="panel-settings" class="panel hidden">
     <div class="panel-card">
       <div class="panel-header">
-        <div class="panel-title">Settings</div>
+        <div class="panel-title">SETTINGS</div>
         <button class="panel-close" data-panel-close="panel-settings">×</button>
       </div>
       <div class="panel-body">
-        <p style="font-size:8px;color:#d3c7ff;margin-bottom:8px;">
-          Tweak audio and comfort options. In a real Play Store build, purchases and ads would be powered by Google Play Billing and AdMob.
-        </p>
         <ul class="list">
           <li class="list-item">
             <div class="list-label">
               <span>Music</span>
-              <span>90s arcade background track during menus and runs.</span>
+              <span>Turn background music on or off.</span>
             </div>
-            <button class="small-btn" id="btn-toggle-music">ON</button>
+            <button id="btn-toggle-music" class="small-btn">TOGGLE</button>
           </li>
           <li class="list-item">
             <div class="list-label">
               <span>Sound FX</span>
-              <span>Flaps, hits, coins, UI clicks.</span>
+              <span>Flaps, hits and UI sounds.</span>
             </div>
-            <button class="small-btn" id="btn-toggle-sfx">ON</button>
+            <button id="btn-toggle-sfx" class="small-btn">TOGGLE</button>
           </li>
           <li class="list-item">
             <div class="list-label">
               <span>Vibration</span>
-              <span>Small haptics on hit and key actions (where supported).</span>
+              <span>Small haptics on hit (if supported).</span>
             </div>
-            <button class="small-btn" id="btn-toggle-vibrate">ON</button>
+            <button id="btn-toggle-vibrate" class="small-btn">TOGGLE</button>
           </li>
         </ul>
+        <p id="settings-status" style="margin-top:8px;font-size:8px;color:#c0c7ff;"></p>
       </div>
       <div class="panel-footer">
-        <button class="small-btn secondary" data-panel-close="panel-settings">Close</button>
+        <button class="small-btn secondary" data-panel-close="panel-settings">CLOSE</button>
       </div>
     </div>
   </div>
 
-  <div id="panel-maps" class="panel">
+  <!-- INFO PANEL -->
+  <div id="panel-info" class="panel hidden">
     <div class="panel-card">
       <div class="panel-header">
-        <div class="panel-title">Maps</div>
-        <button class="panel-close" data-panel-close="panel-maps">×</button>
+        <div class="panel-title">HOW TO PLAY</div>
+        <button class="panel-close" data-panel-close="panel-info">×</button>
       </div>
       <div class="panel-body">
-        <ul class="list" id="maps-list"></ul>
+        <p>• TAP anywhere (or press SPACE) to flap.</p>
+        <p>• Fly through the gaps. Each pipe passed = +1 score.</p>
+        <p>• Coins are earned as you score. Use coins to unlock skins & maps.</p>
+        <p>• The game speeds up the better you do.</p>
+        <p>• Lives regenerate over time or from watching an ad.</p>
+        <p style="margin-top:10px;color:#ffd93d;">
+          PURE SKILL. NO BOOSTERS. JUST YOU AND THE BIRD.
+        </p>
       </div>
       <div class="panel-footer">
-        <button class="small-btn secondary" data-panel-close="panel-maps">Close</button>
+        <button class="small-btn secondary" data-panel-close="panel-info">CLOSE</button>
       </div>
     </div>
   </div>
 
-  <div id="panel-skins" class="panel">
-    <div class="panel-card">
-      <div class="panel-header">
-        <div class="panel-title">Skins</div>
-        <button class="panel-close" data-panel-close="panel-skins">×</button>
-      </div>
-      <div class="panel-body">
-        <ul class="list" id="skins-list"></ul>
-      </div>
-      <div class="panel-footer">
-        <button class="small-btn secondary" data-panel-close="panel-skins">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="panel-daily" class="panel">
-    <div class="panel-card">
-      <div class="panel-header">
-        <div class="panel-title">Daily Bonus</div>
-        <button class="panel-close" data-panel-close="panel-daily">×</button>
-      </div>
-      <div class="panel-body">
-        <p id="daily-text" style="font-size:8px;color:#e0d7ff;margin-bottom:10px;"></p>
-      </div>
-      <div class="panel-footer">
-        <button class="small-btn" id="btn-claim-daily">Claim</button>
-        <button class="small-btn secondary" data-panel-close="panel-daily">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- CENTER CARDS -->
-  <div id="card-gameover" class="center-card">
+  <!-- GAME OVER -->
+  <div id="card-gameover" class="center-card hidden">
     <h1>GAME OVER</h1>
-    <p>Score: <span id="final-score">0</span></p>
-    <p>Best: <span id="best-score">0</span></p>
-    <p>Lives left: <span id="lives-left-label">0</span></p>
+    <p>SCORE: <span id="final-score">0</span></p>
+    <p>BEST: <span id="best-score">0</span></p>
+    <p>LIVES LEFT: <span id="lives-left-label">0</span></p>
     <div style="margin-top:10px;">
-      <button id="btn-restart" class="small-btn">PLAY AGAIN</button>
-      <button id="btn-back-menu" class="small-btn secondary">BACK TO MENU</button>
+      <button id="btn-restart" class="small-btn">RETRY</button>
+      <button id="btn-back-menu" class="small-btn secondary">MENU</button>
     </div>
   </div>
 
-  <div id="card-nolives" class="center-card">
+  <!-- NO LIVES -->
+  <div id="card-nolives" class="center-card hidden">
     <h1>NO LIVES</h1>
     <p>You are out of lives.</p>
-    <p style="font-size:8px;">
-      Lives regenerate over time (1 per hour). Watch a short ad for +1 life, or come back later.
+    <p style="font-size:8px;margin-top:6px;">
+      Lives regenerate over time. You can also watch an ad or buy a life pack.
     </p>
     <div style="margin-top:10px;">
-      <button id="btn-watch-ad" class="small-btn">WATCH AD</button>
-      <button id="btn-nolives-menu" class="small-btn secondary">BACK TO MENU</button>
+      <button id="btn-watch-ad" class="small-btn">WATCH AD (+1)</button>
+      <button id="btn-buy-life-pack" class="small-btn secondary">LIFE PACK 69p</button>
+      <button id="btn-nolives-menu" class="small-btn ghost" style="margin-top:6px;">MENU</button>
     </div>
   </div>
 
-  <div id="card-fake-ad" class="center-card">
+  <!-- FAKE AD -->
+  <div id="card-ad" class="center-card hidden">
     <h1>AD PLAYING…</h1>
-    <p style="font-size:8px;">Pretend this is one of those ridiculous mobile game trailers.</p>
+    <p style="font-size:8px;">Pretend this is a terrible mobile game trailer.</p>
     <div id="fake-ad-progress"><div id="fake-ad-bar"></div></div>
-    <div id="fake-ad-timer">5s remaining</div>
+    <div id="fake-ad-timer">5s</div>
   </div>
 
-  <div id="card-confirm" class="center-card">
+  <!-- PURCHASE FLOW -->
+  <div id="card-purchase-confirm" class="center-card hidden">
     <h1>CONFIRM</h1>
-    <p id="confirm-text" style="font-size:8px;"></p>
+    <p id="purchase-confirm-text"></p>
     <div style="margin-top:10px;">
-      <button id="btn-confirm-yes" class="small-btn">YES</button>
-      <button id="btn-confirm-no" class="small-btn secondary">NO</button>
+      <button id="purchase-confirm-yes" class="small-btn">BUY</button>
+      <button id="purchase-confirm-no" class="small-btn secondary">CANCEL</button>
     </div>
   </div>
 
-  <div id="card-message" class="center-card">
-    <h1>DONE</h1>
-    <p id="message-text" style="font-size:8px;"></p>
+  <div id="card-purchase-processing" class="center-card hidden">
+    <h1>PROCESSING…</h1>
+    <p style="font-size:8px;">Contacting fake Google Play Billing…</p>
+  </div>
+
+  <div id="card-purchase-success" class="center-card hidden">
+    <h1>SUCCESS!</h1>
+    <p id="purchase-success-text"></p>
     <div style="margin-top:10px;">
-      <button id="btn-message-ok" class="small-btn">OK</button>
+      <button id="purchase-success-ok" class="small-btn">OK</button>
     </div>
   </div>
 </div>
 
 <script>
-  // ==== BASIC SETUP ====
+  // ====== BASIC CANVAS SETUP ======
   const canvas = document.getElementById("gameCanvas");
   const ctx = canvas.getContext("2d");
 
   function resizeCanvas() {
-    const rect = document.getElementById("game-container").getBoundingClientRect();
-    canvas.width = rect.width;
-    canvas.height = rect.height;
+    const maxWidth = 480;
+    const maxHeight = 860;
+    let w = window.innerWidth;
+    let h = window.innerHeight;
+    if (w > maxWidth) {
+      w = maxWidth;
+      h = Math.min(window.innerHeight, maxHeight);
+    }
+    canvas.width = w;
+    canvas.height = h;
   }
   window.addEventListener("resize", resizeCanvas);
   resizeCanvas();
 
-  // Preview canvas for menu
-  const previewCanvas = document.getElementById("preview-canvas");
-  const pctx = previewCanvas.getContext("2d");
-
-  // ==== CONSTANTS ====
+  // ====== CONSTANTS ======
   const GRAVITY = 0.28;
-  const FLAP_STRENGTH = -5.2;
-  const PIPE_WIDTH = 64;
+  const FLAP_VELOCITY = -5.5;
   const MAX_LIVES = 5;
   const LIFE_REGEN_MS = 60 * 60 * 1000; // 1 hour
-  const DAILY_REWARD_COINS = 40;
 
-  // ==== AUDIO ====
+  // AUDIO
   const bgm = document.getElementById("bgm");
   const sfxFlap = document.getElementById("sfx-flap");
-  const sfxCoin = document.getElementById("sfx-coin");
+  const sfxScore = document.getElementById("sfx-score");
   const sfxHit = document.getElementById("sfx-hit");
-  const sfxUi = document.getElementById("sfx-ui");
+  const sfxUI = document.getElementById("sfx-ui");
+  const sfxPurchase = document.getElementById("sfx-purchase");
 
-  let musicOn = localStorage.getItem("ww_musicOn");
-  if (musicOn === null) musicOn = "true";
-  let sfxOn = localStorage.getItem("ww_sfxOn");
-  if (sfxOn === null) sfxOn = "true";
-  let vibrateOn = localStorage.getItem("ww_vibrateOn");
-  if (vibrateOn === null) vibrateOn = "true";
+  function playSfx(sound) {
+    if (settings.sfx !== "on") return;
+    if (!sound) return;
+    try {
+      sound.currentTime = 0;
+      sound.play().catch(() => {});
+    } catch (_) {}
+  }
 
   function tryVibrate(pattern) {
-    if (vibrateOn === "true" && "vibrate" in navigator) {
+    if (settings.vibrate !== "on") return;
+    if ("vibrate" in navigator) {
       navigator.vibrate(pattern);
     }
   }
 
-  function playSfx(audio) {
-    if (sfxOn !== "true") return;
-    if (!audio) return;
-    try {
-      audio.currentTime = 0;
-      audio.play().catch(() => {});
-    } catch (_) {}
-  }
-
   function ensureMusic() {
-    if (musicOn !== "true") {
-      bgm.pause();
+    if (settings.music !== "on") {
+      try { bgm.pause(); } catch(_) {}
       return;
     }
-    if (bgm.paused) {
-      bgm.volume = 0.5;
-      bgm.play().catch(() => {});
-    }
-  }
-
-  function stopMusic() {
     try {
-      bgm.pause();
-      bgm.currentTime = 0;
-    } catch (_) {}
+      if (bgm.paused) {
+        bgm.volume = 0.55;
+        bgm.play().catch(() => {});
+      }
+    } catch(_) {}
   }
 
-  // ==== DOM ====
+  // ====== DOM SHORTCUTS ======
+  const hubOverlay = document.getElementById("hub-overlay");
   const scoreEl = document.getElementById("score-display");
   const coinsEl = document.getElementById("coins-display");
   const livesEl = document.getElementById("lives-display");
-  const hubOverlay = document.getElementById("hub-overlay");
-  const hubModeLabel = document.getElementById("hub-mode-label");
+  const podiumCanvas = document.getElementById("podium-character");
+  const podiumCtx = podiumCanvas.getContext("2d");
+  const podiumLabel = document.getElementById("hub-podium-label");
 
   const btnPlay = document.getElementById("btn-play");
   const btnStore = document.getElementById("btn-store");
-  const iconSettings = document.getElementById("icon-settings");
-  const iconMaps = document.getElementById("icon-maps");
-  const iconSkins = document.getElementById("icon-skins");
-  const iconDaily = document.getElementById("icon-daily");
-  const iconReset = document.getElementById("icon-reset");
-  const iconRestore = document.getElementById("icon-restore");
+  const btnSettings = document.getElementById("btn-settings");
+  const btnInfo = document.getElementById("btn-info");
 
   const panelStore = document.getElementById("panel-store");
   const panelSettings = document.getElementById("panel-settings");
-  const panelMaps = document.getElementById("panel-maps");
-  const panelSkins = document.getElementById("panel-skins");
-  const panelDaily = document.getElementById("panel-daily");
+  const panelInfo = document.getElementById("panel-info");
 
   const storeSkinsList = document.getElementById("store-skins");
   const storeMapsList = document.getElementById("store-maps");
-  const storeUpgradesList = document.getElementById("store-upgrades");
   const storeCoinsList = document.getElementById("store-coins");
-  const mapsList = document.getElementById("maps-list");
-  const skinsList = document.getElementById("skins-list");
+  const storePremiumList = document.getElementById("store-premium");
+  const btnStoreReset = document.getElementById("btn-store-reset");
 
   const btnToggleMusic = document.getElementById("btn-toggle-music");
   const btnToggleSfx = document.getElementById("btn-toggle-sfx");
   const btnToggleVibrate = document.getElementById("btn-toggle-vibrate");
+  const settingsStatus = document.getElementById("settings-status");
 
   const cardGameOver = document.getElementById("card-gameover");
-  const cardNoLives = document.getElementById("card-nolives");
-  const cardFakeAd = document.getElementById("card-fake-ad");
-  const cardConfirm = document.getElementById("card-confirm");
-  const cardMessage = document.getElementById("card-message");
-
   const finalScoreEl = document.getElementById("final-score");
   const bestScoreEl = document.getElementById("best-score");
   const livesLeftLabel = document.getElementById("lives-left-label");
+  const btnRestart = document.getElementById("btn-restart");
+  const btnBackMenu = document.getElementById("btn-back-menu");
 
+  const cardNoLives = document.getElementById("card-nolives");
+  const btnWatchAd = document.getElementById("btn-watch-ad");
+  const btnBuyLifePack = document.getElementById("btn-buy-life-pack");
+  const btnNoLivesMenu = document.getElementById("btn-nolives-menu");
+
+  const cardAd = document.getElementById("card-ad");
   const fakeAdBar = document.getElementById("fake-ad-bar");
   const fakeAdTimer = document.getElementById("fake-ad-timer");
 
-  const btnRestart = document.getElementById("btn-restart");
-  const btnBackMenu = document.getElementById("btn-back-menu");
-  const btnWatchAd = document.getElementById("btn-watch-ad");
-  const btnNoLivesMenu = document.getElementById("btn-nolives-menu");
-  const btnConfirmYes = document.getElementById("btn-confirm-yes");
-  const btnConfirmNo = document.getElementById("btn-confirm-no");
-  const btnMessageOk = document.getElementById("btn-message-ok");
-  const confirmText = document.getElementById("confirm-text");
-  const messageText = document.getElementById("message-text");
+  const cardPurchaseConfirm = document.getElementById("card-purchase-confirm");
+  const cardPurchaseProcessing = document.getElementById("card-purchase-processing");
+  const cardPurchaseSuccess = document.getElementById("card-purchase-success");
+  const purchaseConfirmText = document.getElementById("purchase-confirm-text");
+  const purchaseSuccessText = document.getElementById("purchase-success-text");
+  const purchaseConfirmYes = document.getElementById("purchase-confirm-yes");
+  const purchaseConfirmNo = document.getElementById("purchase-confirm-no");
+  const purchaseSuccessOk = document.getElementById("purchase-success-ok");
 
-  const dailyText = document.getElementById("daily-text");
-  const btnClaimDaily = document.getElementById("btn-claim-daily");
+  // ====== DATA / STORE ======
 
-  // ==== META STATE ====
-  let lives = parseInt(localStorage.getItem("ww_lives") || String(MAX_LIVES), 10);
-  if (Number.isNaN(lives) || lives < 0) lives = MAX_LIVES;
-  let lastLifeTime = parseInt(localStorage.getItem("ww_lastLife") || String(Date.now()), 10);
-  if (Number.isNaN(lastLifeTime)) lastLifeTime = Date.now();
+  const SKINS = [
+    { id: "classic", name: "Classic", desc: "Blue arcade hero.", cost: 0, body:"#3b82f6", belly:"#e5f0ff", beak:"#ffb020" },
+    { id: "red",     name: "Red Rage", desc: "Angry high-score chaser.", cost: 250, body:"#ef4444", belly:"#fee2e2", beak:"#ffb020" },
+    { id: "gold",    name: "Golden", desc: "Shiny flex penguin.", cost: 400, body:"#facc15", belly:"#fef3c7", beak:"#f97316" },
+    { id: "neon",    name: "Neon", desc: "Glows like a CRT.", cost: 450, body:"#22d3ee", belly:"#ecfeff", beak:"#a855f7" },
+    { id: "toxic",   name: "Toxic", desc: "Radioactive drip.", cost: 500, body:"#22c55e", belly:"#d1fae5", beak:"#84cc16" },
+    { id: "ghost",   name: "Ghost", desc: "Almost invisible...", cost: 550, body:"#e5e7eb", belly:"#ffffff", beak:"#9ca3af" },
+    { id: "shadow",  name: "Shadow", desc: "Pure stealth black.", cost: 600, body:"#020617", belly:"#111827", beak:"#4b5563" },
+    { id: "bubblegum", name:"Bubblegum", desc:"Pink sugar rush.", cost: 650, body:"#f973bf", belly:"#fdf2ff", beak:"#fb7185" },
+    { id: "lava",    name: "Lava Core", desc:"Molten feathers.", cost: 700, body:"#fb923c", belly:"#fed7aa", beak:"#f97316" },
+    { id: "ice",     name: "Ice Cube", desc:"Frozen high score.", cost: 750, body:"#38bdf8", belly:"#e0f2fe", beak:"#0ea5e9" },
+    { id: "galaxy",  name: "Galaxy", desc:"Stars in its eyes.", cost: 800, body:"#4f46e5", belly:"#e0e7ff", beak:"#a855f7" },
+    { id: "wireframe",name:"Wireframe",desc:"Tron-style wire bird.", cost: 900, body:"#22c55e", belly:"#22c55e", beak:"#22c55e" }
+  ];
+
+  const MAPS = [
+    { id:"day",     name:"Snow Day",    desc:"Bright sky, light snow.",      cost:0,   theme:"day" },
+    { id:"night",   name:"Polar Night", desc:"Dark blue with stars.",        cost:250, theme:"night" },
+    { id:"blizzard",name:"Blizzard",    desc:"Heavy snow & chaos.",          cost:350, theme:"blizzard" },
+    { id:"sunset",  name:"Arcade Sunset",desc:"Orange/purple horizon.",      cost:400, theme:"sunset" },
+    { id:"neon",    name:"Neon Grid",   desc:"90s synthwave grid.",          cost:500, theme:"neon" },
+    { id:"void",    name:"Cosmic Void", desc:"Deep purple & starlight.",     cost:650, theme:"void" }
+  ];
+
+  const COIN_PACKS = [
+    { id:"coins-small", name:"Coin Stack",   desc:"+250 coins.",   amount:250, priceLabel:"£0.69" },
+    { id:"coins-med",   name:"Coin Bag",     desc:"+750 coins.",   amount:750, priceLabel:"£1.99" },
+    { id:"coins-big",   name:"Coin Chest",   desc:"+2000 coins.",  amount:2000, priceLabel:"£4.99" },
+    { id:"coins-mega",  name:"Mega Vault",   desc:"+6000 coins.",  amount:6000, priceLabel:"£9.99" }
+  ];
+
+  const PREMIUM = [
+    { id:"removeAds", name:"Remove Ads", desc:"No ads between runs & instant lives.", priceLabel:"£3.49" },
+    { id:"doubleCoins", name:"2x Coins Forever", desc:"All coin gains are doubled.", priceLabel:"£3.49" },
+    { id:"arcadeBundle", name:"Arcade Bundle", desc:"Remove Ads + 2x Coins + Neon Skin + Neon Map.", priceLabel:"£7.99" }
+  ];
+
+  // ====== LOCAL STORAGE STATE ======
+  function loadJSON(key, fallback) {
+    try {
+      const raw = localStorage.getItem(key);
+      if (!raw) return fallback;
+      return JSON.parse(raw);
+    } catch (_) {
+      return fallback;
+    }
+  }
 
   let coins = parseInt(localStorage.getItem("ww_coins") || "0", 10);
   if (Number.isNaN(coins)) coins = 0;
 
-  let highScore = parseInt(localStorage.getItem("ww_highScore") || "0", 10);
-  if (Number.isNaN(highScore)) highScore = 0;
+  let bestScore = parseInt(localStorage.getItem("ww_best") || "0", 10);
+  if (Number.isNaN(bestScore)) bestScore = 0;
 
-  let lastDaily = localStorage.getItem("ww_lastDaily") || "";
+  let lives = parseInt(localStorage.getItem("ww_lives") || String(MAX_LIVES), 10);
+  if (Number.isNaN(lives) || lives < 0) lives = MAX_LIVES;
 
-  let removeAds = localStorage.getItem("ww_removeAds") === "true";
-  let doubleCoins = localStorage.getItem("ww_doubleCoins") === "true";
-  let ultraLives = localStorage.getItem("ww_ultraLives") === "true";
+  let lastLifeTime = parseInt(localStorage.getItem("ww_lastLifeTime") || String(Date.now()), 10);
+  if (Number.isNaN(lastLifeTime)) lastLifeTime = Date.now();
 
-  let ownedSkins = JSON.parse(localStorage.getItem("ww_ownedSkins") || '["classic"]');
-  let ownedMaps = JSON.parse(localStorage.getItem("ww_ownedMaps") || '["day"]');
+  let ownedSkins = loadJSON("ww_ownedSkins", ["classic"]);
   if (!ownedSkins.includes("classic")) ownedSkins.push("classic");
+  let ownedMaps = loadJSON("ww_ownedMaps", ["day"]);
   if (!ownedMaps.includes("day")) ownedMaps.push("day");
 
   let equippedSkinId = localStorage.getItem("ww_skin") || "classic";
   let equippedMapId = localStorage.getItem("ww_map") || "day";
 
-  // difficulty mode determined from map – kept simple
-  function modeLabel() {
-    if (equippedMapId === "blizzard") return "Hard";
-    if (equippedMapId === "night") return "Normal+";
-    if (equippedMapId === "synth") return "Chaos";
-    return "Normal";
-  }
+  let removeAds = localStorage.getItem("ww_removeAds") === "true";
+  let doubleCoins = localStorage.getItem("ww_doubleCoins") === "true";
 
-  // ==== GAME OBJECTS & DATA ====
-  const SKINS = [
-    { id: "classic", name: "Classic Blue", desc: "Plain, loyal arcade hero.", cost: 0, body: "#2196f3", wing: "#1565c0", beak: "#ffeb3b" },
-    { id: "red", name: "Crimson Chip", desc: "Red-hot 16-bit rebel.", cost: 250, body: "#e53935", wing: "#b71c1c", beak: "#ffb74d" },
-    { id: "gold", name: "Golden Token", desc: "Show-off premium shine.", cost: 400, body: "#ffd700", wing: "#c9a000", beak: "#fff59d" },
-    { id: "neon", name: "Neon Grid", desc: "Straight out of an arcade cab.", cost: 500, body: "#00e5ff", wing: "#00bfa5", beak: "#ff4081" },
-    { id: "void", name: "Void Glitch", desc: "Glitchy purple chaos bird.", cost: 650, body: "#7c4dff", wing: "#311b92", beak: "#e040fb" }
-  ];
-
-  const MAPS = [
-    {
-      id: "day",
-      name: "Snowfield Day",
-      desc: "Light snow, soft clouds. Standard difficulty.",
-      cost: 0,
-      gradient: ["#87ceeb", "#f0f9ff"],
-      type: "day"
-    },
-    {
-      id: "night",
-      name: "Pixel Night",
-      desc: "Deep starry sky. Pipes move slightly faster.",
-      cost: 300,
-      gradient: ["#020817", "#001b3f"],
-      type: "night"
-    },
-    {
-      id: "blizzard",
-      name: "Blizzard Zone",
-      desc: "Heavy snow, reduced visibility. Hard mode.",
-      cost: 400,
-      gradient: ["#607d8b", "#eceff1"],
-      type: "blizzard"
-    },
-    {
-      id: "synth",
-      name: "Neon City",
-      desc: "Purple/orange synthwave chaos. Fast pipes.",
-      cost: 500,
-      gradient: ["#4a148c", "#ff6f00"],
-      type: "synth"
-    }
-  ];
-
-  const UPGRADES = [
-    { id: "removeAds", name: "Remove Ads", desc: "Forever skip rewarded ads. Life bonuses instantly.", label: "£3.99" },
-    { id: "doubleCoins", name: "Double Coins", desc: "All coin rewards x2 forever.", label: "£3.99" },
-    { id: "ultraLives", name: "Infinite Lives", desc: "Never run out of lives again.", label: "£9.99" },
-    { id: "arcadePack", name: "Arcade Pack", desc: "Remove Ads + Double Coins + Infinite Lives + unlock Neon & Synth.", label: "£19.99" }
-  ];
-
-  const COIN_PACKS = [
-    { id: "coins-small", name: "Coin Stack", desc: "+250 coins.", amount: 250, label: "£0.99" },
-    { id: "coins-med", name: "Coin Chest", desc: "+650 coins.", amount: 650, label: "£2.49" },
-    { id: "coins-big", name: "Coin Vault", desc: "+1500 coins.", amount: 1500, label: "£4.99" }
-  ];
-
-  function getSkin(id) {
-    return SKINS.find(s => s.id === id) || SKINS[0];
-  }
-
-  function getMap(id) {
-    return MAPS.find(m => m.id === id) || MAPS[0];
-  }
+  let settings = {
+    music: localStorage.getItem("ww_music") || "on",
+    sfx: localStorage.getItem("ww_sfx") || "on",
+    vibrate: localStorage.getItem("ww_vibrate") || "on"
+  };
 
   function saveMeta() {
-    localStorage.setItem("ww_lives", String(lives));
-    localStorage.setItem("ww_lastLife", String(lastLifeTime));
     localStorage.setItem("ww_coins", String(coins));
-    localStorage.setItem("ww_highScore", String(highScore));
-    localStorage.setItem("ww_lastDaily", lastDaily);
-    localStorage.setItem("ww_removeAds", String(removeAds));
-    localStorage.setItem("ww_doubleCoins", String(doubleCoins));
-    localStorage.setItem("ww_ultraLives", String(ultraLives));
+    localStorage.setItem("ww_best", String(bestScore));
+    localStorage.setItem("ww_lives", String(lives));
+    localStorage.setItem("ww_lastLifeTime", String(lastLifeTime));
     localStorage.setItem("ww_ownedSkins", JSON.stringify(ownedSkins));
     localStorage.setItem("ww_ownedMaps", JSON.stringify(ownedMaps));
     localStorage.setItem("ww_skin", equippedSkinId);
     localStorage.setItem("ww_map", equippedMapId);
-    localStorage.setItem("ww_musicOn", musicOn);
-    localStorage.setItem("ww_sfxOn", sfxOn);
-    localStorage.setItem("ww_vibrateOn", vibrateOn);
+    localStorage.setItem("ww_removeAds", String(removeAds));
+    localStorage.setItem("ww_doubleCoins", String(doubleCoins));
+    localStorage.setItem("ww_music", settings.music);
+    localStorage.setItem("ww_sfx", settings.sfx);
+    localStorage.setItem("ww_vibrate", settings.vibrate);
   }
 
-  function updateLivesFromTime() {
-    if (ultraLives) {
-      lives = MAX_LIVES;
-      lastLifeTime = Date.now();
-      saveMeta();
-      return;
-    }
+  function getSkinById(id) {
+    return SKINS.find(s => s.id === id) || SKINS[0];
+  }
+
+  function getMapById(id) {
+    return MAPS.find(m => m.id === id) || MAPS[0];
+  }
+
+  function updateTopBar() {
+    coinsEl.textContent = "COINS: " + coins;
+    livesEl.textContent = "LIVES: " + lives;
+  }
+
+  // Lives regen
+  function regenLives() {
     const now = Date.now();
     if (lives >= MAX_LIVES) {
       lastLifeTime = now;
-      localStorage.setItem("ww_lastLife", String(lastLifeTime));
+      localStorage.setItem("ww_lastLifeTime", String(lastLifeTime));
       return;
     }
     const elapsed = now - lastLifeTime;
-    if (elapsed <= 0) return;
     const gained = Math.floor(elapsed / LIFE_REGEN_MS);
     if (gained > 0) {
       lives = Math.min(MAX_LIVES, lives + gained);
       lastLifeTime = now;
       saveMeta();
+      updateTopBar();
+    }
+  }
+  regenLives();
+  setInterval(regenLives, 30 * 1000);
+
+  // ====== DRAW PENGUIN (PODIUM + IN GAME) ======
+
+  function drawPenguinAt(ctx2d, x, y, skin, flapPhase) {
+    ctx2d.save();
+    ctx2d.translate(x, y);
+    const bodyColor = skin.body;
+    const bellyColor = skin.belly;
+    const beakColor = skin.beak || "#ffb020";
+
+    // body
+    ctx2d.fillStyle = bodyColor;
+    ctx2d.beginPath();
+    ctx2d.ellipse(0, 0, 18, 24, 0, 0, Math.PI * 2);
+    ctx2d.fill();
+
+    // belly
+    ctx2d.fillStyle = bellyColor;
+    ctx2d.beginPath();
+    ctx2d.ellipse(-1, 4, 12, 16, 0, 0, Math.PI * 2);
+    ctx2d.fill();
+
+    // eye
+    ctx2d.fillStyle = "#fff";
+    ctx2d.beginPath();
+    ctx2d.arc(7, -7, 5, 0, Math.PI * 2);
+    ctx2d.fill();
+    ctx2d.fillStyle = "#000";
+    ctx2d.beginPath();
+    ctx2d.arc(8.5, -7, 2, 0, Math.PI * 2);
+    ctx2d.fill();
+
+    // beak
+    ctx2d.fillStyle = beakColor;
+    ctx2d.beginPath();
+    ctx2d.moveTo(9, -2);
+    ctx2d.lineTo(19, 1);
+    ctx2d.lineTo(9, 4);
+    ctx2d.fill();
+
+    // wing
+    ctx2d.fillStyle = bodyColor;
+    const wingOffset = Math.sin(flapPhase) * 3;
+    ctx2d.beginPath();
+    ctx2d.ellipse(-6, 4 + wingOffset, 7, 10, -0.5, 0, Math.PI * 2);
+    ctx2d.fill();
+
+    // feet
+    ctx2d.fillStyle = beakColor;
+    ctx2d.beginPath();
+    ctx2d.ellipse(-4, 20, 5, 3, 0, 0, Math.PI * 2);
+    ctx2d.ellipse(4, 20, 5, 3, 0, 0, Math.PI * 2);
+    ctx2d.fill();
+
+    ctx2d.restore();
+  }
+
+  function updatePodium() {
+    const skin = getSkinById(equippedSkinId);
+    podiumCtx.clearRect(0, 0, podiumCanvas.width, podiumCanvas.height);
+    podiumCtx.save();
+    podiumCtx.fillStyle = "#020617";
+    podiumCtx.fillRect(0, 0, podiumCanvas.width, podiumCanvas.height);
+    podiumCtx.restore();
+
+    const t = performance.now() * 0.004;
+    const bobY = 5 * Math.sin(t);
+    drawPenguinAt(podiumCtx, podiumCanvas.width/2, podiumCanvas.height/2 + bobY, skin, t);
+
+    podiumLabel.textContent = skin.name.toUpperCase() + " PENGUIN";
+  }
+
+  // ====== GAME STATE ======
+  let frames = 0;
+  let score = 0;
+  let running = false;
+  let gameOver = false;
+  let startedFlight = false;
+
+  const penguin = {
+    x: 0,
+    y: 0,
+    radius: 18,
+    velocity: 0,
+    reset() {
+      this.x = canvas.width * 0.22;
+      this.y = canvas.height * 0.45;
+      this.velocity = 0;
+    },
+    flap() {
+      this.velocity = FLAP_VELOCITY;
+    },
+    update() {
+      this.velocity += GRAVITY;
+      this.y += this.velocity;
+
+      if (this.y + this.radius >= canvas.height) {
+        this.y = canvas.height - this.radius;
+        triggerGameOver();
+      }
+      if (this.y - this.radius <= 0) {
+        this.y = this.radius;
+        this.velocity = 0;
+      }
+    }
+  };
+
+  const pipeSystem = {
+    pipes: [],
+    reset() { this.pipes = []; },
+    update() {
+      const baseGap = 170;
+      const baseSpeed = 2.6;
+      const extraSpeed = Math.min(2.4, score * 0.03);
+      const speed = baseSpeed + extraSpeed;
+      const gapReduction = Math.min(50, score * 0.4);
+      const gap = baseGap - gapReduction;
+
+      if (frames % 90 === 0) {
+        const minTop = 60;
+        const maxTop = canvas.height - gap - 60;
+        const top = Math.random() * (maxTop - minTop) + minTop;
+        this.pipes.push({ x: canvas.width, top, gap, passed:false });
+      }
+
+      for (let i = 0; i < this.pipes.length; i++) {
+        const p = this.pipes[i];
+        p.x -= speed;
+
+        // collision
+        const pipeW = 65;
+        const pxLeft = penguin.x - penguin.radius;
+        const pxRight = penguin.x + penguin.radius;
+        const pyTop = penguin.y - penguin.radius;
+        const pyBottom = penguin.y + penguin.radius;
+
+        if (pxRight > p.x && pxLeft < p.x + pipeW) {
+          if (pyTop < p.top || pyBottom > p.top + p.gap) {
+            triggerGameOver();
+          }
+        }
+
+        if (!p.passed && p.x + pipeW < penguin.x) {
+          p.passed = true;
+          score++;
+          let gain = 1;
+          if (doubleCoins) gain *= 2;
+          coins += gain;
+          scoreEl.textContent = score;
+          playSfx(sfxScore);
+          updateTopBar();
+          saveMeta();
+        }
+
+        if (p.x + pipeW < -10) {
+          this.pipes.splice(i, 1);
+          i--;
+        }
+      }
+    },
+    draw() {
+      const map = getMapById(equippedMapId);
+      const theme = map.theme;
+
+      for (const p of this.pipes) {
+        const pipeW = 65;
+        const gradTop = ctx.createLinearGradient(p.x, 0, p.x + pipeW, 0);
+        const gradBottom = ctx.createLinearGradient(p.x, 0, p.x + pipeW, 0);
+
+        if (theme === "night" || theme === "void") {
+          gradTop.addColorStop(0, "#0ea5e9");
+          gradTop.addColorStop(1, "#38bdf8");
+          gradBottom.addColorStop(0, "#22c55e");
+          gradBottom.addColorStop(1, "#4ade80");
+        } else if (theme === "blizzard") {
+          gradTop.addColorStop(0, "#e5e7eb");
+          gradTop.addColorStop(1, "#cbd5f5");
+          gradBottom.addColorStop(0, "#cbd5f5");
+          gradBottom.addColorStop(1, "#e5e7eb");
+        } else if (theme === "neon") {
+          gradTop.addColorStop(0, "#22d3ee");
+          gradTop.addColorStop(1, "#a855f7");
+          gradBottom.addColorStop(0, "#f97316");
+          gradBottom.addColorStop(1, "#fde047");
+        } else if (theme === "sunset") {
+          gradTop.addColorStop(0, "#fb7185");
+          gradTop.addColorStop(1, "#f97316");
+          gradBottom.addColorStop(0, "#facc15");
+          gradBottom.addColorStop(1, "#f97316");
+        } else {
+          // day
+          gradTop.addColorStop(0, "#38bdf8");
+          gradTop.addColorStop(1, "#0ea5e9");
+          gradBottom.addColorStop(0, "#22c55e");
+          gradBottom.addColorStop(1, "#16a34a");
+        }
+
+        // top pipe
+        ctx.fillStyle = gradTop;
+        ctx.fillRect(p.x, 0, pipeW, p.top);
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(p.x, p.top - 10, pipeW, 10);
+
+        // bottom pipe
+        ctx.fillStyle = gradBottom;
+        ctx.fillRect(p.x, p.top + p.gap, pipeW, canvas.height - (p.top + p.gap));
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(p.x, p.top + p.gap, pipeW, 10);
+      }
+    }
+  };
+
+  // SNOW / STARS
+  const particles = [];
+  function initParticles() {
+    particles.length = 0;
+    const count = 60;
+    for (let i = 0; i < count; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 2 + 1,
+        s: Math.random() * 0.8 + 0.4
+      });
+    }
+  }
+  initParticles();
+
+  function drawBackground() {
+    const map = getMapById(equippedMapId);
+    const theme = map.theme;
+
+    let g = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    if (theme === "day") {
+      g.addColorStop(0, "#7dd3fc");
+      g.addColorStop(1, "#e0f2fe");
+    } else if (theme === "night") {
+      g.addColorStop(0, "#020617");
+      g.addColorStop(1, "#0f172a");
+    } else if (theme === "blizzard") {
+      g.addColorStop(0, "#94a3b8");
+      g.addColorStop(1, "#e5e7eb");
+    } else if (theme === "sunset") {
+      g.addColorStop(0, "#fb7185");
+      g.addColorStop(0.5, "#f97316");
+      g.addColorStop(1, "#facc15");
+    } else if (theme === "neon") {
+      g.addColorStop(0, "#0f172a");
+      g.addColorStop(1, "#4c1d95");
+    } else if (theme === "void") {
+      g.addColorStop(0, "#020617");
+      g.addColorStop(1, "#312e81");
+    }
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // ground-ish
+    ctx.fillStyle = theme === "blizzard" ? "#e5e7eb" : "#f9fafb";
+    ctx.fillRect(0, canvas.height - 40, canvas.width, 40);
+
+    // particles
+    ctx.fillStyle = theme === "night" || theme === "void" ? "#e5e7eb" : "rgba(255,255,255,0.9)";
+    for (const p of particles) {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+
+      const mult = theme === "blizzard" ? 2.2 : 1;
+      p.y += p.s * mult;
+      p.x += Math.sin(p.y * 0.03) * 0.2;
+
+      if (p.y > canvas.height) {
+        p.y = -5;
+        p.x = Math.random() * canvas.width;
+      }
+    }
+
+    // neon grid for neon map
+    if (theme === "neon") {
+      ctx.save();
+      ctx.strokeStyle = "rgba(56,189,248,0.25)";
+      ctx.lineWidth = 1;
+      const gridSize = 30;
+      for (let x = -gridSize; x < canvas.width + gridSize; x += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(x, canvas.height);
+        ctx.lineTo(x + 80, canvas.height - 160);
+        ctx.stroke();
+      }
+      for (let y = canvas.height - 40; y > canvas.height - 200; y -= gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y - 160);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    // stars for night/void
+    if (theme === "night" || theme === "void") {
+      ctx.save();
+      ctx.fillStyle = "rgba(248,250,252,0.8)";
+      for (let i = 0; i < 40; i++) {
+        const sx = (i * 37 + frames * 0.3) % canvas.width;
+        const sy = (i * 57) % (canvas.height - 80);
+        ctx.fillRect(sx, sy, 1.5, 1.5);
+      }
+      ctx.restore();
     }
   }
 
-  function updateMetaUI() {
-    coinsEl.textContent = "💰 " + coins;
-    livesEl.textContent = ultraLives ? "♥ ∞" : "♥ " + lives;
-    hubModeLabel.textContent = "Difficulty: " + modeLabel();
-  }
+  // ====== LOOP ======
+  let lastTime = performance.now();
 
-  updateLivesFromTime();
-  updateMetaUI();
-  setInterval(() => { updateLivesFromTime(); updateMetaUI(); }, 30000);
+  function gameLoop(timestamp) {
+    if (!running) {
+      lastTime = timestamp;
+      return;
+    }
+    const dt = (timestamp - lastTime) / 1000;
+    lastTime = timestamp;
+    frames++;
 
-  // ==== DAILY BONUS ====
-  function todayStr() {
-    return new Date().toISOString().slice(0, 10);
-  }
+    drawBackground();
 
-  function refreshDailyPanel() {
-    const today = todayStr();
-    if (lastDaily === today) {
-      dailyText.textContent = "Already collected today's reward. Check back tomorrow.";
-      btnClaimDaily.disabled = true;
-      btnClaimDaily.style.opacity = "0.5";
+    if (!startedFlight) {
+      // idle hover
+      const t = timestamp * 0.004;
+      penguin.y = canvas.height * 0.45 + Math.sin(t) * 8;
+      drawPenguinAt(ctx, penguin.x, penguin.y, getSkinById(equippedSkinId), frames * 0.35);
     } else {
-      let reward = DAILY_REWARD_COINS;
-      if (doubleCoins) reward *= 2;
-      dailyText.textContent = `Today's bonus is +${reward} coins. Tap Claim to collect.`;
-      btnClaimDaily.disabled = false;
-      btnClaimDaily.style.opacity = "1";
+      penguin.update();
+      pipeSystem.update();
+      pipeSystem.draw();
+      drawPenguinAt(ctx, penguin.x, penguin.y, getSkinById(equippedSkinId), frames * 0.35);
     }
+
+    requestAnimationFrame(gameLoop);
   }
 
-  btnClaimDaily.addEventListener("click", () => {
-    const today = todayStr();
-    if (lastDaily === today) return;
-    let reward = DAILY_REWARD_COINS;
-    if (doubleCoins) reward *= 2;
-    coins += reward;
-    lastDaily = today;
-    saveMeta();
-    updateMetaUI();
-    refreshDailyPanel();
-    showMessage(`Daily reward collected: +${reward} coins.`);
-  });
+  // ====== GAME CONTROL ======
+  function startRun() {
+    regenLives();
+    if (lives <= 0) {
+      showNoLives();
+      return;
+    }
 
-  // ==== STORE RENDERING ====
-  function renderStoreSkins(list) {
-    list.innerHTML = "";
+    hubOverlay.classList.add("hidden");
+    cardGameOver.classList.add("hidden");
+    cardNoLives.classList.add("hidden");
+
+    score = 0;
+    scoreEl.textContent = "0";
+    gameOver = false;
+    startedFlight = false;
+    penguin.reset();
+    pipeSystem.reset();
+    initParticles();
+    running = true;
+    ensureMusic();
+    lastTime = performance.now();
+    requestAnimationFrame(gameLoop);
+  }
+
+  function triggerGameOver() {
+    if (gameOver) return;
+    gameOver = true;
+    running = false;
+    playSfx(sfxHit);
+    tryVibrate([80, 60, 80]);
+
+    lives = Math.max(0, lives - 1);
+    lastLifeTime = Date.now();
+    if (score > bestScore) bestScore = score;
+    saveMeta();
+    updateTopBar();
+
+    finalScoreEl.textContent = score;
+    bestScoreEl.textContent = bestScore;
+    livesLeftLabel.textContent = lives;
+
+    setTimeout(() => {
+      cardGameOver.classList.remove("hidden");
+    }, 250);
+  }
+
+  function showNoLives() {
+    cardNoLives.classList.remove("hidden");
+  }
+
+  function handleFlapInput(e) {
+    if (e && e.type === "keydown" && e.code !== "Space") return;
+    if (e && e.type === "keydown") e.preventDefault();
+
+    if (!running || gameOver) return;
+    if (!startedFlight) {
+      startedFlight = true;
+    }
+    penguin.flap();
+    playSfx(sfxFlap);
+  }
+
+  window.addEventListener("keydown", handleFlapInput);
+  canvas.addEventListener("mousedown", handleFlapInput);
+  canvas.addEventListener("touchstart", function(e) {
+    e.preventDefault();
+    handleFlapInput(e);
+  }, { passive:false });
+
+  // ====== STORE RENDERING ======
+  function renderStoreSkins() {
+    storeSkinsList.innerHTML = "";
     SKINS.forEach(skin => {
+      const owned = ownedSkins.includes(skin.id);
       const li = document.createElement("li");
       li.className = "list-item";
 
       const label = document.createElement("div");
       label.className = "list-label";
-      const title = document.createElement("span");
-      title.textContent = skin.name;
-      const owned = ownedSkins.includes(skin.id);
-      const desc = document.createElement("span");
-      desc.textContent = owned
-        ? skin.desc + (skin.id === equippedSkinId ? " • Equipped" : " • Owned")
-        : `${skin.desc} • Cost: ${skin.cost} coins`;
-      label.appendChild(title);
-      label.appendChild(desc);
+      const t = document.createElement("span");
+      t.textContent = `[Skin] ${skin.name}`;
+      const d = document.createElement("span");
+      d.textContent = owned
+        ? skin.desc + (skin.id === equippedSkinId ? " • EQUIPPED" : " • OWNED")
+        : `${skin.desc} • COST: ${skin.cost} coins`;
+      label.appendChild(t);
+      label.appendChild(d);
 
       const btn = document.createElement("button");
       btn.className = "small-btn";
       if (!owned && skin.cost > 0) {
-        btn.textContent = `Buy ${skin.cost}`;
+        btn.textContent = `BUY ${skin.cost}`;
         btn.onclick = () => {
-          if (coins < skin.cost) { showMessage("Not enough coins."); return; }
+          if (coins < skin.cost) {
+            alert("Not enough coins.");
+            return;
+          }
           coins -= skin.cost;
-          if (!ownedSkins.includes(skin.id)) ownedSkins.push(skin.id);
+          ownedSkins.push(skin.id);
           equippedSkinId = skin.id;
           saveMeta();
-          updateMetaUI();
-          renderStoreSkins(storeSkinsList);
-          renderStoreSkins(skinsList);
+          updateTopBar();
+          renderStoreSkins();
+          updatePodium();
+          playSfx(sfxPurchase);
         };
       } else {
         if (skin.id === equippedSkinId) {
-          btn.textContent = "Equipped";
-          btn.classList.add("equipped", "disabled");
+          btn.textContent = "EQUIPPED";
+          btn.classList.add("disabled");
           btn.disabled = true;
         } else {
-          btn.textContent = "Equip";
+          btn.textContent = "EQUIP";
           btn.onclick = () => {
             equippedSkinId = skin.id;
             saveMeta();
-            renderStoreSkins(storeSkinsList);
-            renderStoreSkins(skinsList);
+            renderStoreSkins();
+            updatePodium();
+            playSfx(sfxUI);
           };
         }
       }
 
       li.appendChild(label);
       li.appendChild(btn);
-      list.appendChild(li);
+      storeSkinsList.appendChild(li);
     });
   }
 
-  function renderStoreMaps(list) {
-    list.innerHTML = "";
+  function renderStoreMaps() {
+    storeMapsList.innerHTML = "";
     MAPS.forEach(map => {
+      const owned = ownedMaps.includes(map.id);
       const li = document.createElement("li");
       li.className = "list-item";
 
       const label = document.createElement("div");
       label.className = "list-label";
-      const title = document.createElement("span");
-      title.textContent = map.name;
-      const owned = ownedMaps.includes(map.id);
-      const desc = document.createElement("span");
-      desc.textContent = owned
-        ? map.desc + (map.id === equippedMapId ? " • Selected" : " • Unlocked")
-        : `${map.desc} • Cost: ${map.cost} coins`;
-      label.appendChild(title);
-      label.appendChild(desc);
+      const t = document.createElement("span");
+      t.textContent = `[Map] ${map.name}`;
+      const d = document.createElement("span");
+      d.textContent = owned
+        ? map.desc + (map.id === equippedMapId ? " • EQUIPPED" : " • OWNED")
+        : `${map.desc} • COST: ${map.cost} coins`;
+      label.appendChild(t);
+      label.appendChild(d);
 
       const btn = document.createElement("button");
       btn.className = "small-btn";
       if (!owned && map.cost > 0) {
-        btn.textContent = `Buy ${map.cost}`;
+        btn.textContent = `BUY ${map.cost}`;
         btn.onclick = () => {
-          if (coins < map.cost) { showMessage("Not enough coins."); return; }
+          if (coins < map.cost) {
+            alert("Not enough coins.");
+            return;
+          }
           coins -= map.cost;
-          if (!ownedMaps.includes(map.id)) ownedMaps.push(map.id);
+          ownedMaps.push(map.id);
           equippedMapId = map.id;
           saveMeta();
-          updateMetaUI();
-          renderStoreMaps(storeMapsList);
-          renderStoreMaps(mapsList);
+          updateTopBar();
+          renderStoreMaps();
+          playSfx(sfxPurchase);
         };
       } else {
         if (map.id === equippedMapId) {
-          btn.textContent = "Selected";
-          btn.classList.add("equipped", "disabled");
+          btn.textContent = "EQUIPPED";
+          btn.classList.add("disabled");
           btn.disabled = true;
         } else {
-          btn.textContent = "Select";
+          btn.textContent = "EQUIP";
           btn.onclick = () => {
             equippedMapId = map.id;
             saveMeta();
-            updateMetaUI();
-            renderStoreMaps(storeMapsList);
-            renderStoreMaps(mapsList);
+            renderStoreMaps();
+            playSfx(sfxUI);
           };
         }
       }
 
       li.appendChild(label);
       li.appendChild(btn);
-      list.appendChild(li);
+      storeMapsList.appendChild(li);
     });
   }
 
-  function renderStoreUpgrades() {
-    storeUpgradesList.innerHTML = "";
-    UPGRADES.forEach(up => {
-      const li = document.createElement("li");
-      li.className = "list-item";
+  let currentPurchase = null; // { label, onComplete }
 
-      const label = document.createElement("div");
-      label.className = "list-label";
-      const title = document.createElement("span");
-      title.textContent = up.name;
-      const desc = document.createElement("span");
-      desc.textContent = up.desc + " • " + up.label;
-      label.appendChild(title);
-      label.appendChild(desc);
+  function openPurchaseConfirm(label, onComplete) {
+    currentPurchase = { label, onComplete };
+    purchaseConfirmText.textContent = label;
+    cardPurchaseConfirm.classList.remove("hidden");
+  }
 
-      const btn = document.createElement("button");
-      btn.className = "small-btn";
+  function closePurchaseUI() {
+    cardPurchaseConfirm.classList.add("hidden");
+    cardPurchaseProcessing.classList.add("hidden");
+    cardPurchaseSuccess.classList.add("hidden");
+    currentPurchase = null;
+  }
 
-      let ownedFlag = false;
-      if (up.id === "removeAds") ownedFlag = removeAds;
-      if (up.id === "doubleCoins") ownedFlag = doubleCoins;
-      if (up.id === "ultraLives") ownedFlag = ultraLives;
-      if (up.id === "arcadePack" && removeAds && doubleCoins && ultraLives) ownedFlag = true;
+  purchaseConfirmYes.addEventListener("click", () => {
+    cardPurchaseConfirm.classList.add("hidden");
+    cardPurchaseProcessing.classList.remove("hidden");
+    playSfx(sfxUI);
 
-      if (ownedFlag) {
-        btn.textContent = "Owned";
-        btn.classList.add("equipped", "disabled");
-        btn.disabled = true;
-      } else {
-        btn.textContent = up.label;
-        btn.onclick = () => {
-          showConfirm(`${up.name} – ${up.label}\n\nIn a real build this would open Google Play Billing.\nHere it instantly unlocks for testing.`, () => {
-            if (up.id === "removeAds") removeAds = true;
-            if (up.id === "doubleCoins") doubleCoins = true;
-            if (up.id === "ultraLives") { ultraLives = true; lives = MAX_LIVES; }
-            if (up.id === "arcadePack") {
-              removeAds = true;
-              doubleCoins = true;
-              ultraLives = true;
-              lives = MAX_LIVES;
-              if (!ownedSkins.includes("neon")) ownedSkins.push("neon");
-              if (!ownedMaps.includes("synth")) ownedMaps.push("synth");
-            }
-            saveMeta();
-            updateMetaUI();
-            renderStoreUpgrades();
-            renderStoreSkins(storeSkinsList);
-            renderStoreMaps(storeMapsList);
-            showMessage("Upgrade unlocked for this test build.");
-          });
-        };
+    setTimeout(() => {
+      cardPurchaseProcessing.classList.add("hidden");
+      if (currentPurchase && typeof currentPurchase.onComplete === "function") {
+        currentPurchase.onComplete();
       }
+      playSfx(sfxPurchase);
+      tryVibrate(40);
+      purchaseSuccessText.textContent = "Purchase successful.\n" + (currentPurchase ? currentPurchase.label : "");
+      cardPurchaseSuccess.classList.remove("hidden");
+    }, 1200);
+  });
 
-      li.appendChild(label);
-      li.appendChild(btn);
-      storeUpgradesList.appendChild(li);
-    });
-  }
+  purchaseConfirmNo.addEventListener("click", () => {
+    closePurchaseUI();
+  });
+
+  purchaseSuccessOk.addEventListener("click", () => {
+    closePurchaseUI();
+  });
 
   function renderStoreCoins() {
     storeCoinsList.innerHTML = "";
@@ -1193,23 +1479,22 @@
 
       const label = document.createElement("div");
       label.className = "list-label";
-      const title = document.createElement("span");
-      title.textContent = pack.name;
-      const desc = document.createElement("span");
-      desc.textContent = `${pack.desc} • ${pack.label}`;
-      label.appendChild(title);
-      label.appendChild(desc);
+      const t = document.createElement("span");
+      t.textContent = pack.name;
+      const d = document.createElement("span");
+      d.textContent = `${pack.desc} • ${pack.priceLabel}`;
+      label.appendChild(t);
+      label.appendChild(d);
 
       const btn = document.createElement("button");
       btn.className = "small-btn";
-      btn.textContent = pack.label;
+      btn.textContent = pack.priceLabel;
       btn.onclick = () => {
-        showConfirm(`${pack.name} – ${pack.label}\n\nSimulated purchase: add ${pack.amount} coins.`, () => {
+        openPurchaseConfirm(`${pack.name} – ${pack.priceLabel}`, () => {
           coins += pack.amount;
           saveMeta();
-          updateMetaUI();
+          updateTopBar();
           renderStoreCoins();
-          showMessage(`Coins added: +${pack.amount}`);
         });
       };
 
@@ -1219,741 +1504,233 @@
     });
   }
 
-  // list panels
-  function renderMapsPanel() { renderStoreMaps(mapsList); }
-  function renderSkinsPanel() { renderStoreSkins(skinsList); }
+  function renderStorePremium() {
+    storePremiumList.innerHTML = "";
+    PREMIUM.forEach(item => {
+      const li = document.createElement("li");
+      li.className = "list-item";
 
-  // ==== CENTER CARD HELPERS ====
-  let confirmCallback = null;
+      const label = document.createElement("div");
+      label.className = "list-label";
+      const t = document.createElement("span");
+      t.textContent = item.name;
+      const d = document.createElement("span");
+      d.textContent = `${item.desc} • ${item.priceLabel}`;
+      label.appendChild(t);
+      label.appendChild(d);
 
-  function hideAllCards() {
-    cardGameOver.classList.remove("visible");
-    cardNoLives.classList.remove("visible");
-    cardFakeAd.classList.remove("visible");
-    cardConfirm.classList.remove("visible");
-    cardMessage.classList.remove("visible");
+      const btn = document.createElement("button");
+      btn.className = "small-btn";
+
+      let ownedFlag = false;
+      if (item.id === "removeAds") ownedFlag = removeAds;
+      if (item.id === "doubleCoins") ownedFlag = doubleCoins;
+      if (item.id === "arcadeBundle") ownedFlag = removeAds && doubleCoins && ownedSkins.includes("neon") && ownedMaps.includes("neon");
+
+      if (ownedFlag) {
+        btn.textContent = "OWNED";
+        btn.classList.add("disabled");
+        btn.disabled = true;
+      } else {
+        btn.textContent = item.priceLabel;
+        btn.onclick = () => {
+          openPurchaseConfirm(`${item.name} – ${item.priceLabel}`, () => {
+            if (item.id === "removeAds") removeAds = true;
+            if (item.id === "doubleCoins") doubleCoins = true;
+            if (item.id === "arcadeBundle") {
+              removeAds = true;
+              doubleCoins = true;
+              if (!ownedSkins.includes("neon")) ownedSkins.push("neon");
+              if (!ownedMaps.includes("neon")) ownedMaps.push("neon");
+            }
+            saveMeta();
+            renderStorePremium();
+            renderStoreSkins();
+            renderStoreMaps();
+          });
+        };
+      }
+
+      li.appendChild(label);
+      li.appendChild(btn);
+      storePremiumList.appendChild(li);
+    });
   }
 
-  function showConfirm(text, onYes) {
-    hideAllCards();
-    confirmCallback = onYes || null;
-    confirmText.textContent = text;
-    cardConfirm.classList.add("visible");
+  function openStore() {
+    renderStoreSkins();
+    renderStoreMaps();
+    renderStoreCoins();
+    renderStorePremium();
+    panelStore.classList.remove("hidden");
   }
 
-  function showMessage(text) {
-    hideAllCards();
-    messageText.textContent = text;
-    cardMessage.classList.add("visible");
-  }
-
-  btnConfirmYes.addEventListener("click", () => {
-    playSfx(sfxUi);
-    cardConfirm.classList.remove("visible");
-    if (confirmCallback) confirmCallback();
-    confirmCallback = null;
-  });
-  btnConfirmNo.addEventListener("click", () => {
-    playSfx(sfxUi);
-    cardConfirm.classList.remove("visible");
-    confirmCallback = null;
-  });
-  btnMessageOk.addEventListener("click", () => {
-    playSfx(sfxUi);
-    cardMessage.classList.remove("visible");
-  });
-
-  // ==== GAME STATE ====
-  let frames = 0;
-  let score = 0;
-  let running = false;
-  let gameOver = false;
-  let startedFlight = false;
-
-  const snowflakes = [];
-  function initSnow() {
-    snowflakes.length = 0;
-    const count = 60;
-    for (let i = 0; i < count; i++) {
-      snowflakes.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        r: Math.random() * 2 + 1,
-        speed: Math.random() * 0.6 + 0.4
-      });
-    }
-  }
-
-  const blizzardFlakes = [];
-  function initBlizzard() {
-    blizzardFlakes.length = 0;
-    const count = 120;
-    for (let i = 0; i < count; i++) {
-      blizzardFlakes.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        r: Math.random() * 2 + 1.5,
-        speedY: Math.random() * 1.2 + 1.2,
-        speedX: Math.random() * 0.8 + 0.6
-      });
-    }
-  }
-
-  const starfield = [];
-  function initStars() {
-    starfield.length = 0;
-    const count = 60;
-    for (let i = 0; i < count; i++) {
-      starfield.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        r: Math.random() * 1.6 + 0.4,
-        tw: Math.random() * Math.PI * 2
-      });
-    }
-  }
-
-  const penguin = {
-    x: 0,
-    y: 0,
-    radius: 18,
-    velocity: 0,
-    rotation: 0,
-
-    reset() {
-      this.x = canvas.width * 0.2;
-      this.y = canvas.height * 0.45;
-      this.velocity = 0;
-      this.rotation = 0;
-    },
-
-    flap() {
-      this.velocity = FLAP_STRENGTH;
-    },
-
-    update() {
-      this.velocity += GRAVITY;
-      this.y += this.velocity;
-
-      if (this.y + this.radius > canvas.height) {
-        this.y = canvas.height - this.radius;
-        triggerGameOver();
-      } else if (this.y - this.radius < 0) {
-        this.y = this.radius;
-        this.velocity = 0;
-      }
-    },
-
-    draw(context) {
-      const skin = getSkin(equippedSkinId);
-      context.save();
-      context.translate(this.x, this.y);
-      this.rotation = Math.max(-Math.PI / 4, Math.min(Math.PI / 4, this.velocity * 0.1));
-      context.rotate(this.rotation);
-
-      // body
-      context.fillStyle = skin.body;
-      context.beginPath();
-      context.ellipse(0, 0, 22, 26, 0, 0, Math.PI * 2);
-      context.fill();
-
-      // white belly
-      context.fillStyle = "#ffffff";
-      context.beginPath();
-      context.ellipse(-2, 3, 14, 18, 0, 0, Math.PI * 2);
-      context.fill();
-
-      // eye
-      context.fillStyle = "#ffffff";
-      context.beginPath();
-      context.arc(7, -8, 6, 0, Math.PI * 2);
-      context.fill();
-      context.fillStyle = "#000000";
-      context.beginPath();
-      context.arc(8.5, -8, 2.3, 0, Math.PI * 2);
-      context.fill();
-
-      // beak
-      context.fillStyle = skin.beak;
-      context.beginPath();
-      context.moveTo(11, -2);
-      context.lineTo(26, 2);
-      context.lineTo(11, 6);
-      context.fill();
-
-      // wing
-      context.fillStyle = skin.wing;
-      context.beginPath();
-      const wingY = Math.sin(frames * 0.25) * 3;
-      context.ellipse(-6, 6 + wingY, 8, 14, -0.6, 0, Math.PI * 2);
-      context.fill();
-
-      // feet
-      context.fillStyle = skin.beak;
-      context.beginPath();
-      context.ellipse(-6, 22, 6, 3.5, 0, 0, Math.PI * 2);
-      context.fill();
-
-      context.restore();
-    }
-  };
-
-  const pipes = {
-    list: [],
-    reset() { this.list = []; },
-
-    update() {
-      const mapConf = getMap(equippedMapId);
-      let baseSpeed = 3.0;
-      let baseGap = 150;
-
-      if (mapConf.type === "night") {
-        baseSpeed = 3.3;
-        baseGap = 145;
-      } else if (mapConf.type === "blizzard") {
-        baseSpeed = 3.6;
-        baseGap = 140;
-      } else if (mapConf.type === "synth") {
-        baseSpeed = 4.0;
-        baseGap = 135;
-      }
-
-      // scaling difficulty
-      if (score >= 25) {
-        baseSpeed += 0.3;
-        baseGap -= 5;
-      }
-      if (score >= 50) {
-        baseSpeed += 0.4;
-        baseGap -= 10;
-      }
-      if (score >= 100) {
-        baseSpeed += 0.5;
-        baseGap -= 10;
-      }
-
-      if (frames % 90 === 0) {
-        const margin = 40;
-        const maxTop = canvas.height - baseGap - margin;
-        const minTop = margin;
-        const top = Math.random() * (maxTop - minTop) + minTop;
-        this.list.push({ x: canvas.width, top: top, passed: false });
-      }
-
-      for (let i = 0; i < this.list.length; i++) {
-        const p = this.list[i];
-
-        let speed = baseSpeed;
-        if (equippedMapId === "synth" && score >= 50) {
-          speed += Math.sin(frames * 0.05 + p.x * 0.02) * 0.6;
-        }
-
-        p.x -= speed;
-
-        const pxLeft = penguin.x - penguin.radius + 2;
-        const pxRight = penguin.x + penguin.radius - 2;
-        const pxTop = penguin.y - penguin.radius + 2;
-        const pxBottom = penguin.y + penguin.radius - 2;
-
-        const topEdge = p.top;
-        const bottomEdge = p.top + baseGap;
-
-        if (pxRight > p.x && pxLeft < p.x + PIPE_WIDTH) {
-          if (pxTop < topEdge || pxBottom > bottomEdge) {
-            triggerGameOver();
-          }
-        }
-
-        if (!p.passed && p.x + PIPE_WIDTH < penguin.x) {
-          p.passed = true;
-          score++;
-          let gain = 1;
-          if (doubleCoins) gain *= 2;
-          coins += gain;
-          scoreEl.textContent = score;
-          updateMetaUI();
-          playSfx(sfxCoin);
-          saveMeta();
-        }
-
-        if (p.x + PIPE_WIDTH < -20) {
-          this.list.splice(i, 1);
-          i--;
-        }
-      }
-    },
-
-    draw() {
-      const mapConf = getMap(equippedMapId);
-      const g1 = mapConf.gradient[0];
-      const g2 = mapConf.gradient[1];
-
-      this.list.forEach(p => {
-        const gradTop = ctx.createLinearGradient(p.x, 0, p.x + PIPE_WIDTH, 0);
-        gradTop.addColorStop(0, g1);
-        gradTop.addColorStop(0.5, g2);
-        gradTop.addColorStop(1, g1);
-
-        const gradBottom = ctx.createLinearGradient(p.x, 0, p.x + PIPE_WIDTH, 0);
-        gradBottom.addColorStop(0, g1);
-        gradBottom.addColorStop(0.5, g2);
-        gradBottom.addColorStop(1, g1);
-
-        // top pipe
-        ctx.fillStyle = gradTop;
-        ctx.fillRect(p.x, 0, PIPE_WIDTH, p.top);
-        ctx.fillStyle = "#e0ffff";
-        ctx.beginPath();
-        ctx.moveTo(p.x + 10, p.top);
-        ctx.lineTo(p.x + PIPE_WIDTH / 2, p.top + 18);
-        ctx.lineTo(p.x + PIPE_WIDTH - 10, p.top);
-        ctx.fill();
-
-        // bottom pipe
-        ctx.fillStyle = gradBottom;
-        ctx.fillRect(p.x, p.top + (score >= 50 ? 0 : 0) + (score >= 100 ? -4 : 0) + PIPE_WIDTH / 2 + (-(PIPE_WIDTH / 2)), p.top + 9999);
-        ctx.fillRect(p.x, p.top + (mapConf.type === "synth" ? 0 : 0) + (mapConf.type === "day" ? 0 : 0) + (mapConf.type === "night" ? 0 : 0) + (mapConf.type === "blizzard" ? 0 : 0) + (PIPE_WIDTH / 2) + (0), canvas.height - (p.top + (PIPE_WIDTH / 2)));
-        // cleaner bottom segment:
-        ctx.fillRect(p.x, p.top + (baseGap = 150), PIPE_WIDTH, canvas.height - (p.top + baseGap)); // fallback line (harmless if repeated)
-
-        // to avoid confusion: draw actual bottom gap properly:
-        const mapConf2 = getMap(equippedMapId);
-        let bg = 150;
-        if (mapConf2.type === "night") bg = 145;
-        else if (mapConf2.type === "blizzard") bg = 140;
-        else if (mapConf2.type === "synth") bg = 135;
-        if (score >= 25) bg -= 5;
-        if (score >= 50) bg -= 10;
-        if (score >= 100) bg -= 10;
-        const bottomStart = p.top + bg;
-        ctx.fillStyle = gradBottom;
-        ctx.fillRect(p.x, bottomStart, PIPE_WIDTH, canvas.height - bottomStart);
-        ctx.fillStyle = "#e0ffff";
-        ctx.beginPath();
-        ctx.moveTo(p.x + 10, bottomStart);
-        ctx.lineTo(p.x + PIPE_WIDTH / 2, bottomStart - 18);
-        ctx.lineTo(p.x + PIPE_WIDTH - 10, bottomStart);
-        ctx.fill();
-
-        // outline
-        ctx.strokeStyle = "#5dbcd2";
-        ctx.lineWidth = 2;
-        ctx.strokeRect(p.x, -2, PIPE_WIDTH, p.top + 4);
-        ctx.strokeRect(p.x, bottomStart - 2, PIPE_WIDTH, canvas.height - bottomStart + 4);
-      });
-    }
-  };
-
-  // ==== BACKGROUND ====
-  function drawBackground() {
-    const mapConf = getMap(equippedMapId);
-    const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    grad.addColorStop(0, mapConf.gradient[0]);
-    grad.addColorStop(1, mapConf.gradient[1]);
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    if (mapConf.type === "day") {
-      ctx.fillStyle = "rgba(255,255,255,0.9)";
-      snowflakes.forEach(f => {
-        ctx.beginPath();
-        ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
-        ctx.fill();
-        f.y += f.speed;
-        if (f.y > canvas.height) {
-          f.y = -5;
-          f.x = Math.random() * canvas.width;
-        }
-      });
-
-      // soft clouds
-      ctx.fillStyle = "rgba(255,255,255,0.65)";
-      for (let i = 0; i < 3; i++) {
-        const y = 40 + i * 30;
-        ctx.beginPath();
-        ctx.ellipse(80 + i * 90, y, 45, 18, 0, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    } else if (mapConf.type === "night") {
-      starfield.forEach(st => {
-        const alpha = 0.3 + (Math.sin(st.tw + frames * 0.03) + 1) / 4;
-        ctx.fillStyle = "rgba(255,255,255," + alpha + ")";
-        ctx.beginPath();
-        ctx.arc(st.x, st.y, st.r, 0, Math.PI * 2);
-        ctx.fill();
-      });
-
-      ctx.fillStyle = "rgba(42,45,80,0.8)";
-      ctx.fillRect(0, canvas.height - 70, canvas.width, 70);
-    } else if (mapConf.type === "blizzard") {
-      ctx.fillStyle = "rgba(255,255,255,0.95)";
-      blizzardFlakes.forEach(f => {
-        ctx.beginPath();
-        ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
-        ctx.fill();
-        f.y += f.speedY;
-        f.x -= f.speedX;
-        if (f.y > canvas.height) f.y = -5;
-        if (f.x < -5) f.x = canvas.width + 5;
-      });
-    } else if (mapConf.type === "synth") {
-      const stripeH = 3;
-      for (let y = canvas.height * 0.55; y < canvas.height; y += stripeH * 2) {
-        const t = (y - canvas.height * 0.55) / (canvas.height * 0.45);
-        ctx.fillStyle = "rgba(255, 255, 255," + (0.08 + t * 0.12) + ")";
-        ctx.fillRect(0, y, canvas.width, stripeH);
-      }
-
-      const cx = canvas.width / 2;
-      const cy = canvas.height * 0.55;
-      const maxR = canvas.width * 1.2;
-      for (let r = 20; r < maxR; r += 30) {
-        ctx.strokeStyle = "rgba(255,255,255,0.15)";
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.ellipse(cx, cy, r, r * 0.4, 0, 0, Math.PI * 2);
-        ctx.stroke();
-      }
-    }
-  }
-
-  // ==== PREVIEW LOOP (MENU) ====
-  function drawPreview() {
-    const mapConf = getMap(equippedMapId);
-    const grad = pctx.createLinearGradient(0, 0, 0, previewCanvas.height);
-    grad.addColorStop(0, mapConf.gradient[0]);
-    grad.addColorStop(1, mapConf.gradient[1]);
-    pctx.fillStyle = grad;
-    pctx.fillRect(0, 0, previewCanvas.width, previewCanvas.height);
-
-    // little clouds
-    pctx.fillStyle = "rgba(255,255,255,0.7)";
-    pctx.beginPath();
-    pctx.ellipse(30, 18, 18, 8, 0, 0, Math.PI * 2);
-    pctx.fill();
-    pctx.beginPath();
-    pctx.ellipse(80, 22, 22, 10, 0, 0, Math.PI * 2);
-    pctx.fill();
-
-    // small pipes
-    pctx.fillStyle = "#4dd0e1";
-    pctx.fillRect(82, 0, 14, 20);
-    pctx.fillRect(82, 46, 14, 34);
-
-    // mini penguin hover
-    const miniY = previewCanvas.height / 2 + Math.sin(frames * 0.15) * 4;
-    pctx.save();
-    pctx.translate(40, miniY);
-    const skin = getSkin(equippedSkinId);
-    pctx.fillStyle = skin.body;
-    pctx.beginPath();
-    pctx.ellipse(0, 0, 10, 12, 0, 0, Math.PI * 2);
-    pctx.fill();
-    pctx.fillStyle = "#ffffff";
-    pctx.beginPath();
-    pctx.ellipse(-1, 1, 7, 9, 0, 0, Math.PI * 2);
-    pctx.fill();
-    pctx.fillStyle = "#ffffff";
-    pctx.beginPath();
-    pctx.arc(4, -4, 3, 0, Math.PI * 2);
-    pctx.fill();
-    pctx.fillStyle = "#000000";
-    pctx.beginPath();
-    pctx.arc(4.8, -4, 1, 0, Math.PI * 2);
-    pctx.fill();
-    pctx.fillStyle = skin.beak;
-    pctx.beginPath();
-    pctx.moveTo(6, -1);
-    pctx.lineTo(11, 1);
-    pctx.lineTo(6, 3);
-    pctx.fill();
-    pctx.restore();
-  }
-
-  // ==== GAME LOOP ====
-  let lastFrameTime = performance.now();
-
-  function loop(now) {
-    if (!running) {
-      frames++;
-      drawBackground();
-      penguin.draw(ctx);
-      drawPreview();
-      requestAnimationFrame(loop);
-      return;
-    }
-
-    const dt = (now - lastFrameTime) / 1000 || 0;
-    lastFrameTime = now;
-    frames++;
-
-    if (!startedFlight) {
-      penguin.y = canvas.height * 0.45 + Math.sin(frames * 0.12) * 10;
-      penguin.velocity = 0;
-    } else {
-      penguin.update();
-      pipes.update();
-    }
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawBackground();
-    pipes.draw();
-    penguin.draw(ctx);
-
-    if (!gameOver) {
-      requestAnimationFrame(loop);
-    }
-  }
-
-  function triggerGameOver() {
-    if (gameOver) return;
-    gameOver = true;
-    running = false;
-    playSfx(sfxHit);
-    tryVibrate([80, 80, 80]);
-
-    if (!ultraLives) {
-      lives = Math.max(0, lives - 1);
-      lastLifeTime = Date.now();
-    }
+  // Reset progress
+  btnStoreReset.addEventListener("click", () => {
+    const sure = confirm("Reset all progress, coins, purchases and skins/maps? This cannot be undone.");
+    if (!sure) return;
+    coins = 0;
+    bestScore = 0;
+    lives = MAX_LIVES;
+    lastLifeTime = Date.now();
+    ownedSkins = ["classic"];
+    ownedMaps = ["day"];
+    equippedSkinId = "classic";
+    equippedMapId = "day";
+    removeAds = false;
+    doubleCoins = false;
     saveMeta();
-    updateMetaUI();
+    updateTopBar();
+    renderStoreSkins();
+    renderStoreMaps();
+    renderStoreCoins();
+    renderStorePremium();
+    updatePodium();
+    alert("Progress reset.");
+  });
 
-    finalScoreEl.textContent = score;
-    if (score > highScore) {
-      highScore = score;
-      localStorage.setItem("ww_highScore", String(highScore));
-    }
-    bestScoreEl.textContent = highScore;
-    livesLeftLabel.textContent = ultraLives ? "∞" : lives;
-
-    hideAllCards();
-    cardGameOver.classList.add("visible");
+  // ====== SETTINGS ======
+  function updateSettingsText() {
+    settingsStatus.textContent =
+      `Music: ${settings.music.toUpperCase()} | ` +
+      `SFX: ${settings.sfx.toUpperCase()} | ` +
+      `Vibrate: ${settings.vibrate.toUpperCase()}`;
   }
 
-  // ==== CONTROLS ====
-  function handleFlap(e) {
-    if (e && e.type === "keydown" && e.code !== "Space") return;
-    if (e && e.type === "keydown") e.preventDefault();
-    if (!running || gameOver) return;
-
-    if (!startedFlight) {
-      startedFlight = true;
-      penguin.flap();
-      playSfx(sfxFlap);
-      return;
-    }
-
-    penguin.flap();
-    playSfx(sfxFlap);
-  }
-
-  window.addEventListener("keydown", handleFlap);
-  canvas.addEventListener("mousedown", handleFlap);
-  canvas.addEventListener("touchstart", e => {
-    e.preventDefault();
-    handleFlap(e);
-  }, { passive: false });
-
-  // ==== START / RESTART ====
-  function startRun() {
-    updateLivesFromTime();
-    updateMetaUI();
-
-    if (!ultraLives && lives <= 0) {
-      hideAllCards();
-      cardNoLives.classList.add("visible");
-      return;
-    }
-
-    hubOverlay.classList.add("hidden");
-    hideAllCards();
-
-    running = true;
-    gameOver = false;
-    startedFlight = false;
-    score = 0;
-    frames = 0;
-    scoreEl.textContent = "0";
-
-    penguin.reset();
-    pipes.reset();
-    initSnow();
-    initBlizzard();
-    initStars();
+  btnToggleMusic.addEventListener("click", () => {
+    settings.music = settings.music === "on" ? "off" : "on";
+    saveMeta();
     ensureMusic();
-    lastFrameTime = performance.now();
-    requestAnimationFrame(loop);
-  }
+    updateSettingsText();
+    playSfx(sfxUI);
+  });
 
+  btnToggleSfx.addEventListener("click", () => {
+    settings.sfx = settings.sfx === "on" ? "off" : "on";
+    saveMeta();
+    updateSettingsText();
+  });
+
+  btnToggleVibrate.addEventListener("click", () => {
+    settings.vibrate = settings.vibrate === "on" ? "off" : "on";
+    saveMeta();
+    updateSettingsText();
+  });
+
+  // ====== PANELS OPEN/CLOSE ======
   btnPlay.addEventListener("click", () => {
-    playSfx(sfxUi);
+    playSfx(sfxUI);
     startRun();
   });
 
+  btnStore.addEventListener("click", () => {
+    playSfx(sfxUI);
+    openStore();
+  });
+
+  btnSettings.addEventListener("click", () => {
+    panelSettings.classList.remove("hidden");
+    updateSettingsText();
+    playSfx(sfxUI);
+  });
+
+  btnInfo.addEventListener("click", () => {
+    panelInfo.classList.remove("hidden");
+    playSfx(sfxUI);
+  });
+
+  document.querySelectorAll("[data-panel-close]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-panel-close");
+      const panel = document.getElementById(id);
+      if (panel) panel.classList.add("hidden");
+      playSfx(sfxUI);
+    });
+  });
+
   btnRestart.addEventListener("click", () => {
-    playSfx(sfxUi);
-    if (!ultraLives && lives <= 0) {
-      hideAllCards();
-      cardNoLives.classList.add("visible");
+    cardGameOver.classList.add("hidden");
+    if (lives <= 0) {
+      showNoLives();
     } else {
-      hideAllCards();
       startRun();
     }
   });
 
   btnBackMenu.addEventListener("click", () => {
-    playSfx(sfxUi);
-    hideAllCards();
-    running = false;
-    gameOver = false;
+    cardGameOver.classList.add("hidden");
     hubOverlay.classList.remove("hidden");
-    stopMusic();
+    running = false;
+    try { bgm.pause(); } catch(_) {}
   });
 
   btnNoLivesMenu.addEventListener("click", () => {
-    playSfx(sfxUi);
-    hideAllCards();
-    running = false;
-    gameOver = false;
+    cardNoLives.classList.add("hidden");
     hubOverlay.classList.remove("hidden");
-    stopMusic();
   });
 
-  // ==== FAKE REWARDED AD ====
-  function runFakeAd(onComplete) {
-    hideAllCards();
-    cardFakeAd.classList.add("visible");
-    let duration = 5;
-    let remaining = duration;
+  // ====== NO LIVES: AD & LIFE PACK ======
+  btnWatchAd.addEventListener("click", () => {
+    if (removeAds) {
+      // ad-free: just grant life
+      lives = Math.min(MAX_LIVES, lives + 1);
+      lastLifeTime = Date.now();
+      saveMeta();
+      updateTopBar();
+      cardNoLives.classList.add("hidden");
+      hubOverlay.classList.remove("hidden");
+      alert("Ad-free bonus: +1 life added.");
+      return;
+    }
+
+    cardNoLives.classList.add("hidden");
+    cardAd.classList.remove("hidden");
+    playSfx(sfxUI);
+
+    let total = 5;
+    let remaining = total;
     fakeAdBar.style.width = "0%";
-    fakeAdTimer.textContent = `${remaining}s remaining`;
+    fakeAdTimer.textContent = remaining + "s";
 
     const interval = setInterval(() => {
       remaining--;
-      const pct = ((duration - remaining) / duration) * 100;
+      const pct = ((total - remaining) / total) * 100;
       fakeAdBar.style.width = pct + "%";
-      fakeAdTimer.textContent = `${Math.max(remaining, 0)}s remaining`;
+      fakeAdTimer.textContent = Math.max(remaining, 0) + "s";
+
       if (remaining <= 0) {
         clearInterval(interval);
         setTimeout(() => {
-          cardFakeAd.classList.remove("visible");
-          if (onComplete) onComplete();
-        }, 200);
+          cardAd.classList.add("hidden");
+          lives = Math.min(MAX_LIVES, lives + 1);
+          lastLifeTime = Date.now();
+          saveMeta();
+          updateTopBar();
+          alert("Thanks for watching! +1 life.");
+          hubOverlay.classList.remove("hidden");
+        }, 300);
       }
     }, 1000);
-  }
+  });
 
-  btnWatchAd.addEventListener("click", () => {
-    playSfx(sfxUi);
-    if (removeAds) {
-      lives = Math.min(MAX_LIVES, lives + 1);
+  btnBuyLifePack.addEventListener("click", () => {
+    openPurchaseConfirm("Life Pack – £0.69", () => {
+      lives = Math.min(MAX_LIVES, lives + 3);
       lastLifeTime = Date.now();
       saveMeta();
-      updateMetaUI();
-      hideAllCards();
-      showMessage("Ad-free user: +1 life bonus instantly added.");
-      return;
-    }
-    runFakeAd(() => {
-      lives = Math.min(MAX_LIVES, lives + 1);
-      lastLifeTime = Date.now();
-      saveMeta();
-      updateMetaUI();
-      showMessage("Thanks for watching! +1 life added.");
-      hideAllCards();
-      cardNoLives.classList.remove("visible");
+      updateTopBar();
+      cardNoLives.classList.add("hidden");
       hubOverlay.classList.remove("hidden");
     });
   });
 
-  // ==== PANELS OPEN/CLOSE ====
-  document.querySelectorAll("[data-panel-close]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const id = btn.getAttribute("data-panel-close");
-      const panel = document.getElementById(id);
-      if (panel) panel.classList.remove("visible");
-      playSfx(sfxUi);
-    });
-  });
-
-  btnStore.addEventListener("click", () => {
-    playSfx(sfxUi);
-    renderStoreSkins(storeSkinsList);
-    renderStoreMaps(storeMapsList);
-    renderStoreUpgrades();
-    renderStoreCoins();
-    panelStore.classList.add("visible");
-  });
-
-  iconSettings.addEventListener("click", () => {
-    playSfx(sfxUi);
-    panelSettings.classList.add("visible");
-    btnToggleMusic.textContent = musicOn === "true" ? "ON" : "OFF";
-    btnToggleSfx.textContent = sfxOn === "true" ? "ON" : "OFF";
-    btnToggleVibrate.textContent = vibrateOn === "true" ? "ON" : "OFF";
-  });
-
-  iconMaps.addEventListener("click", () => {
-    playSfx(sfxUi);
-    renderMapsPanel();
-    panelMaps.classList.add("visible");
-  });
-
-  iconSkins.addEventListener("click", () => {
-    playSfx(sfxUi);
-    renderSkinsPanel();
-    panelSkins.classList.add("visible");
-  });
-
-  iconDaily.addEventListener("click", () => {
-    playSfx(sfxUi);
-    refreshDailyPanel();
-    panelDaily.classList.add("visible");
-  });
-
-  iconReset.addEventListener("click", () => {
-    playSfx(sfxUi);
-    showConfirm("Reset all progress, coins, cosmetics and upgrades?\nThis cannot be undone.", () => {
-      localStorage.clear();
-      location.reload();
-    });
-  });
-
-  iconRestore.addEventListener("click", () => {
-    playSfx(sfxUi);
-    showMessage("Restore Purchases\n\nIn a real build this would query Google Play Billing.\nFor this test version, purchases are already stored locally.");
-  });
-
-  // ==== SETTINGS BUTTONS ====
-  btnToggleMusic.addEventListener("click", () => {
-    musicOn = musicOn === "true" ? "false" : "true";
-    btnToggleMusic.textContent = musicOn === "true" ? "ON" : "OFF";
-    saveMeta();
-    if (musicOn === "true") ensureMusic(); else stopMusic();
-  });
-
-  btnToggleSfx.addEventListener("click", () => {
-    sfxOn = sfxOn === "true" ? "false" : "true";
-    btnToggleSfx.textContent = sfxOn === "true" ? "ON" : "OFF";
-    saveMeta();
-  });
-
-  btnToggleVibrate.addEventListener("click", () => {
-    vibrateOn = vibrateOn === "true" ? "false" : "true";
-    btnToggleVibrate.textContent = vibrateOn === "true" ? "ON" : "OFF";
-    saveMeta();
-  });
-
-  // ==== FIRST RENDER ====
-  initSnow();
-  initBlizzard();
-  initStars();
-  penguin.reset();
+  // ====== INITIAL RENDER ======
+  updateTopBar();
+  updatePodium();
+  ensureMusic();
   drawBackground();
-  penguin.draw(ctx);
-  drawPreview();
-  updateMetaUI();
+  penguin.reset();
+  drawPenguinAt(ctx, penguin.x, penguin.y, getSkinById(equippedSkinId), 0);
 
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
