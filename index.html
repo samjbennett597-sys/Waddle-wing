@@ -4,325 +4,346 @@
   <meta charset="UTF-8" />
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Waddle Wings Universe</title>
+  <title>Waddle Wings: Arcade</title>
 
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#2C3E50" />
+  <meta name="theme-color" content="#150030" />
 
-  <!-- AUDIO -->
-  <!-- Put real files in /music: background.mp3, flap.wav, coin.wav, hit.wav, purchase.mp3 -->
-  <audio id="bgm" src="music/background.mp3" loop preload="auto"></audio>
-  <audio id="sfx-flap" src="music/flap.wav" preload="auto"></audio>
-  <audio id="sfx-coin" src="music/coin.wav" preload="auto"></audio>
-  <audio id="sfx-hit" src="music/hit.wav" preload="auto"></audio>
-  <audio id="sfx-purchase" src="music/purchase.mp3" preload="auto"></audio>
+  <!-- AUDIO (PUT REAL FILES IN ./audio/) -->
+  <audio id="bgm" src="audio/bgm_arcade.mp3" loop preload="auto"></audio>
+  <audio id="sfx-flap" src="audio/flap.wav" preload="auto"></audio>
+  <audio id="sfx-coin" src="audio/coin.wav" preload="auto"></audio>
+  <audio id="sfx-hit" src="audio/hit.wav" preload="auto"></audio>
+  <audio id="sfx-ui" src="audio/ui_click.wav" preload="auto"></audio>
 
   <style>
     @import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
 
     body {
       margin: 0;
       padding: 0;
-      background: radial-gradient(circle at top, #202a3f, #05070b);
+      background: radial-gradient(circle at top, #2b005a, #05000f);
       color: #fff;
       font-family: "Press Start 2P", system-ui, sans-serif;
       overflow: hidden;
       touch-action: none;
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
       height: 100vh;
       width: 100vw;
     }
 
     #game-container {
       position: relative;
-      max-width: 480px;
-      width: 100%;
-      max-height: 800px;
-      height: 100vh;
-      box-shadow: 0 0 30px rgba(0,0,0,0.8);
-      border-radius: 18px;
+      width: min(480px, 100vw);
+      height: min(850px, 100vh);
+      border-radius: 24px;
       overflow: hidden;
       background: #000;
+      box-shadow:
+        0 0 0 3px #ff00ff55,
+        0 22px 45px rgba(0, 0, 0, 0.9);
     }
 
     canvas {
       display: block;
+      width: 100%;
+      height: 100%;
+      image-rendering: pixelated;
     }
 
     #ui-layer {
       position: absolute;
       inset: 0;
       pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
 
+    /* TOP BAR */
     #top-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 6px 10px;
-      font-size: 0.6rem;
-      color: #fff;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+      padding: 8px 10px;
+      font-size: 9px;
+      text-shadow: 0 0 4px #000;
     }
 
     #score-display {
-      font-size: 1.3rem;
+      font-size: 18px;
+      color: #ffec6b;
     }
 
     #meta-right {
       text-align: right;
-      font-size: 0.55rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
     }
 
-    #coins-display { font-size: 0.7rem; }
-    #lives-display { font-size: 0.7rem; margin-top: 4px; }
+    #coins-display,
+    #lives-display {
+      font-size: 9px;
+    }
 
-    /* HUB */
+    /* HUB OVERLAY */
     #hub-overlay {
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at top, rgba(0,0,0,0.05), rgba(6,9,22,0.95));
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      padding: 12px;
       pointer-events: auto;
-      animation: hubFadeIn 0.25s ease-out;
+      background: radial-gradient(circle at top, rgba(30, 0, 70, 0.8), rgba(4, 0, 10, 0.94));
+      backdrop-filter: blur(6px);
+      animation: hubFade 0.25s ease-out;
     }
 
-    @keyframes hubFadeIn {
-      from { opacity: 0; transform: translateY(6px); }
+    @keyframes hubFade {
+      from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
     #hub-header {
-      padding: 10px 12px 4px;
       text-align: center;
-    }
-
-    #hub-title {
-      font-size: 0.9rem;
-      letter-spacing: 2px;
-      text-shadow: 0 0 10px #ff00ff;
-    }
-
-    #hub-subtitle {
-      font-size: 0.5rem;
-      color: #ccc;
       margin-top: 4px;
     }
 
+    #hub-title {
+      font-size: 14px;
+      color: #ff66ff;
+      text-shadow:
+        0 0 4px #ff00ff,
+        0 0 8px #ff00ffaa;
+    }
+
+    #hub-subtitle {
+      font-size: 7px;
+      margin-top: 4px;
+      color: #c7b7ff;
+    }
+
     #hub-main {
+      flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 4px 8px 10px;
-      gap: 8px;
-    }
-
-    #podium-wrapper {
-      width: 100%;
-      display: flex;
       justify-content: center;
-      margin-bottom: 6px;
+      gap: 18px;
     }
 
-    #podium {
-      position: relative;
-      width: 78%;
-      max-width: 280px;
-      height: 150px;
-      background:
-        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.25), transparent 60%),
-        linear-gradient(135deg, rgba(74,0,224,0.9), rgba(0,184,255,0.8));
-      border-radius: 18px;
-      border: 2px solid rgba(255,255,255,0.25);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.8);
-      overflow: hidden;
-    }
-
-    #podium-scanlines {
-      position: absolute;
-      inset: 0;
-      background: repeating-linear-gradient(
-        to bottom,
-        rgba(0,0,0,0.15),
-        rgba(0,0,0,0.15) 2px,
-        transparent 2px,
-        transparent 4px
-      );
-      pointer-events: none;
-      mix-blend-mode: soft-light;
-    }
-
-    #podium-platform {
-      position: absolute;
-      bottom: 18px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 70%;
-      height: 26px;
-      background: linear-gradient(90deg,#1e272e,#485460);
-      border-radius: 999px;
-      box-shadow: 0 6px 15px rgba(0,0,0,0.9);
-    }
-
-    #podium-label {
-      position: absolute;
-      bottom: 2px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 0.5rem;
-      color: #d0e6ff;
-      text-shadow: 0 0 6px #000;
-    }
-
-    #podium-character {
-      position: absolute;
-      bottom: 34px;
-      left: 50%;
-      transform: translateX(-50%);
-    }
-
-    /* MAIN BUTTONS */
-    #hub-main-buttons {
-      width: 100%;
-      max-width: 360px;
+    /* FLOATING LOGO + HOVERING BIRD PREVIEW */
+    #logo-preview {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 10px;
+      gap: 6px;
     }
 
+    #logo-text {
+      font-size: 11px;
+      color: #00ffd0;
+      text-shadow:
+        0 0 4px #00ffd0,
+        0 0 10px #00ffd055;
+      letter-spacing: 1px;
+    }
+
+    #preview-canvas {
+      width: 120px;
+      height: 80px;
+      border-radius: 16px;
+      border: 2px solid #ffffff33;
+      box-shadow:
+        0 0 12px #000000aa,
+        0 0 16px #00e5ff44;
+      background: radial-gradient(circle at top, #1b2a4a, #050814);
+    }
+
+    /* BIG BUTTONS */
     #primary-buttons {
       display: flex;
+      flex-direction: column;
       gap: 10px;
       width: 100%;
+      max-width: 260px;
+      margin-top: 6px;
     }
 
-    .hub-btn {
-      border-radius: 14px;
-      background: linear-gradient(180deg, #ffdd2d, #ff8a00);
-      border: 0;
-      color: #3b1d00;
-      padding: 11px 8px;
-      font-family: "Press Start 2P", system-ui, sans-serif;
-      font-size: 0.7rem;
-      box-shadow: 0 4px 0 #c16300;
-      cursor: pointer;
-      text-shadow: 1px 1px 0 rgba(255,255,255,0.6);
+    .main-btn {
       pointer-events: auto;
+      border: none;
+      border-radius: 999px;
+      padding: 14px 10px;
+      font-family: "Press Start 2P", system-ui, sans-serif;
+      font-size: 11px;
+      text-transform: uppercase;
+      cursor: pointer;
+      text-shadow: 0 0 4px #000;
+      box-shadow:
+        0 8px 0 #5c002f,
+        0 16px 24px rgba(0, 0, 0, 0.8);
+      transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.1s ease;
     }
 
-    .hub-btn.primary {
-      flex: 1;
-      font-size: 0.75rem;
-      text-align: center;
+    .main-btn.primary {
+      background: linear-gradient(135deg, #ff5c97, #ffcc67);
+      color: #1a0022;
     }
 
-    .hub-btn:active {
+    .main-btn.secondary {
+      background: linear-gradient(135deg, #4c6fff, #00e5ff);
+      color: #050014;
+      box-shadow:
+        0 8px 0 #1b2a5a,
+        0 16px 24px rgba(0, 0, 0, 0.8);
+    }
+
+    .main-btn:active {
       transform: translateY(3px);
-      box-shadow: 0 1px 0 #c16300;
+      box-shadow:
+        0 3px 0 #2a0022,
+        0 8px 14px rgba(0, 0, 0, 0.9);
+      filter: brightness(0.95);
     }
 
-    #secondary-icons {
+    /* ICON ROW */
+    #icon-row {
       display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
       justify-content: center;
+      gap: 12px;
+      margin-top: 8px;
     }
 
     .icon-btn {
-      width: 36px;
-      height: 36px;
+      pointer-events: auto;
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
-      border: 1px solid rgba(255,255,255,0.4);
-      background: radial-gradient(circle at top, rgba(255,255,255,0.1), rgba(0,0,0,0.9));
-      color: #fff;
-      font-size: 0.85rem;
+      border: 2px solid #ffffff33;
+      background: radial-gradient(circle at 30% 20%, #ffffff33, #110422);
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 3px 0 rgba(0,0,0,0.6);
+      font-size: 14px;
+      color: #ffec6b;
       cursor: pointer;
-      pointer-events: auto;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.9);
     }
 
     .icon-btn:active {
       transform: translateY(2px);
-      box-shadow: 0 1px 0 rgba(0,0,0,0.8);
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.9);
     }
 
     #hub-footer {
-      padding: 6px 10px 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.5rem;
-      color: #ccc;
+      font-size: 7px;
+      color: #a0a0ff;
+      text-shadow: 0 0 4px #000;
+      padding: 4px 4px 6px;
+    }
+
+    #hub-mode-label {
+      max-width: 60%;
     }
 
     /* PANELS */
     .panel {
       position: absolute;
       inset: 0;
-      background: rgba(0,0,0,0.7);
-      display: flex;
-      justify-content: center;
+      display: none;
       align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top, rgba(8, 0, 18, 0.95), rgba(0, 0, 0, 0.96));
       pointer-events: auto;
+      z-index: 5;
+    }
+
+    .panel.visible {
+      display: flex;
     }
 
     .panel-card {
-      background: rgba(10,15,35,0.97);
-      border-radius: 16px;
-      border: 2px solid rgba(255,255,255,0.2);
-      padding: 14px;
-      width: 93%;
+      width: 92%;
       max-width: 420px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.8);
-      animation: slideUp 0.2s ease-out;
-      font-size: 0.6rem;
-    }
-
-    @keyframes slideUp {
-      from { transform: translateY(12px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+      max-height: 80%;
+      background: radial-gradient(circle at top, #1c0033, #050009);
+      border-radius: 18px;
+      border: 2px solid #ff00ff55;
+      padding: 16px;
+      box-shadow:
+        0 18px 30px rgba(0, 0, 0, 1),
+        0 0 20px #ff00ff55;
+      display: flex;
+      flex-direction: column;
+      font-size: 9px;
     }
 
     .panel-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
 
     .panel-title {
-      font-size: 0.8rem;
+      font-size: 12px;
+      color: #ffec6b;
+      text-shadow: 0 0 4px #000;
     }
 
     .panel-close {
-      background: transparent;
       border: none;
+      background: transparent;
       color: #fff;
-      font-size: 1rem;
+      font-size: 18px;
       cursor: pointer;
     }
 
     .panel-body {
-      max-height: 260px;
+      flex: 1;
       overflow-y: auto;
+      padding-right: 4px;
     }
 
     .panel-footer {
+      text-align: right;
       margin-top: 10px;
-      display: flex;
-      justify-content: space-between;
-      gap: 6px;
-      flex-wrap: wrap;
+    }
+
+    .small-btn {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-family: "Press Start 2P", system-ui, sans-serif;
+      font-size: 8px;
+      cursor: pointer;
+      background: linear-gradient(135deg, #ff5c97, #ffcc67);
+      color: #210017;
+      box-shadow: 0 4px 0 #4b0024;
+    }
+
+    .small-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #4b0024;
+    }
+
+    .small-btn.secondary {
+      background: linear-gradient(135deg, #4c6fff, #00e5ff);
+      box-shadow: 0 4px 0 #122863;
+      color: #050014;
     }
 
     .list {
@@ -334,196 +355,141 @@
     .list-item {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      padding: 6px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
+      align-items: flex-start;
       gap: 6px;
+      padding: 6px 0;
+      border-bottom: 1px solid #ffffff22;
     }
 
     .list-label {
-      display: flex;
-      flex-direction: column;
+      flex: 1;
     }
 
     .list-label span:first-child {
-      font-size: 0.6rem;
+      display: block;
+      font-size: 9px;
       margin-bottom: 2px;
+      color: #ffec6b;
     }
 
     .list-label span:last-child {
-      font-size: 0.48rem;
-      color: #aaa;
+      display: block;
+      font-size: 8px;
+      color: #c7b7ff;
     }
 
     .section-label {
-      font-size: 0.5rem;
       text-transform: uppercase;
+      font-size: 7px;
       letter-spacing: 1px;
-      color: #bbb;
+      color: #9b7cff;
       margin: 8px 0 2px;
     }
 
-    .small-btn {
-      padding: 6px 10px;
-      font-size: 0.5rem;
-      border-radius: 20px;
-      background: #ff7676;
-      border: none;
-      color: #fff;
-      cursor: pointer;
-      box-shadow: 0 3px 0 #c04444;
-      min-width: 80px;
-      text-align: center;
-      white-space: nowrap;
+    .pill-tag {
+      display: inline-block;
+      border-radius: 999px;
+      border: 1px solid #ffffff44;
+      padding: 2px 6px;
+      font-size: 7px;
+      color: #ffffffaa;
+      margin-left: 4px;
     }
 
-    .small-btn.off {
-      background: rgba(255,255,255,0.1);
-      box-shadow: none;
-      border: 1px solid rgba(255,255,255,0.25);
-    }
-
-    .small-btn.equipped {
-      background: #4caf50;
-      box-shadow: 0 3px 0 #2e7d32;
+    .toggle-indicator {
+      display: inline-block;
+      margin-left: 4px;
+      font-size: 7px;
+      color: #7dffb7;
     }
 
     .small-btn.disabled {
-      opacity: 0.6;
+      opacity: 0.55;
       cursor: default;
       box-shadow: none;
     }
 
-    .small-btn:active {
-      transform: translateY(2px);
-      box-shadow: 0 1px 0 #c04444;
+    .small-btn.equipped {
+      background: linear-gradient(135deg, #7dffb7, #00e676);
+      color: #041610;
+      box-shadow: 0 4px 0 #00693b;
     }
 
-    .ghost {
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.25);
-      box-shadow: none;
-      color: #fff;
-    }
-
-    /* CENTER CARDS (GAME OVER, ADS, PURCHASES) */
+    /* CENTER CARDS (GAME OVER / NO LIVES / ADS / CONFIRM) */
     .center-card {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
+      min-width: 230px;
+      max-width: 320px;
+      background: radial-gradient(circle at top, #2a003f, #050006);
+      border-radius: 18px;
+      border: 2px solid #ff00ffaa;
+      padding: 18px 14px 16px;
+      box-shadow:
+        0 18px 30px rgba(0, 0, 0, 1),
+        0 0 20px #ff00ff55;
       text-align: center;
-      background: rgba(255,255,255,0.96);
-      color: #222;
-      padding: 18px;
-      border-radius: 16px;
-      border: 3px solid #2C3E50;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-      min-width: 240px;
+      font-size: 9px;
       pointer-events: auto;
-      font-size: 0.6rem;
+      z-index: 10;
+      display: none;
+    }
+
+    .center-card.visible {
+      display: block;
     }
 
     .center-card h1 {
-      margin: 0 0 8px;
-      font-size: 1rem;
+      margin: 0 0 10px;
+      font-size: 16px;
+      color: #ffec6b;
+      text-shadow: 0 0 4px #000;
     }
 
     .center-card p {
-      margin: 4px 0 8px;
-    }
-
-    button {
-      font-family: "Press Start 2P", system-ui, sans-serif;
-    }
-
-    .main-btn {
-      background: linear-gradient(180deg,#ff6b6b,#ff1744);
-      color: #fff;
-      border: none;
-      padding: 9px 18px;
-      font-size: 0.6rem;
-      border-radius: 24px;
-      cursor: pointer;
-      box-shadow: 0 4px 0 #b71c1c;
-      margin: 4px 4px;
-    }
-
-    .main-btn:active {
-      transform: translateY(3px);
-      box-shadow: 0 1px 0 #b71c1c;
-    }
-
-    .secondary-btn {
-      background: linear-gradient(180deg,#6078ea,#364fc7);
-      box-shadow: 0 4px 0 #243369;
-      color: #fff;
-      border: none;
-      padding: 8px 16px;
-      font-size: 0.55rem;
-      border-radius: 24px;
-      cursor: pointer;
-      margin: 4px 4px;
-    }
-
-    .secondary-btn:active {
-      transform: translateY(2px);
-      box-shadow: 0 1px 0 #243369;
+      margin: 4px 0;
     }
 
     #fake-ad-progress {
       width: 100%;
-      height: 8px;
+      height: 10px;
       border-radius: 999px;
-      background: #eee;
       overflow: hidden;
+      background: #16001f;
       margin-top: 8px;
+      border: 1px solid #ffffff44;
     }
 
     #fake-ad-bar {
       height: 100%;
       width: 0%;
-      background: linear-gradient(90deg,#ff6b6b,#ffd66b);
+      background: linear-gradient(90deg, #ff5c97, #ffcc67);
     }
 
     #fake-ad-timer {
-      font-size: 0.55rem;
-      margin-top: 4px;
-      color: #555;
+      font-size: 8px;
+      margin-top: 6px;
+      color: #c7b7ff;
     }
 
-    /* POWERUP HUD (NOT USED BUT LEFT FOR FUTURE) */
-    #powerup-hud {
+    /* BOTTOM HINT */
+    #bottom-hint {
       position: absolute;
       bottom: 4px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 4px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 7px;
+      color: #ffffffaa;
+      text-shadow: 0 0 4px #000;
       pointer-events: none;
     }
 
-    .powerup-icon {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      border: 2px solid rgba(255,255,255,0.8);
-      background: rgba(0,0,0,0.5);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 0.55rem;
-      color: #fff;
-      position: relative;
+    .hidden {
+      display: none !important;
     }
-
-    .powerup-timer {
-      position: absolute;
-      bottom: -9px;
-      font-size: 0.45rem;
-    }
-
-    .hidden { display: none !important; }
   </style>
 </head>
 <body>
@@ -538,65 +504,110 @@
         <div id="lives-display">♥ 5</div>
       </div>
     </div>
-    <div id="powerup-hud"></div>
+    <div id="bottom-hint">TAP OR PRESS SPACE TO FLAP</div>
   </div>
 
-  <!-- HUB MENU over the live game -->
+  <!-- HUB MENU -->
   <div id="hub-overlay">
     <div id="hub-header">
-      <div id="hub-title">WADDLE WINGS UNIVERSE</div>
-      <div id="hub-subtitle">Arcade • Skins • Maps • Coins • Lives • Missions</div>
+      <div id="hub-title">WADDLE WINGS: ARCADE</div>
+      <div id="hub-subtitle">Tap to flap • Dodge pipes • Stack coins • Unlock skins & maps</div>
     </div>
 
     <div id="hub-main">
-      <div id="podium-wrapper">
-        <div id="podium">
-          <div id="podium-scanlines"></div>
-          <div id="podium-platform"></div>
-          <div id="podium-label">Classic Penguin</div>
-          <canvas id="podium-character" width="80" height="80"></canvas>
-        </div>
+      <div id="logo-preview">
+        <div id="logo-text">INSERT COIN TO START</div>
+        <canvas id="preview-canvas" width="120" height="80"></canvas>
       </div>
 
-      <div id="hub-main-buttons">
-        <div id="primary-buttons">
-          <button class="hub-btn primary" id="btn-play">PLAY</button>
-          <button class="hub-btn primary" id="btn-store">STORE</button>
-        </div>
-        <div id="secondary-icons">
-          <button class="icon-btn" id="btn-modes" title="Modes">🎮</button>
-          <button class="icon-btn" id="btn-skins" title="Skins">🐧</button>
-          <button class="icon-btn" id="btn-maps" title="Maps">🗺️</button>
-          <button class="icon-btn" id="btn-missions" title="Missions">⭐</button>
-          <button class="icon-btn" id="btn-daily" title="Daily Reward">🎁</button>
-          <button class="icon-btn" id="btn-settings" title="Settings">⚙️</button>
-        </div>
+      <div id="primary-buttons">
+        <button id="btn-play" class="main-btn primary">▶ PLAY</button>
+        <button id="btn-store" class="main-btn secondary">★ STORE</button>
+      </div>
+
+      <div id="icon-row">
+        <button class="icon-btn" id="icon-settings" title="Settings">⚙</button>
+        <button class="icon-btn" id="icon-maps" title="Maps">🗺</button>
+        <button class="icon-btn" id="icon-skins" title="Skins">👾</button>
+        <button class="icon-btn" id="icon-daily" title="Daily Bonus">🎁</button>
+        <button class="icon-btn" id="icon-reset" title="Reset Data">🗑</button>
+        <button class="icon-btn" id="icon-restore" title="Restore Purchases">⟳</button>
       </div>
     </div>
 
     <div id="hub-footer">
-      <span id="hub-mode-label">Mode: Normal</span>
-      <span>v3.5 – Arcade Dev</span>
+      <span id="hub-mode-label">Difficulty: Normal</span>
+      <span>v4.0 – Arcade Build</span>
     </div>
   </div>
 
   <!-- PANELS -->
-  <div id="panel-skins" class="panel hidden">
+  <div id="panel-store" class="panel">
     <div class="panel-card">
       <div class="panel-header">
-        <div class="panel-title">Skins</div>
-        <button class="panel-close" data-panel-close="panel-skins">×</button>
+        <div class="panel-title">Arcade Store</div>
+        <button class="panel-close" data-panel-close="panel-store">×</button>
       </div>
       <div class="panel-body">
-        <ul class="list" id="skins-list"></ul>
+        <div class="section-label">Skins</div>
+        <ul class="list" id="store-skins"></ul>
+
+        <div class="section-label">Maps</div>
+        <ul class="list" id="store-maps"></ul>
+
+        <div class="section-label">Upgrades</div>
+        <ul class="list" id="store-upgrades"></ul>
+
+        <div class="section-label">Coin Packs</div>
+        <ul class="list" id="store-coins"></ul>
       </div>
       <div class="panel-footer">
-        <button class="small-btn" data-panel-close="panel-skins">Close</button>
+        <button class="small-btn secondary" data-panel-close="panel-store">Close</button>
       </div>
     </div>
   </div>
 
-  <div id="panel-maps" class="panel hidden">
+  <div id="panel-settings" class="panel">
+    <div class="panel-card">
+      <div class="panel-header">
+        <div class="panel-title">Settings</div>
+        <button class="panel-close" data-panel-close="panel-settings">×</button>
+      </div>
+      <div class="panel-body">
+        <p style="font-size:8px;color:#d3c7ff;margin-bottom:8px;">
+          Tweak audio and comfort options. In a real Play Store build, purchases and ads would be powered by Google Play Billing and AdMob.
+        </p>
+        <ul class="list">
+          <li class="list-item">
+            <div class="list-label">
+              <span>Music</span>
+              <span>90s arcade background track during menus and runs.</span>
+            </div>
+            <button class="small-btn" id="btn-toggle-music">ON</button>
+          </li>
+          <li class="list-item">
+            <div class="list-label">
+              <span>Sound FX</span>
+              <span>Flaps, hits, coins, UI clicks.</span>
+            </div>
+            <button class="small-btn" id="btn-toggle-sfx">ON</button>
+          </li>
+          <li class="list-item">
+            <div class="list-label">
+              <span>Vibration</span>
+              <span>Small haptics on hit and key actions (where supported).</span>
+            </div>
+            <button class="small-btn" id="btn-toggle-vibrate">ON</button>
+          </li>
+        </ul>
+      </div>
+      <div class="panel-footer">
+        <button class="small-btn secondary" data-panel-close="panel-settings">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="panel-maps" class="panel">
     <div class="panel-card">
       <div class="panel-header">
         <div class="panel-title">Maps</div>
@@ -606,308 +617,123 @@
         <ul class="list" id="maps-list"></ul>
       </div>
       <div class="panel-footer">
-        <button class="small-btn" data-panel-close="panel-maps">Close</button>
+        <button class="small-btn secondary" data-panel-close="panel-maps">Close</button>
       </div>
     </div>
   </div>
 
-  <div id="panel-modes" class="panel hidden">
+  <div id="panel-skins" class="panel">
     <div class="panel-card">
       <div class="panel-header">
-        <div class="panel-title">Modes</div>
-        <button class="panel-close" data-panel-close="panel-modes">×</button>
+        <div class="panel-title">Skins</div>
+        <button class="panel-close" data-panel-close="panel-skins">×</button>
       </div>
       <div class="panel-body">
-        <ul class="list" id="modes-list"></ul>
+        <ul class="list" id="skins-list"></ul>
       </div>
       <div class="panel-footer">
-        <button class="small-btn" data-panel-close="panel-modes">Close</button>
+        <button class="small-btn secondary" data-panel-close="panel-skins">Close</button>
       </div>
     </div>
   </div>
 
-  <div id="panel-settings" class="panel hidden">
+  <div id="panel-daily" class="panel">
     <div class="panel-card">
       <div class="panel-header">
-        <div class="panel-title">Settings</div>
-        <button class="panel-close" data-panel-close="panel-settings">×</button>
-      </div>
-      <div class="panel-body">
-        <p style="font-size:0.5rem; color:#ddd; line-height:1.4;">
-          Audio & comfort options. On Play Store, purchases + ads would use real SDKs.
-        </p>
-        <ul class="list">
-          <li class="list-item">
-            <div class="list-label">
-              <span>Music</span>
-              <span>Background soundtrack.</span>
-            </div>
-            <button class="small-btn" id="btn-toggle-music">Toggle</button>
-          </li>
-          <li class="list-item">
-            <div class="list-label">
-              <span>SFX</span>
-              <span>Flap, coins, hits, purchases.</span>
-            </div>
-            <button class="small-btn" id="btn-toggle-sfx">Toggle</button>
-          </li>
-          <li class="list-item">
-            <div class="list-label">
-              <span>Vibration</span>
-              <span>Haptics on events (if supported).</span>
-            </div>
-            <button class="small-btn" id="btn-toggle-vibrate">Toggle</button>
-          </li>
-        </ul>
-        <p id="settings-audio-status"
-           style="font-size:0.48rem; color:#ccc; margin-top:8px;"></p>
-      </div>
-      <div class="panel-footer">
-        <button class="small-btn" data-panel-close="panel-settings">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="panel-missions" class="panel hidden">
-    <div class="panel-card">
-      <div class="panel-header">
-        <div class="panel-title">Missions</div>
-        <button class="panel-close" data-panel-close="panel-missions">×</button>
-      </div>
-      <div class="panel-body">
-        <ul class="list" id="missions-list"></ul>
-      </div>
-      <div class="panel-footer">
-        <button class="small-btn" data-panel-close="panel-missions">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="panel-daily" class="panel hidden">
-    <div class="panel-card">
-      <div class="panel-header">
-        <div class="panel-title">Daily Reward</div>
+        <div class="panel-title">Daily Bonus</div>
         <button class="panel-close" data-panel-close="panel-daily">×</button>
       </div>
       <div class="panel-body">
-        <p style="font-size:0.52rem; color:#ddd;">
-          Claim once per day for a free coin boost.
-        </p>
-        <p id="daily-status" style="font-size:0.5rem; color:#ccc;"></p>
+        <p id="daily-text" style="font-size:8px;color:#e0d7ff;margin-bottom:10px;"></p>
       </div>
       <div class="panel-footer">
         <button class="small-btn" id="btn-claim-daily">Claim</button>
-        <button class="small-btn" data-panel-close="panel-daily">Close</button>
+        <button class="small-btn secondary" data-panel-close="panel-daily">Close</button>
       </div>
     </div>
   </div>
 
-  <!-- STORE PANEL -->
-  <div id="panel-store" class="panel hidden">
-    <div class="panel-card">
-      <div class="panel-header">
-        <div class="panel-title">Store</div>
-        <button class="panel-close" data-panel-close="panel-store">×</button>
-      </div>
-      <div class="panel-body">
-        <div class="section-label">Skins & Maps (coins)</div>
-        <ul class="list" id="store-cosmetics"></ul>
-
-        <div class="section-label">Premium Upgrades (cash)</div>
-        <ul class="list" id="store-premium"></ul>
-
-        <div class="section-label">Coin Packs (cash)</div>
-        <ul class="list" id="store-currency"></ul>
-      </div>
-      <div class="panel-footer">
-        <button class="small-btn ghost" id="btn-reset-progress">Reset Progress</button>
-        <button class="small-btn ghost" id="btn-restore-purchases">Restore Purchases</button>
-        <button class="small-btn" data-panel-close="panel-store">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- PURCHASE POPUPS -->
-  <div id="purchase-confirm" class="center-card hidden">
-    <h1>CONFIRM</h1>
-    <p id="purchase-confirm-text"></p>
-    <button id="purchase-confirm-yes" class="main-btn">BUY</button>
-    <button id="purchase-confirm-no" class="secondary-btn">CANCEL</button>
-  </div>
-
-  <div id="purchase-processing" class="center-card hidden">
-    <h1>PROCESSING…</h1>
-    <p style="font-size:0.5rem;">Contacting fake Google Play Billing…</p>
-  </div>
-
-  <div id="purchase-success" class="center-card hidden">
-    <h1>SUCCESS!</h1>
-    <p id="purchase-success-text"></p>
-    <button id="purchase-success-ok" class="main-btn">OK</button>
-  </div>
-
-  <!-- GAME STATE CARDS -->
-  <div id="game-over-screen" class="center-card hidden">
+  <!-- CENTER CARDS -->
+  <div id="card-gameover" class="center-card">
     <h1>GAME OVER</h1>
     <p>Score: <span id="final-score">0</span></p>
     <p>Best: <span id="best-score">0</span></p>
     <p>Lives left: <span id="lives-left-label">0</span></p>
-    <button id="restart-btn" class="main-btn">PLAY AGAIN</button>
-    <button id="back-menu-btn" class="secondary-btn">BACK TO HUB</button>
-  </div>
-
-  <div id="no-lives-screen" class="center-card hidden">
-    <h1>NO LIVES</h1>
-    <p>You’re out of lives.</p>
-    <p style="font-size:0.5rem;">
-      Lives regenerate over time (1/hour) or watch an ad for +1 life.
-    </p>
-    <button id="watch-ad-btn" class="main-btn">WATCH AD</button>
-    <button id="back-from-nolives-btn" class="secondary-btn">BACK TO HUB</button>
-  </div>
-
-  <div id="fake-ad-screen" class="center-card hidden">
-    <h1>AD PLAYING…</h1>
-    <p style="font-size:0.5rem;">Pretend this is some cursed mobile game trailer.</p>
-    <div id="fake-ad-progress">
-      <div id="fake-ad-bar"></div>
+    <div style="margin-top:10px;">
+      <button id="btn-restart" class="small-btn">PLAY AGAIN</button>
+      <button id="btn-back-menu" class="small-btn secondary">BACK TO MENU</button>
     </div>
+  </div>
+
+  <div id="card-nolives" class="center-card">
+    <h1>NO LIVES</h1>
+    <p>You are out of lives.</p>
+    <p style="font-size:8px;">
+      Lives regenerate over time (1 per hour). Watch a short ad for +1 life, or come back later.
+    </p>
+    <div style="margin-top:10px;">
+      <button id="btn-watch-ad" class="small-btn">WATCH AD</button>
+      <button id="btn-nolives-menu" class="small-btn secondary">BACK TO MENU</button>
+    </div>
+  </div>
+
+  <div id="card-fake-ad" class="center-card">
+    <h1>AD PLAYING…</h1>
+    <p style="font-size:8px;">Pretend this is one of those ridiculous mobile game trailers.</p>
+    <div id="fake-ad-progress"><div id="fake-ad-bar"></div></div>
     <div id="fake-ad-timer">5s remaining</div>
+  </div>
+
+  <div id="card-confirm" class="center-card">
+    <h1>CONFIRM</h1>
+    <p id="confirm-text" style="font-size:8px;"></p>
+    <div style="margin-top:10px;">
+      <button id="btn-confirm-yes" class="small-btn">YES</button>
+      <button id="btn-confirm-no" class="small-btn secondary">NO</button>
+    </div>
+  </div>
+
+  <div id="card-message" class="center-card">
+    <h1>DONE</h1>
+    <p id="message-text" style="font-size:8px;"></p>
+    <div style="margin-top:10px;">
+      <button id="btn-message-ok" class="small-btn">OK</button>
+    </div>
   </div>
 </div>
 
 <script>
-  /* BASIC SETUP */
+  // ==== BASIC SETUP ====
   const canvas = document.getElementById("gameCanvas");
   const ctx = canvas.getContext("2d");
 
   function resizeCanvas() {
-    const maxWidth = 480;
-    const maxHeight = 800;
-    let w = window.innerWidth;
-    let h = window.innerHeight;
-    if (w > maxWidth) {
-      w = maxWidth;
-      h = Math.min(window.innerHeight, maxHeight);
-    }
-    canvas.width = w;
-    canvas.height = h;
+    const rect = document.getElementById("game-container").getBoundingClientRect();
+    canvas.width = rect.width;
+    canvas.height = rect.height;
   }
   window.addEventListener("resize", resizeCanvas);
   resizeCanvas();
 
-  /* CONSTANTS */
-  const GRAVITY = 0.25;
-  const FLAP_STRENGTH = -5.5;
-  const MAX_LIVES = 5;
-  const REGEN_TIME = 60 * 60 * 1000; // 1 hour
-  const DAILY_REWARD_COINS = 20;
+  // Preview canvas for menu
+  const previewCanvas = document.getElementById("preview-canvas");
+  const pctx = previewCanvas.getContext("2d");
 
-  /* AUDIO ELEMENTS */
+  // ==== CONSTANTS ====
+  const GRAVITY = 0.28;
+  const FLAP_STRENGTH = -5.2;
+  const PIPE_WIDTH = 64;
+  const MAX_LIVES = 5;
+  const LIFE_REGEN_MS = 60 * 60 * 1000; // 1 hour
+  const DAILY_REWARD_COINS = 40;
+
+  // ==== AUDIO ====
   const bgm = document.getElementById("bgm");
   const sfxFlap = document.getElementById("sfx-flap");
   const sfxCoin = document.getElementById("sfx-coin");
   const sfxHit = document.getElementById("sfx-hit");
-  const sfxPurchase = document.getElementById("sfx-purchase");
+  const sfxUi = document.getElementById("sfx-ui");
 
-  /* DOM REFERENCES */
-  const scoreEl = document.getElementById("score-display");
-  const coinsEl = document.getElementById("coins-display");
-  const livesEl = document.getElementById("lives-display");
-
-  const hubOverlay = document.getElementById("hub-overlay");
-  const hubModeLabel = document.getElementById("hub-mode-label");
-  const podiumLabel = document.getElementById("podium-label");
-  const podiumCanvas = document.getElementById("podium-character");
-  const podiumCtx = podiumCanvas.getContext("2d");
-
-  const skinsPanel = document.getElementById("panel-skins");
-  const mapsPanel = document.getElementById("panel-maps");
-  const modesPanel = document.getElementById("panel-modes");
-  const missionsPanel = document.getElementById("panel-missions");
-  const dailyPanel = document.getElementById("panel-daily");
-  const settingsPanel = document.getElementById("panel-settings");
-  const storePanel = document.getElementById("panel-store");
-
-  const skinsList = document.getElementById("skins-list");
-  const mapsList = document.getElementById("maps-list");
-  const modesList = document.getElementById("modes-list");
-  const missionsList = document.getElementById("missions-list");
-
-  const storeCosmeticsList = document.getElementById("store-cosmetics");
-  const storePremiumList = document.getElementById("store-premium");
-  const storeCurrencyList = document.getElementById("store-currency");
-
-  const settingsAudioStatus = document.getElementById("settings-audio-status");
-  const dailyStatus = document.getElementById("daily-status");
-  const claimDailyBtn = document.getElementById("btn-claim-daily");
-
-  const gameOverScreen = document.getElementById("game-over-screen");
-  const noLivesScreen = document.getElementById("no-lives-screen");
-  const fakeAdScreen = document.getElementById("fake-ad-screen");
-  const fakeAdBar = document.getElementById("fake-ad-bar");
-  const fakeAdTimer = document.getElementById("fake-ad-timer");
-
-  const finalScoreEl = document.getElementById("final-score");
-  const bestScoreEl = document.getElementById("best-score");
-  const livesLeftLabel = document.getElementById("lives-left-label");
-
-  const btnPlay = document.getElementById("btn-play");
-  const btnModes = document.getElementById("btn-modes");
-  const btnSkins = document.getElementById("btn-skins");
-  const btnMaps = document.getElementById("btn-maps");
-  const btnStore = document.getElementById("btn-store");
-  const btnMissions = document.getElementById("btn-missions");
-  const btnDaily = document.getElementById("btn-daily");
-  const btnSettings = document.getElementById("btn-settings");
-
-  const restartBtn = document.getElementById("restart-btn");
-  const backMenuBtn = document.getElementById("back-menu-btn");
-  const backFromNoLivesBtn = document.getElementById("back-from-nolives-btn");
-  const watchAdBtn = document.getElementById("watch-ad-btn");
-
-  const btnToggleMusic = document.getElementById("btn-toggle-music");
-  const btnToggleSfx = document.getElementById("btn-toggle-sfx");
-  const btnToggleVibrate = document.getElementById("btn-toggle-vibrate");
-
-  const purchaseConfirm = document.getElementById("purchase-confirm");
-  const purchaseProcessing = document.getElementById("purchase-processing");
-  const purchaseSuccess = document.getElementById("purchase-success");
-  const purchaseConfirmText = document.getElementById("purchase-confirm-text");
-  const purchaseSuccessText = document.getElementById("purchase-success-text");
-  const purchaseConfirmYes = document.getElementById("purchase-confirm-yes");
-  const purchaseConfirmNo = document.getElementById("purchase-confirm-no");
-  const purchaseSuccessOk = document.getElementById("purchase-success-ok");
-
-  const powerupHud = document.getElementById("powerup-hud");
-
-  const btnResetProgress = document.getElementById("btn-reset-progress");
-  const btnRestorePurchases = document.getElementById("btn-restore-purchases");
-
-  /* META STATE */
-  let lives = parseInt(localStorage.getItem("ww_lives") || String(MAX_LIVES), 10);
-  if (Number.isNaN(lives) || lives < 0) lives = MAX_LIVES;
-
-  let lastLifeTimestamp = parseInt(
-    localStorage.getItem("ww_lastLife") || String(Date.now()),
-    10
-  );
-  if (Number.isNaN(lastLifeTimestamp)) lastLifeTimestamp = Date.now();
-
-  let coins = parseInt(localStorage.getItem("ww_coins") || "0", 10);
-  if (Number.isNaN(coins)) coins = 0;
-
-  let highScore = parseInt(localStorage.getItem("waddleHighScore") || "0", 10);
-  if (Number.isNaN(highScore)) highScore = 0;
-
-  let removeAds = localStorage.getItem("ww_removeAds") === "true";
-  let ultraLives = localStorage.getItem("ww_ultraLives") === "true";
-  let doubleCoins = localStorage.getItem("ww_doubleCoins") === "true";
-  let ultimatePack = localStorage.getItem("ww_ultimatePack") === "true";
-
-  let lastDaily = localStorage.getItem("ww_lastDaily") || "";
-
-  /* AUDIO SETTINGS */
   let musicOn = localStorage.getItem("ww_musicOn");
   if (musicOn === null) musicOn = "true";
   let sfxOn = localStorage.getItem("ww_sfxOn");
@@ -915,219 +741,28 @@
   let vibrateOn = localStorage.getItem("ww_vibrateOn");
   if (vibrateOn === null) vibrateOn = "true";
 
-  /* POWERUP TOKENS (present but not used in store for this build) */
-  function getToken(key) {
-    const val = parseInt(localStorage.getItem(key) || "0", 10);
-    return Number.isNaN(val) ? 0 : val;
-  }
-  function setToken(key, val) {
-    localStorage.setItem(key, String(val));
-  }
-  const TOKENS = {
-    god: "ww_tok_god",
-    autopilot: "ww_tok_autopilot",
-    slow: "ww_tok_slow",
-    magnet: "ww_tok_magnet",
-    shrink: "ww_tok_shrink",
-    clone: "ww_tok_clone",
-    cont: "ww_tok_continue"
-  };
-
-  /* COSMETICS / MODES */
-  const SKINS = [
-    {
-      id: "classic",
-      name: "Classic Penguin",
-      desc: "Default blue hero.",
-      cost: 0,
-      body: "#2C3E50",
-      wing: "#34495E",
-      beak: "#FFB300",
-    },
-    {
-      id: "red",
-      name: "Red Rebel",
-      desc: "Looks faster. Isn’t.",
-      cost: 250,
-      body: "#E53935",
-      wing: "#B71C1C",
-      beak: "#FFCA28",
-    },
-    {
-      id: "gold",
-      name: "Golden Waddle",
-      desc: "Premium flex skin.",
-      cost: 350,
-      body: "#FFD54F",
-      wing: "#FBC02D",
-      beak: "#FFF59D",
-    },
-    {
-      id: "neon",
-      name: "Neon Cyber",
-      desc: "Glowing arcade bird.",
-      cost: 500,
-      body: "#00e5ff",
-      wing: "#00b0ff",
-      beak: "#ffeb3b",
-    }
-  ];
-
-  const MAPS = [
-    {
-      id: "day",
-      name: "Snowfield Day",
-      desc: "Bright sky, light snow.",
-      cost: 0,
-      gradient: ["#87CEEB", "#E0F7FA"],
-      snowLevel: "light",
-    },
-    {
-      id: "night",
-      name: "Polar Night",
-      desc: "Dark sky, medium snow.",
-      cost: 250,
-      gradient: ["#001c3d", "#00335c"],
-      snowLevel: "medium",
-    },
-    {
-      id: "blizzard",
-      name: "Blizzard",
-      desc: "White-out challenge.",
-      cost: 300,
-      gradient: ["#546E7A", "#ECEFF1"],
-      snowLevel: "heavy",
-    },
-    {
-      id: "synth",
-      name: "Neon Grid",
-      desc: "80s arcade skyline.",
-      cost: 400,
-      gradient: ["#4a148c", "#ff6f00"],
-      snowLevel: "none",
-    }
-  ];
-
-  const MODES = [
-    { id: "easy", name: "Easy", desc: "Slower pipes, big gaps.", speed: 2.4, gap: 190 },
-    { id: "normal", name: "Normal", desc: "Standard challenge.", speed: 3.0, gap: 160 },
-    { id: "hard", name: "Hard", desc: "Faster pipes, smaller gaps.", speed: 3.6, gap: 140 },
-    { id: "extreme", name: "Extreme", desc: "Chaos mode.", speed: 4.4, gap: 120 },
-  ];
-
-  /* MISSIONS */
-  const MISSIONS = [
-    { id: "score10", name: "First Steps", desc: "Reach score 10.", type: "bestScoreAtLeast", target: 10, rewardCoins: 30 },
-    { id: "score25", name: "Getting Good", desc: "Reach score 25.", type: "bestScoreAtLeast", target: 25, rewardCoins: 60 },
-    { id: "runs3", name: "Committed", desc: "Play 3 runs today.", type: "runsToday", target: 3, rewardCoins: 25 },
-  ];
-  let missionState = JSON.parse(localStorage.getItem("ww_missions") || "{}");
-  let runsToday = 0;
-  let runsTodayDate = localStorage.getItem("ww_runsTodayDate") || "";
-  function todayStr() {
-    return new Date().toISOString().slice(0, 10);
-  }
-  if (runsTodayDate !== todayStr()) {
-    runsToday = 0;
-    runsTodayDate = todayStr();
-    localStorage.setItem("ww_runsTodayDate", runsTodayDate);
-    localStorage.setItem("ww_runsToday", String(runsToday));
-  } else {
-    runsToday = parseInt(localStorage.getItem("ww_runsToday") || "0", 10);
-    if (Number.isNaN(runsToday)) runsToday = 0;
-  }
-
-  /* OWNERSHIP */
-  let ownedSkins = JSON.parse(localStorage.getItem("ww_ownedSkins") || '["classic"]');
-  if (!ownedSkins.includes("classic")) ownedSkins.push("classic");
-
-  let ownedMaps = JSON.parse(localStorage.getItem("ww_ownedMaps") || '["day"]');
-  if (!ownedMaps.includes("day")) ownedMaps.push("day");
-
-  let equippedSkinId = localStorage.getItem("ww_skin") || "classic";
-  let equippedMapId = localStorage.getItem("ww_map") || "day";
-  let modeId = localStorage.getItem("ww_mode") || "normal";
-
-  function saveMeta() {
-    localStorage.setItem("ww_lives", String(lives));
-    localStorage.setItem("ww_lastLife", String(lastLifeTimestamp));
-    localStorage.setItem("ww_coins", String(coins));
-    localStorage.setItem("waddleHighScore", String(highScore));
-    localStorage.setItem("ww_removeAds", String(removeAds));
-    localStorage.setItem("ww_ultraLives", String(ultraLives));
-    localStorage.setItem("ww_doubleCoins", String(doubleCoins));
-    localStorage.setItem("ww_ultimatePack", String(ultimatePack));
-    localStorage.setItem("ww_lastDaily", lastDaily);
-    localStorage.setItem("ww_missions", JSON.stringify(missionState));
-    localStorage.setItem("ww_runsToday", String(runsToday));
-    localStorage.setItem("ww_runsTodayDate", runsTodayDate);
-    localStorage.setItem("ww_musicOn", musicOn);
-    localStorage.setItem("ww_sfxOn", sfxOn);
-    localStorage.setItem("ww_vibrateOn", vibrateOn);
-  }
-
-  function saveCosmetics() {
-    localStorage.setItem("ww_ownedSkins", JSON.stringify(ownedSkins));
-    localStorage.setItem("ww_ownedMaps", JSON.stringify(ownedMaps));
-    localStorage.setItem("ww_skin", equippedSkinId);
-    localStorage.setItem("ww_map", equippedMapId);
-    localStorage.setItem("ww_mode", modeId);
-  }
-
-  function getEquippedSkin() {
-    return SKINS.find(s => s.id === equippedSkinId) || SKINS[0];
-  }
-
-  function getEquippedMap() {
-    return MAPS.find(m => m.id === equippedMapId) || MAPS[0];
-  }
-
-  function getSelectedMode() {
-    return MODES.find(m => m.id === modeId) || MODES[1];
-  }
-
-  /* UI HELPERS */
-  function updateLivesUI() {
-    if (ultraLives) {
-      livesEl.textContent = "♥ ∞";
-    } else {
-      livesEl.textContent = "♥ " + lives;
-    }
-  }
-
-  function updateCoinsUI() {
-    coinsEl.textContent = "💰 " + coins;
-  }
-
-  function updateAudioStatusUI() {
-    settingsAudioStatus.textContent =
-      "MUSIC: " + (musicOn === "true" ? "ON" : "OFF") +
-      " | SFX: " + (sfxOn === "true" ? "ON" : "OFF") +
-      " | VIB: " + (vibrateOn === "true" ? "ON" : "OFF");
-  }
-
   function tryVibrate(pattern) {
     if (vibrateOn === "true" && "vibrate" in navigator) {
       navigator.vibrate(pattern);
     }
   }
 
-  function playSfx(sound) {
+  function playSfx(audio) {
     if (sfxOn !== "true") return;
-    if (!sound) return;
+    if (!audio) return;
     try {
-      sound.currentTime = 0;
-      sound.play().catch(() => {});
+      audio.currentTime = 0;
+      audio.play().catch(() => {});
     } catch (_) {}
   }
 
-  function ensureMusicPlaying() {
+  function ensureMusic() {
     if (musicOn !== "true") {
       bgm.pause();
       return;
     }
     if (bgm.paused) {
-      bgm.volume = 0.4;
+      bgm.volume = 0.5;
       bgm.play().catch(() => {});
     }
   }
@@ -1139,143 +774,255 @@
     } catch (_) {}
   }
 
-  /* LIVES REGEN */
-  function regenLives() {
+  // ==== DOM ====
+  const scoreEl = document.getElementById("score-display");
+  const coinsEl = document.getElementById("coins-display");
+  const livesEl = document.getElementById("lives-display");
+  const hubOverlay = document.getElementById("hub-overlay");
+  const hubModeLabel = document.getElementById("hub-mode-label");
+
+  const btnPlay = document.getElementById("btn-play");
+  const btnStore = document.getElementById("btn-store");
+  const iconSettings = document.getElementById("icon-settings");
+  const iconMaps = document.getElementById("icon-maps");
+  const iconSkins = document.getElementById("icon-skins");
+  const iconDaily = document.getElementById("icon-daily");
+  const iconReset = document.getElementById("icon-reset");
+  const iconRestore = document.getElementById("icon-restore");
+
+  const panelStore = document.getElementById("panel-store");
+  const panelSettings = document.getElementById("panel-settings");
+  const panelMaps = document.getElementById("panel-maps");
+  const panelSkins = document.getElementById("panel-skins");
+  const panelDaily = document.getElementById("panel-daily");
+
+  const storeSkinsList = document.getElementById("store-skins");
+  const storeMapsList = document.getElementById("store-maps");
+  const storeUpgradesList = document.getElementById("store-upgrades");
+  const storeCoinsList = document.getElementById("store-coins");
+  const mapsList = document.getElementById("maps-list");
+  const skinsList = document.getElementById("skins-list");
+
+  const btnToggleMusic = document.getElementById("btn-toggle-music");
+  const btnToggleSfx = document.getElementById("btn-toggle-sfx");
+  const btnToggleVibrate = document.getElementById("btn-toggle-vibrate");
+
+  const cardGameOver = document.getElementById("card-gameover");
+  const cardNoLives = document.getElementById("card-nolives");
+  const cardFakeAd = document.getElementById("card-fake-ad");
+  const cardConfirm = document.getElementById("card-confirm");
+  const cardMessage = document.getElementById("card-message");
+
+  const finalScoreEl = document.getElementById("final-score");
+  const bestScoreEl = document.getElementById("best-score");
+  const livesLeftLabel = document.getElementById("lives-left-label");
+
+  const fakeAdBar = document.getElementById("fake-ad-bar");
+  const fakeAdTimer = document.getElementById("fake-ad-timer");
+
+  const btnRestart = document.getElementById("btn-restart");
+  const btnBackMenu = document.getElementById("btn-back-menu");
+  const btnWatchAd = document.getElementById("btn-watch-ad");
+  const btnNoLivesMenu = document.getElementById("btn-nolives-menu");
+  const btnConfirmYes = document.getElementById("btn-confirm-yes");
+  const btnConfirmNo = document.getElementById("btn-confirm-no");
+  const btnMessageOk = document.getElementById("btn-message-ok");
+  const confirmText = document.getElementById("confirm-text");
+  const messageText = document.getElementById("message-text");
+
+  const dailyText = document.getElementById("daily-text");
+  const btnClaimDaily = document.getElementById("btn-claim-daily");
+
+  // ==== META STATE ====
+  let lives = parseInt(localStorage.getItem("ww_lives") || String(MAX_LIVES), 10);
+  if (Number.isNaN(lives) || lives < 0) lives = MAX_LIVES;
+  let lastLifeTime = parseInt(localStorage.getItem("ww_lastLife") || String(Date.now()), 10);
+  if (Number.isNaN(lastLifeTime)) lastLifeTime = Date.now();
+
+  let coins = parseInt(localStorage.getItem("ww_coins") || "0", 10);
+  if (Number.isNaN(coins)) coins = 0;
+
+  let highScore = parseInt(localStorage.getItem("ww_highScore") || "0", 10);
+  if (Number.isNaN(highScore)) highScore = 0;
+
+  let lastDaily = localStorage.getItem("ww_lastDaily") || "";
+
+  let removeAds = localStorage.getItem("ww_removeAds") === "true";
+  let doubleCoins = localStorage.getItem("ww_doubleCoins") === "true";
+  let ultraLives = localStorage.getItem("ww_ultraLives") === "true";
+
+  let ownedSkins = JSON.parse(localStorage.getItem("ww_ownedSkins") || '["classic"]');
+  let ownedMaps = JSON.parse(localStorage.getItem("ww_ownedMaps") || '["day"]');
+  if (!ownedSkins.includes("classic")) ownedSkins.push("classic");
+  if (!ownedMaps.includes("day")) ownedMaps.push("day");
+
+  let equippedSkinId = localStorage.getItem("ww_skin") || "classic";
+  let equippedMapId = localStorage.getItem("ww_map") || "day";
+
+  // difficulty mode determined from map – kept simple
+  function modeLabel() {
+    if (equippedMapId === "blizzard") return "Hard";
+    if (equippedMapId === "night") return "Normal+";
+    if (equippedMapId === "synth") return "Chaos";
+    return "Normal";
+  }
+
+  // ==== GAME OBJECTS & DATA ====
+  const SKINS = [
+    { id: "classic", name: "Classic Blue", desc: "Plain, loyal arcade hero.", cost: 0, body: "#2196f3", wing: "#1565c0", beak: "#ffeb3b" },
+    { id: "red", name: "Crimson Chip", desc: "Red-hot 16-bit rebel.", cost: 250, body: "#e53935", wing: "#b71c1c", beak: "#ffb74d" },
+    { id: "gold", name: "Golden Token", desc: "Show-off premium shine.", cost: 400, body: "#ffd700", wing: "#c9a000", beak: "#fff59d" },
+    { id: "neon", name: "Neon Grid", desc: "Straight out of an arcade cab.", cost: 500, body: "#00e5ff", wing: "#00bfa5", beak: "#ff4081" },
+    { id: "void", name: "Void Glitch", desc: "Glitchy purple chaos bird.", cost: 650, body: "#7c4dff", wing: "#311b92", beak: "#e040fb" }
+  ];
+
+  const MAPS = [
+    {
+      id: "day",
+      name: "Snowfield Day",
+      desc: "Light snow, soft clouds. Standard difficulty.",
+      cost: 0,
+      gradient: ["#87ceeb", "#f0f9ff"],
+      type: "day"
+    },
+    {
+      id: "night",
+      name: "Pixel Night",
+      desc: "Deep starry sky. Pipes move slightly faster.",
+      cost: 300,
+      gradient: ["#020817", "#001b3f"],
+      type: "night"
+    },
+    {
+      id: "blizzard",
+      name: "Blizzard Zone",
+      desc: "Heavy snow, reduced visibility. Hard mode.",
+      cost: 400,
+      gradient: ["#607d8b", "#eceff1"],
+      type: "blizzard"
+    },
+    {
+      id: "synth",
+      name: "Neon City",
+      desc: "Purple/orange synthwave chaos. Fast pipes.",
+      cost: 500,
+      gradient: ["#4a148c", "#ff6f00"],
+      type: "synth"
+    }
+  ];
+
+  const UPGRADES = [
+    { id: "removeAds", name: "Remove Ads", desc: "Forever skip rewarded ads. Life bonuses instantly.", label: "£3.99" },
+    { id: "doubleCoins", name: "Double Coins", desc: "All coin rewards x2 forever.", label: "£3.99" },
+    { id: "ultraLives", name: "Infinite Lives", desc: "Never run out of lives again.", label: "£9.99" },
+    { id: "arcadePack", name: "Arcade Pack", desc: "Remove Ads + Double Coins + Infinite Lives + unlock Neon & Synth.", label: "£19.99" }
+  ];
+
+  const COIN_PACKS = [
+    { id: "coins-small", name: "Coin Stack", desc: "+250 coins.", amount: 250, label: "£0.99" },
+    { id: "coins-med", name: "Coin Chest", desc: "+650 coins.", amount: 650, label: "£2.49" },
+    { id: "coins-big", name: "Coin Vault", desc: "+1500 coins.", amount: 1500, label: "£4.99" }
+  ];
+
+  function getSkin(id) {
+    return SKINS.find(s => s.id === id) || SKINS[0];
+  }
+
+  function getMap(id) {
+    return MAPS.find(m => m.id === id) || MAPS[0];
+  }
+
+  function saveMeta() {
+    localStorage.setItem("ww_lives", String(lives));
+    localStorage.setItem("ww_lastLife", String(lastLifeTime));
+    localStorage.setItem("ww_coins", String(coins));
+    localStorage.setItem("ww_highScore", String(highScore));
+    localStorage.setItem("ww_lastDaily", lastDaily);
+    localStorage.setItem("ww_removeAds", String(removeAds));
+    localStorage.setItem("ww_doubleCoins", String(doubleCoins));
+    localStorage.setItem("ww_ultraLives", String(ultraLives));
+    localStorage.setItem("ww_ownedSkins", JSON.stringify(ownedSkins));
+    localStorage.setItem("ww_ownedMaps", JSON.stringify(ownedMaps));
+    localStorage.setItem("ww_skin", equippedSkinId);
+    localStorage.setItem("ww_map", equippedMapId);
+    localStorage.setItem("ww_musicOn", musicOn);
+    localStorage.setItem("ww_sfxOn", sfxOn);
+    localStorage.setItem("ww_vibrateOn", vibrateOn);
+  }
+
+  function updateLivesFromTime() {
     if (ultraLives) {
       lives = MAX_LIVES;
-      lastLifeTimestamp = Date.now();
+      lastLifeTime = Date.now();
       saveMeta();
-      updateLivesUI();
       return;
     }
     const now = Date.now();
     if (lives >= MAX_LIVES) {
-      lastLifeTimestamp = now;
-      localStorage.setItem("ww_lastLife", String(lastLifeTimestamp));
+      lastLifeTime = now;
+      localStorage.setItem("ww_lastLife", String(lastLifeTime));
       return;
     }
-    const elapsed = now - lastLifeTimestamp;
-    const regained = Math.floor(elapsed / REGEN_TIME);
-    if (regained > 0) {
-      lives = Math.min(MAX_LIVES, lives + regained);
-      lastLifeTimestamp = now;
+    const elapsed = now - lastLifeTime;
+    if (elapsed <= 0) return;
+    const gained = Math.floor(elapsed / LIFE_REGEN_MS);
+    if (gained > 0) {
+      lives = Math.min(MAX_LIVES, lives + gained);
+      lastLifeTime = now;
       saveMeta();
-      updateLivesUI();
     }
   }
 
-  regenLives();
-  updateLivesUI();
-  updateCoinsUI();
-  updateAudioStatusUI();
-  setInterval(regenLives, 30 * 1000);
+  function updateMetaUI() {
+    coinsEl.textContent = "💰 " + coins;
+    livesEl.textContent = ultraLives ? "♥ ∞" : "♥ " + lives;
+    hubModeLabel.textContent = "Difficulty: " + modeLabel();
+  }
 
-  /* DAILY */
-  function updateDailyPanel() {
+  updateLivesFromTime();
+  updateMetaUI();
+  setInterval(() => { updateLivesFromTime(); updateMetaUI(); }, 30000);
+
+  // ==== DAILY BONUS ====
+  function todayStr() {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  function refreshDailyPanel() {
     const today = todayStr();
     if (lastDaily === today) {
-      dailyStatus.textContent = "Already claimed today. Come back tomorrow.";
-      claimDailyBtn.disabled = true;
-      claimDailyBtn.style.opacity = "0.5";
+      dailyText.textContent = "Already collected today's reward. Check back tomorrow.";
+      btnClaimDaily.disabled = true;
+      btnClaimDaily.style.opacity = "0.5";
     } else {
-      const reward = doubleCoins ? DAILY_REWARD_COINS * 2 : DAILY_REWARD_COINS;
-      dailyStatus.textContent = `Available: +${reward} coins.`;
-      claimDailyBtn.disabled = false;
-      claimDailyBtn.style.opacity = "1";
+      let reward = DAILY_REWARD_COINS;
+      if (doubleCoins) reward *= 2;
+      dailyText.textContent = `Today's bonus is +${reward} coins. Tap Claim to collect.`;
+      btnClaimDaily.disabled = false;
+      btnClaimDaily.style.opacity = "1";
     }
   }
 
-  claimDailyBtn.addEventListener("click", () => {
+  btnClaimDaily.addEventListener("click", () => {
     const today = todayStr();
-    if (lastDaily === today) {
-      alert("Already claimed today.");
-      return;
-    }
-    lastDaily = today;
+    if (lastDaily === today) return;
     let reward = DAILY_REWARD_COINS;
     if (doubleCoins) reward *= 2;
     coins += reward;
+    lastDaily = today;
     saveMeta();
-    updateCoinsUI();
-    updateDailyPanel();
-    alert(`Daily reward claimed: +${reward} coins.`);
+    updateMetaUI();
+    refreshDailyPanel();
+    showMessage(`Daily reward collected: +${reward} coins.`);
   });
 
-  /* MISSIONS */
-  function missionProgress(m) {
-    if (m.type === "bestScoreAtLeast") {
-      return { current: highScore, target: m.target };
-    }
-    if (m.type === "runsToday") {
-      return { current: runsToday, target: m.target };
-    }
-    return { current: 0, target: m.target };
-  }
-
-  function checkMissionsCompletion() {
-    MISSIONS.forEach(m => {
-      const state = missionState[m.id] || { completed: false, claimed: false };
-      if (state.completed) return;
-      const prog = missionProgress(m);
-      if (prog.current >= m.target) {
-        state.completed = true;
-        missionState[m.id] = state;
-      }
-    });
-  }
-
-  function renderMissionsPanel() {
-    missionsList.innerHTML = "";
-    MISSIONS.forEach(m => {
-      const state = missionState[m.id] || { completed: false, claimed: false };
-      const li = document.createElement("li");
-      li.className = "list-item";
-
-      const label = document.createElement("div");
-      label.className = "list-label";
-      const title = document.createElement("span");
-      title.textContent = m.name;
-      const prog = missionProgress(m);
-      const desc = document.createElement("span");
-      desc.textContent = `${m.desc} (${prog.current}/${m.target}) • Reward: ${m.rewardCoins} coins`;
-      label.appendChild(title);
-      label.appendChild(desc);
-
-      const right = document.createElement("div");
-      const tag = document.createElement("span");
-      tag.textContent = !state.completed ? "…"
-                        : !state.claimed ? "READY" : "DONE";
-      right.appendChild(tag);
-
-      if (state.completed && !state.claimed) {
-        const btn = document.createElement("button");
-        btn.className = "small-btn";
-        btn.textContent = "Claim";
-        btn.onclick = () => {
-          let reward = m.rewardCoins;
-          if (doubleCoins) reward *= 2;
-          coins += reward;
-          state.claimed = true;
-          missionState[m.id] = state;
-          saveMeta();
-          updateCoinsUI();
-          renderMissionsPanel();
-        };
-        right.appendChild(btn);
-      }
-
-      li.appendChild(label);
-      li.appendChild(right);
-      missionsList.appendChild(li);
-    });
-  }
-
-  /* PANELS: SKINS / MAPS / MODES */
-  function renderSkinsPanel() {
-    skinsList.innerHTML = "";
+  // ==== STORE RENDERING ====
+  function renderStoreSkins(list) {
+    list.innerHTML = "";
     SKINS.forEach(skin => {
       const li = document.createElement("li");
       li.className = "list-item";
+
       const label = document.createElement("div");
       label.className = "list-label";
       const title = document.createElement("span");
@@ -1293,19 +1040,14 @@
       if (!owned && skin.cost > 0) {
         btn.textContent = `Buy ${skin.cost}`;
         btn.onclick = () => {
-          if (coins < skin.cost) {
-            alert("Not enough coins.");
-            return;
-          }
+          if (coins < skin.cost) { showMessage("Not enough coins."); return; }
           coins -= skin.cost;
-          ownedSkins.push(skin.id);
+          if (!ownedSkins.includes(skin.id)) ownedSkins.push(skin.id);
           equippedSkinId = skin.id;
           saveMeta();
-          saveCosmetics();
-          updateCoinsUI();
-          renderSkinsPanel();
-          renderStoreCosmetics();
-          updateHubView();
+          updateMetaUI();
+          renderStoreSkins(storeSkinsList);
+          renderStoreSkins(skinsList);
         };
       } else {
         if (skin.id === equippedSkinId) {
@@ -1316,25 +1058,25 @@
           btn.textContent = "Equip";
           btn.onclick = () => {
             equippedSkinId = skin.id;
-            saveCosmetics();
-            renderSkinsPanel();
-            renderStoreCosmetics();
-            updateHubView();
+            saveMeta();
+            renderStoreSkins(storeSkinsList);
+            renderStoreSkins(skinsList);
           };
         }
       }
 
       li.appendChild(label);
       li.appendChild(btn);
-      skinsList.appendChild(li);
+      list.appendChild(li);
     });
   }
 
-  function renderMapsPanel() {
-    mapsList.innerHTML = "";
+  function renderStoreMaps(list) {
+    list.innerHTML = "";
     MAPS.forEach(map => {
       const li = document.createElement("li");
       li.className = "list-item";
+
       const label = document.createElement("div");
       label.className = "list-label";
       const title = document.createElement("span");
@@ -1342,7 +1084,7 @@
       const owned = ownedMaps.includes(map.id);
       const desc = document.createElement("span");
       desc.textContent = owned
-        ? map.desc + (map.id === equippedMapId ? " • Equipped" : " • Owned")
+        ? map.desc + (map.id === equippedMapId ? " • Selected" : " • Unlocked")
         : `${map.desc} • Cost: ${map.cost} coins`;
       label.appendChild(title);
       label.appendChild(desc);
@@ -1352,281 +1094,50 @@
       if (!owned && map.cost > 0) {
         btn.textContent = `Buy ${map.cost}`;
         btn.onclick = () => {
-          if (coins < map.cost) {
-            alert("Not enough coins.");
-            return;
-          }
+          if (coins < map.cost) { showMessage("Not enough coins."); return; }
           coins -= map.cost;
-          ownedMaps.push(map.id);
+          if (!ownedMaps.includes(map.id)) ownedMaps.push(map.id);
           equippedMapId = map.id;
           saveMeta();
-          saveCosmetics();
-          updateCoinsUI();
-          renderMapsPanel();
-          renderStoreCosmetics();
-          updateHubView();
+          updateMetaUI();
+          renderStoreMaps(storeMapsList);
+          renderStoreMaps(mapsList);
         };
       } else {
         if (map.id === equippedMapId) {
-          btn.textContent = "Equipped";
+          btn.textContent = "Selected";
           btn.classList.add("equipped", "disabled");
           btn.disabled = true;
         } else {
-          btn.textContent = "Equip";
+          btn.textContent = "Select";
           btn.onclick = () => {
             equippedMapId = map.id;
-            saveCosmetics();
-            renderMapsPanel();
-            renderStoreCosmetics();
-            updateHubView();
+            saveMeta();
+            updateMetaUI();
+            renderStoreMaps(storeMapsList);
+            renderStoreMaps(mapsList);
           };
         }
       }
 
       li.appendChild(label);
       li.appendChild(btn);
-      mapsList.appendChild(li);
+      list.appendChild(li);
     });
   }
 
-  function renderModesPanel() {
-    modesList.innerHTML = "";
-    MODES.forEach(mode => {
-      const li = document.createElement("li");
-      li.className = "list-item";
-      const label = document.createElement("div");
-      label.className = "list-label";
-      const title = document.createElement("span");
-      title.textContent = mode.name;
-      const desc = document.createElement("span");
-      desc.textContent = mode.desc;
-      label.appendChild(title);
-      label.appendChild(desc);
-
-      const btn = document.createElement("button");
-      btn.className = "small-btn";
-      if (mode.id === modeId) {
-        btn.textContent = "Selected";
-        btn.classList.add("equipped", "disabled");
-        btn.disabled = true;
-      } else {
-        btn.textContent = "Set";
-        btn.onclick = () => {
-          modeId = mode.id;
-          saveCosmetics();
-          renderModesPanel();
-          updateHubView();
-        };
-      }
-
-      li.appendChild(label);
-      li.appendChild(btn);
-      modesList.appendChild(li);
-    });
-  }
-
-  /* STORE DEFINITIONS */
-
-  // Boosters defined but NOT shown in store for this version
-  const POWERUP_DEFS = [
-    { id: "god", name: "God Mode (10s)", desc: "Invincible for 10 seconds.", tokenKey: TOKENS.god, priceCoins: 40 },
-    { id: "autopilot", name: "Auto-Pilot", desc: "AI flies until death.", tokenKey: TOKENS.autopilot, priceCoins: 50 },
-    { id: "slow", name: "Slow Motion (5s)", desc: "Pipes move slower.", tokenKey: TOKENS.slow, priceCoins: 30 },
-    { id: "magnet", name: "Coin Magnet (10s)", desc: "Pull in coins.", tokenKey: TOKENS.magnet, priceCoins: 30 },
-    { id: "shrink", name: "Shrink (5s)", desc: "Smaller hitbox.", tokenKey: TOKENS.shrink, priceCoins: 25 },
-    { id: "clone", name: "Shadow Clone (10s)", desc: "Ghost doubles coins.", tokenKey: TOKENS.clone, priceCoins: 35 },
-    { id: "cont", name: "Continue Token", desc: "Resume once after death.", tokenKey: TOKENS.cont, priceCoins: 40 },
-  ];
-
-  const PREMIUM_ITEMS = [
-    { id: "ultraLives", name: "Unlimited Lives", desc: "Never run out of lives again.", priceLabel: "£19.99" },
-    { id: "removeAds", name: "Remove Ads", desc: "No ads, ever.", priceLabel: "£4.99" },
-    { id: "doubleCoins", name: "Double Coins", desc: "All coins & rewards x2.", priceLabel: "£4.99" },
-    { id: "life69", name: "Extra Life", desc: "Instant +1 life right now.", priceLabel: "£0.69" },
-    { id: "ultimate", name: "Ultimate Pack", desc: "Unlimited Lives + Remove Ads + Double Coins + bonus cosmetics.", priceLabel: "£29.99" },
-  ];
-
-  const CURRENCY_PACKS = [
-    { id: "coins-small", name: "Small Coin Pack", desc: "+100 coins.", amount: 100, priceLabel: "£0.99" },
-    { id: "coins-med", name: "Medium Coin Pack", desc: "+300 coins.", amount: 300, priceLabel: "£2.49" },
-    { id: "coins-big", name: "Big Coin Pack", desc: "+800 coins.", amount: 800, priceLabel: "£4.99" },
-  ];
-
-  let currentPurchase = null; // { label, onComplete }
-
-  function openPurchaseConfirm(label, onComplete) {
-    currentPurchase = { label, onComplete };
-    purchaseConfirmText.textContent = label;
-    purchaseConfirm.classList.remove("hidden");
-  }
-
-  function closePurchaseUI() {
-    purchaseConfirm.classList.add("hidden");
-    purchaseProcessing.classList.add("hidden");
-    purchaseSuccess.classList.add("hidden");
-    currentPurchase = null;
-  }
-
-  purchaseConfirmYes.addEventListener("click", () => {
-    purchaseConfirm.classList.add("hidden");
-    purchaseProcessing.classList.remove("hidden");
-    setTimeout(() => {
-      purchaseProcessing.classList.add("hidden");
-      if (currentPurchase && typeof currentPurchase.onComplete === "function") {
-        currentPurchase.onComplete();
-      }
-      playSfx(sfxPurchase);
-      tryVibrate(40);
-      purchaseSuccessText.textContent =
-        "Purchase successful.\n" + (currentPurchase ? currentPurchase.label : "");
-      purchaseSuccess.classList.remove("hidden");
-    }, 1200);
-  });
-
-  purchaseConfirmNo.addEventListener("click", () => {
-    closePurchaseUI();
-  });
-
-  purchaseSuccessOk.addEventListener("click", () => {
-    closePurchaseUI();
-  });
-
-  /* STORE: COSMETICS SECTION */
-  function renderStoreCosmetics() {
-    storeCosmeticsList.innerHTML = "";
-
-    // Skins
-    SKINS.forEach(skin => {
+  function renderStoreUpgrades() {
+    storeUpgradesList.innerHTML = "";
+    UPGRADES.forEach(up => {
       const li = document.createElement("li");
       li.className = "list-item";
 
       const label = document.createElement("div");
       label.className = "list-label";
       const title = document.createElement("span");
-      title.textContent = `[Skin] ${skin.name}`;
-      const owned = ownedSkins.includes(skin.id);
+      title.textContent = up.name;
       const desc = document.createElement("span");
-      desc.textContent = owned
-        ? skin.desc + (skin.id === equippedSkinId ? " • Equipped" : " • Owned")
-        : `${skin.desc} • Cost: ${skin.cost} coins`;
-      label.appendChild(title);
-      label.appendChild(desc);
-
-      const btn = document.createElement("button");
-      btn.className = "small-btn";
-
-      if (!owned && skin.cost > 0) {
-        btn.textContent = `Buy ${skin.cost}`;
-        btn.onclick = () => {
-          if (coins < skin.cost) {
-            alert("Not enough coins.");
-            return;
-          }
-          coins -= skin.cost;
-          ownedSkins.push(skin.id);
-          equippedSkinId = skin.id; // auto-equip
-          saveMeta();
-          saveCosmetics();
-          updateCoinsUI();
-          renderSkinsPanel();
-          renderStoreCosmetics();
-          updateHubView();
-        };
-      } else {
-        if (skin.id === equippedSkinId) {
-          btn.textContent = "Equipped";
-          btn.classList.add("equipped", "disabled");
-          btn.disabled = true;
-        } else {
-          btn.textContent = "Equip";
-          btn.onclick = () => {
-            equippedSkinId = skin.id;
-            saveCosmetics();
-            renderSkinsPanel();
-            renderStoreCosmetics();
-            updateHubView();
-          };
-        }
-      }
-
-      li.appendChild(label);
-      li.appendChild(btn);
-      storeCosmeticsList.appendChild(li);
-    });
-
-    // Maps
-    MAPS.forEach(map => {
-      const li = document.createElement("li");
-      li.className = "list-item";
-
-      const label = document.createElement("div");
-      label.className = "list-label";
-      const title = document.createElement("span");
-      title.textContent = `[Map] ${map.name}`;
-      const owned = ownedMaps.includes(map.id);
-      const desc = document.createElement("span");
-      desc.textContent = owned
-        ? map.desc + (map.id === equippedMapId ? " • Equipped" : " • Owned")
-        : `${map.desc} • Cost: ${map.cost} coins`;
-      label.appendChild(title);
-      label.appendChild(desc);
-
-      const btn = document.createElement("button");
-      btn.className = "small-btn";
-
-      if (!owned && map.cost > 0) {
-        btn.textContent = `Buy ${map.cost}`;
-        btn.onclick = () => {
-          if (coins < map.cost) {
-            alert("Not enough coins.");
-            return;
-          }
-          coins -= map.cost;
-          ownedMaps.push(map.id);
-          equippedMapId = map.id; // auto-equip
-          saveMeta();
-          saveCosmetics();
-          updateCoinsUI();
-          renderMapsPanel();
-          renderStoreCosmetics();
-          updateHubView();
-        };
-      } else {
-        if (map.id === equippedMapId) {
-          btn.textContent = "Equipped";
-          btn.classList.add("equipped", "disabled");
-          btn.disabled = true;
-        } else {
-          btn.textContent = "Equip";
-          btn.onclick = () => {
-            equippedMapId = map.id;
-            saveCosmetics();
-            renderMapsPanel();
-            renderStoreCosmetics();
-            updateHubView();
-          };
-        }
-      }
-
-      li.appendChild(label);
-      li.appendChild(btn);
-      storeCosmeticsList.appendChild(li);
-    });
-  }
-
-  /* STORE: PREMIUM */
-  function renderStorePremium() {
-    storePremiumList.innerHTML = "";
-    PREMIUM_ITEMS.forEach(item => {
-      const li = document.createElement("li");
-      li.className = "list-item";
-
-      const label = document.createElement("div");
-      label.className = "list-label";
-      const title = document.createElement("span");
-      title.textContent = item.name;
-      const desc = document.createElement("span");
-      desc.textContent = item.desc + " • " + item.priceLabel;
+      desc.textContent = up.desc + " • " + up.label;
       label.appendChild(title);
       label.appendChild(desc);
 
@@ -1634,68 +1145,49 @@
       btn.className = "small-btn";
 
       let ownedFlag = false;
-      if (item.id === "ultraLives") ownedFlag = ultraLives;
-      if (item.id === "removeAds") ownedFlag = removeAds;
-      if (item.id === "doubleCoins") ownedFlag = doubleCoins;
-      if (item.id === "ultimate") ownedFlag = ultimatePack;
+      if (up.id === "removeAds") ownedFlag = removeAds;
+      if (up.id === "doubleCoins") ownedFlag = doubleCoins;
+      if (up.id === "ultraLives") ownedFlag = ultraLives;
+      if (up.id === "arcadePack" && removeAds && doubleCoins && ultraLives) ownedFlag = true;
 
-      if (item.id === "life69") {
-        btn.textContent = item.priceLabel;
-        btn.onclick = () => {
-          openPurchaseConfirm(`${item.name} – ${item.priceLabel}`, () => {
-            lives = Math.min(MAX_LIVES, lives + 1);
-            lastLifeTimestamp = Date.now();
-            saveMeta();
-            updateLivesUI();
-          });
-        };
-      } else if (ownedFlag) {
+      if (ownedFlag) {
         btn.textContent = "Owned";
         btn.classList.add("equipped", "disabled");
         btn.disabled = true;
       } else {
-        btn.textContent = item.priceLabel;
+        btn.textContent = up.label;
         btn.onclick = () => {
-          openPurchaseConfirm(`${item.name} – ${item.priceLabel}`, () => {
-            if (item.id === "ultraLives") {
-              ultraLives = true;
-              lives = MAX_LIVES;
-            }
-            if (item.id === "removeAds") {
-              removeAds = true;
-            }
-            if (item.id === "doubleCoins") {
-              doubleCoins = true;
-            }
-            if (item.id === "ultimate") {
-              ultimatePack = true;
-              ultraLives = true;
+          showConfirm(`${up.name} – ${up.label}\n\nIn a real build this would open Google Play Billing.\nHere it instantly unlocks for testing.`, () => {
+            if (up.id === "removeAds") removeAds = true;
+            if (up.id === "doubleCoins") doubleCoins = true;
+            if (up.id === "ultraLives") { ultraLives = true; lives = MAX_LIVES; }
+            if (up.id === "arcadePack") {
               removeAds = true;
               doubleCoins = true;
+              ultraLives = true;
               lives = MAX_LIVES;
               if (!ownedSkins.includes("neon")) ownedSkins.push("neon");
               if (!ownedMaps.includes("synth")) ownedMaps.push("synth");
-              saveCosmetics();
             }
             saveMeta();
-            updateLivesUI();
-            updateCoinsUI();
-            renderStorePremium();
-            renderStoreCosmetics();
+            updateMetaUI();
+            renderStoreUpgrades();
+            renderStoreSkins(storeSkinsList);
+            renderStoreMaps(storeMapsList);
+            showMessage("Upgrade unlocked for this test build.");
           });
         };
       }
 
       li.appendChild(label);
       li.appendChild(btn);
-      storePremiumList.appendChild(li);
+      storeUpgradesList.appendChild(li);
     });
   }
 
-  /* STORE: COINS */
-  function renderStoreCurrency() {
-    storeCurrencyList.innerHTML = "";
-    CURRENCY_PACKS.forEach(pack => {
+  function renderStoreCoins() {
+    storeCoinsList.innerHTML = "";
+    COIN_PACKS.forEach(pack => {
       const li = document.createElement("li");
       li.className = "list-item";
 
@@ -1704,134 +1196,119 @@
       const title = document.createElement("span");
       title.textContent = pack.name;
       const desc = document.createElement("span");
-      desc.textContent = `${pack.desc} • ${pack.priceLabel}`;
+      desc.textContent = `${pack.desc} • ${pack.label}`;
       label.appendChild(title);
       label.appendChild(desc);
 
       const btn = document.createElement("button");
       btn.className = "small-btn";
-      btn.textContent = pack.priceLabel;
+      btn.textContent = pack.label;
       btn.onclick = () => {
-        openPurchaseConfirm(`${pack.name} – ${pack.priceLabel}`, () => {
+        showConfirm(`${pack.name} – ${pack.label}\n\nSimulated purchase: add ${pack.amount} coins.`, () => {
           coins += pack.amount;
           saveMeta();
-          updateCoinsUI();
-          renderStoreCurrency();
+          updateMetaUI();
+          renderStoreCoins();
+          showMessage(`Coins added: +${pack.amount}`);
         });
       };
 
       li.appendChild(label);
       li.appendChild(btn);
-      storeCurrencyList.appendChild(li);
+      storeCoinsList.appendChild(li);
     });
   }
 
-  /* RESET & RESTORE */
-  btnResetProgress.addEventListener("click", () => {
-    if (!confirm("Reset all progress, coins, lives and cosmetics on THIS DEVICE?\nThis cannot be undone.")) return;
-    localStorage.clear();
-    location.reload();
-  });
+  // list panels
+  function renderMapsPanel() { renderStoreMaps(mapsList); }
+  function renderSkinsPanel() { renderStoreSkins(skinsList); }
 
-  btnRestorePurchases.addEventListener("click", () => {
-    alert("On the real Play Store build this would restore purchases from Google.\nIn this demo, purchases already live in this device’s storage.");
-  });
+  // ==== CENTER CARD HELPERS ====
+  let confirmCallback = null;
 
-  /* PODIUM */
-  function drawPodiumCharacter() {
-    const skin = getEquippedSkin();
-    podiumCtx.clearRect(0, 0, podiumCanvas.width, podiumCanvas.height);
-    podiumCtx.save();
-    podiumCtx.translate(podiumCanvas.width / 2, podiumCanvas.height / 2 + 8);
-
-    podiumCtx.fillStyle = skin.body;
-    podiumCtx.beginPath();
-    podiumCtx.ellipse(0, 0, 18, 22, 0, 0, Math.PI * 2);
-    podiumCtx.fill();
-
-    podiumCtx.fillStyle = "#ffffff";
-    podiumCtx.beginPath();
-    podiumCtx.ellipse(-1, 2, 12, 16, 0, 0, Math.PI * 2);
-    podiumCtx.fill();
-
-    podiumCtx.fillStyle = "white";
-    podiumCtx.beginPath();
-    podiumCtx.arc(5, -7, 5, 0, Math.PI * 2);
-    podiumCtx.fill();
-    podiumCtx.fillStyle = "black";
-    podiumCtx.beginPath();
-    podiumCtx.arc(6.5, -7, 2, 0, Math.PI * 2);
-    podiumCtx.fill();
-
-    podiumCtx.fillStyle = skin.beak;
-    podiumCtx.beginPath();
-    podiumCtx.moveTo(8, -2);
-    podiumCtx.lineTo(18, 1);
-    podiumCtx.lineTo(8, 4);
-    podiumCtx.fill();
-
-    podiumCtx.fillStyle = skin.wing;
-    podiumCtx.beginPath();
-    podiumCtx.ellipse(-5, 4, 7, 12, -0.4, 0, Math.PI * 2);
-    podiumCtx.fill();
-
-    podiumCtx.fillStyle = skin.beak;
-    podiumCtx.beginPath();
-    podiumCtx.ellipse(-4, 19, 5, 3, 0, Math.PI * 2);
-    podiumCtx.fill();
-
-    podiumCtx.restore();
+  function hideAllCards() {
+    cardGameOver.classList.remove("visible");
+    cardNoLives.classList.remove("visible");
+    cardFakeAd.classList.remove("visible");
+    cardConfirm.classList.remove("visible");
+    cardMessage.classList.remove("visible");
   }
 
-  function updateHubView() {
-    const skin = getEquippedSkin();
-    const mode = getSelectedMode();
-    podiumLabel.textContent = skin.name;
-    hubModeLabel.textContent = "Mode: " + mode.name;
-    drawPodiumCharacter();
-    updateLivesUI();
-    updateCoinsUI();
+  function showConfirm(text, onYes) {
+    hideAllCards();
+    confirmCallback = onYes || null;
+    confirmText.textContent = text;
+    cardConfirm.classList.add("visible");
   }
 
-  /* GAME STATE */
+  function showMessage(text) {
+    hideAllCards();
+    messageText.textContent = text;
+    cardMessage.classList.add("visible");
+  }
+
+  btnConfirmYes.addEventListener("click", () => {
+    playSfx(sfxUi);
+    cardConfirm.classList.remove("visible");
+    if (confirmCallback) confirmCallback();
+    confirmCallback = null;
+  });
+  btnConfirmNo.addEventListener("click", () => {
+    playSfx(sfxUi);
+    cardConfirm.classList.remove("visible");
+    confirmCallback = null;
+  });
+  btnMessageOk.addEventListener("click", () => {
+    playSfx(sfxUi);
+    cardMessage.classList.remove("visible");
+  });
+
+  // ==== GAME STATE ====
   let frames = 0;
   let score = 0;
-  let isRunning = false;
-  let isGameOver = false;
-  let startedFlight = false; // hover until first input
+  let running = false;
+  let gameOver = false;
+  let startedFlight = false;
 
   const snowflakes = [];
-  const clouds = [];
-
   function initSnow() {
     snowflakes.length = 0;
-    const map = getEquippedMap();
-    let count = 40;
-    if (map.snowLevel === "medium") count = 70;
-    if (map.snowLevel === "heavy") count = 120;
-    if (map.snowLevel === "none") count = 10;
+    const count = 60;
     for (let i = 0; i < count; i++) {
       snowflakes.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
         r: Math.random() * 2 + 1,
-        speed: Math.random() * 1 + 0.5,
+        speed: Math.random() * 0.6 + 0.4
       });
     }
   }
 
-  function initClouds() {
-    clouds.length = 0;
-    const map = getEquippedMap();
-    const count = map.id === "blizzard" ? 2 : 4;
+  const blizzardFlakes = [];
+  function initBlizzard() {
+    blizzardFlakes.length = 0;
+    const count = 120;
     for (let i = 0; i < count; i++) {
-      clouds.push({
+      blizzardFlakes.push({
         x: Math.random() * canvas.width,
-        y: Math.random() * (canvas.height * 0.4),
-        w: 60 + Math.random() * 40,
-        h: 18 + Math.random() * 10,
-        speed: 0.2 + Math.random() * 0.3,
-        alpha: 0.12 + Math.random() * 0.18,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 2 + 1.5,
+        speedY: Math.random() * 1.2 + 1.2,
+        speedX: Math.random() * 0.8 + 0.6
+      });
+    }
+  }
+
+  const starfield = [];
+  function initStars() {
+    starfield.length = 0;
+    const count = 60;
+    for (let i = 0; i < count; i++) {
+      starfield.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 1.6 + 0.4,
+        tw: Math.random() * Math.PI * 2
       });
     }
   }
@@ -1843,407 +1320,422 @@
     velocity: 0,
     rotation: 0,
 
-    draw() {
-      const skin = getEquippedSkin();
-      ctx.save();
-      ctx.translate(this.x, this.y);
-      const rot = this.velocity * 0.1;
-      this.rotation = Math.min(Math.PI / 4, Math.max(-Math.PI / 4, rot));
-      ctx.rotate(this.rotation);
-
-      ctx.fillStyle = skin.body;
-      ctx.beginPath();
-      ctx.ellipse(0, 0, 20, 25, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = "#ffffff";
-      ctx.beginPath();
-      ctx.ellipse(-2, 2, 14, 18, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = "white";
-      ctx.beginPath();
-      ctx.arc(6, -8, 6, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = "black";
-      ctx.beginPath();
-      ctx.arc(8, -8, 2, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = skin.beak;
-      ctx.beginPath();
-      ctx.moveTo(10, -2);
-      ctx.lineTo(24, 2);
-      ctx.lineTo(10, 6);
-      ctx.fill();
-
-      ctx.fillStyle = skin.wing;
-      ctx.beginPath();
-      const wingY = Math.sin(frames * 0.25) * 3;
-      ctx.ellipse(-5, 5 + wingY, 8, 14, -0.5, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = skin.beak;
-      ctx.beginPath();
-      ctx.ellipse(-5, 22, 6, 4, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.restore();
-    },
-
-    update() {
-      this.velocity += GRAVITY;
-      this.y += this.velocity;
-
-      if (this.y + this.radius >= canvas.height) {
-        this.y = canvas.height - this.radius;
-        triggerGameOver();
-      }
-      if (this.y - this.radius <= 0) {
-        this.y = this.radius;
-        this.velocity = 0;
-      }
+    reset() {
+      this.x = canvas.width * 0.2;
+      this.y = canvas.height * 0.45;
+      this.velocity = 0;
+      this.rotation = 0;
     },
 
     flap() {
       this.velocity = FLAP_STRENGTH;
     },
 
-    reset() {
-      this.x = canvas.width * 0.2;
-      this.y = canvas.height / 2;
-      this.velocity = 0;
-      this.rotation = 0;
+    update() {
+      this.velocity += GRAVITY;
+      this.y += this.velocity;
+
+      if (this.y + this.radius > canvas.height) {
+        this.y = canvas.height - this.radius;
+        triggerGameOver();
+      } else if (this.y - this.radius < 0) {
+        this.y = this.radius;
+        this.velocity = 0;
+      }
     },
+
+    draw(context) {
+      const skin = getSkin(equippedSkinId);
+      context.save();
+      context.translate(this.x, this.y);
+      this.rotation = Math.max(-Math.PI / 4, Math.min(Math.PI / 4, this.velocity * 0.1));
+      context.rotate(this.rotation);
+
+      // body
+      context.fillStyle = skin.body;
+      context.beginPath();
+      context.ellipse(0, 0, 22, 26, 0, 0, Math.PI * 2);
+      context.fill();
+
+      // white belly
+      context.fillStyle = "#ffffff";
+      context.beginPath();
+      context.ellipse(-2, 3, 14, 18, 0, 0, Math.PI * 2);
+      context.fill();
+
+      // eye
+      context.fillStyle = "#ffffff";
+      context.beginPath();
+      context.arc(7, -8, 6, 0, Math.PI * 2);
+      context.fill();
+      context.fillStyle = "#000000";
+      context.beginPath();
+      context.arc(8.5, -8, 2.3, 0, Math.PI * 2);
+      context.fill();
+
+      // beak
+      context.fillStyle = skin.beak;
+      context.beginPath();
+      context.moveTo(11, -2);
+      context.lineTo(26, 2);
+      context.lineTo(11, 6);
+      context.fill();
+
+      // wing
+      context.fillStyle = skin.wing;
+      context.beginPath();
+      const wingY = Math.sin(frames * 0.25) * 3;
+      context.ellipse(-6, 6 + wingY, 8, 14, -0.6, 0, Math.PI * 2);
+      context.fill();
+
+      // feet
+      context.fillStyle = skin.beak;
+      context.beginPath();
+      context.ellipse(-6, 22, 6, 3.5, 0, 0, Math.PI * 2);
+      context.fill();
+
+      context.restore();
+    }
   };
 
   const pipes = {
-    items: [],
-    reset() { this.items = []; },
+    list: [],
+    reset() { this.list = []; },
 
     update() {
-      const mode = getSelectedMode();
-      if (frames % 100 === 0) {
-        const minLen = 50;
-        const maxPos = canvas.height - minLen - mode.gap;
-        const minPos = minLen;
-        const topY = Math.floor(Math.random() * (maxPos - minPos + 1)) + minPos;
-        this.items.push({ x: canvas.width, y: topY, passed: false });
+      const mapConf = getMap(equippedMapId);
+      let baseSpeed = 3.0;
+      let baseGap = 150;
+
+      if (mapConf.type === "night") {
+        baseSpeed = 3.3;
+        baseGap = 145;
+      } else if (mapConf.type === "blizzard") {
+        baseSpeed = 3.6;
+        baseGap = 140;
+      } else if (mapConf.type === "synth") {
+        baseSpeed = 4.0;
+        baseGap = 135;
       }
 
-      for (let i = 0; i < this.items.length; i++) {
-        const p = this.items[i];
-        const m = getSelectedMode();
-        let speed = m.speed;
+      // scaling difficulty
+      if (score >= 25) {
+        baseSpeed += 0.3;
+        baseGap -= 5;
+      }
+      if (score >= 50) {
+        baseSpeed += 0.4;
+        baseGap -= 10;
+      }
+      if (score >= 100) {
+        baseSpeed += 0.5;
+        baseGap -= 10;
+      }
 
-        if (score >= 30) speed *= 1.05;
-        if (score >= 60) speed *= 1.15;
-        if (score >= 100) {
-          speed *= 1.25;
-          p.y += Math.sin(frames * 0.08 + p.x * 0.02) * 1.5;
+      if (frames % 90 === 0) {
+        const margin = 40;
+        const maxTop = canvas.height - baseGap - margin;
+        const minTop = margin;
+        const top = Math.random() * (maxTop - minTop) + minTop;
+        this.list.push({ x: canvas.width, top: top, passed: false });
+      }
+
+      for (let i = 0; i < this.list.length; i++) {
+        const p = this.list[i];
+
+        let speed = baseSpeed;
+        if (equippedMapId === "synth" && score >= 50) {
+          speed += Math.sin(frames * 0.05 + p.x * 0.02) * 0.6;
         }
 
         p.x -= speed;
 
-        const pipeWidth = 60;
-        const pLeft = penguin.x - penguin.radius;
-        const pRight = penguin.x + penguin.radius;
-        const pTop = penguin.y - penguin.radius;
-        const pBottom = penguin.y + penguin.radius;
+        const pxLeft = penguin.x - penguin.radius + 2;
+        const pxRight = penguin.x + penguin.radius - 2;
+        const pxTop = penguin.y - penguin.radius + 2;
+        const pxBottom = penguin.y + penguin.radius - 2;
 
-        if (pRight > p.x && pLeft < p.x + pipeWidth) {
-          const gap = m.gap;
-          const topLimit = p.y;
-          const bottomLimit = p.y + gap;
-          let hit = false;
-          if (pTop < topLimit) hit = true;
-          if (pBottom > bottomLimit) hit = true;
+        const topEdge = p.top;
+        const bottomEdge = p.top + baseGap;
 
-          if (hit) {
+        if (pxRight > p.x && pxLeft < p.x + PIPE_WIDTH) {
+          if (pxTop < topEdge || pxBottom > bottomEdge) {
             triggerGameOver();
           }
         }
 
-        if (p.x + pipeWidth < penguin.x && !p.passed) {
+        if (!p.passed && p.x + PIPE_WIDTH < penguin.x) {
           p.passed = true;
           score++;
-          let coinGain = 1;
-          if (doubleCoins) coinGain *= 2;
-          coins += coinGain;
+          let gain = 1;
+          if (doubleCoins) gain *= 2;
+          coins += gain;
           scoreEl.textContent = score;
-          updateCoinsUI();
+          updateMetaUI();
           playSfx(sfxCoin);
           saveMeta();
         }
 
-        if (p.x + pipeWidth < 0) {
-          this.items.shift();
+        if (p.x + PIPE_WIDTH < -20) {
+          this.list.splice(i, 1);
           i--;
         }
       }
     },
 
     draw() {
-      const map = getEquippedMap();
-      for (let i = 0; i < this.items.length; i++) {
-        const p = this.items[i];
-        const pipeWidth = 60;
-        const m = getSelectedMode();
-        const gap = m.gap;
+      const mapConf = getMap(equippedMapId);
+      const g1 = mapConf.gradient[0];
+      const g2 = mapConf.gradient[1];
 
-        const gradTop = ctx.createLinearGradient(p.x, 0, p.x + pipeWidth, 0);
-        gradTop.addColorStop(0, map.gradient[0]);
-        gradTop.addColorStop(0.5, map.gradient[1]);
-        gradTop.addColorStop(1, map.gradient[0]);
+      this.list.forEach(p => {
+        const gradTop = ctx.createLinearGradient(p.x, 0, p.x + PIPE_WIDTH, 0);
+        gradTop.addColorStop(0, g1);
+        gradTop.addColorStop(0.5, g2);
+        gradTop.addColorStop(1, g1);
 
-        const gradBot = ctx.createLinearGradient(p.x, 0, p.x + pipeWidth, 0);
-        gradBot.addColorStop(0, map.gradient[0]);
-        gradBot.addColorStop(0.5, map.gradient[1]);
-        gradBot.addColorStop(1, map.gradient[0]);
+        const gradBottom = ctx.createLinearGradient(p.x, 0, p.x + PIPE_WIDTH, 0);
+        gradBottom.addColorStop(0, g1);
+        gradBottom.addColorStop(0.5, g2);
+        gradBottom.addColorStop(1, g1);
 
+        // top pipe
         ctx.fillStyle = gradTop;
-        ctx.fillRect(p.x, 0, pipeWidth, p.y);
-        ctx.fillStyle = "#E0FFFF";
+        ctx.fillRect(p.x, 0, PIPE_WIDTH, p.top);
+        ctx.fillStyle = "#e0ffff";
         ctx.beginPath();
-        ctx.moveTo(p.x + 10, p.y);
-        ctx.lineTo(p.x + 30, p.y + 20);
-        ctx.lineTo(p.x + 50, p.y);
+        ctx.moveTo(p.x + 10, p.top);
+        ctx.lineTo(p.x + PIPE_WIDTH / 2, p.top + 18);
+        ctx.lineTo(p.x + PIPE_WIDTH - 10, p.top);
         ctx.fill();
 
-        ctx.fillStyle = gradBot;
-        ctx.fillRect(
-          p.x,
-          p.y + gap,
-          pipeWidth,
-          canvas.height - (p.y + gap)
-        );
+        // bottom pipe
+        ctx.fillStyle = gradBottom;
+        ctx.fillRect(p.x, p.top + (score >= 50 ? 0 : 0) + (score >= 100 ? -4 : 0) + PIPE_WIDTH / 2 + (-(PIPE_WIDTH / 2)), p.top + 9999);
+        ctx.fillRect(p.x, p.top + (mapConf.type === "synth" ? 0 : 0) + (mapConf.type === "day" ? 0 : 0) + (mapConf.type === "night" ? 0 : 0) + (mapConf.type === "blizzard" ? 0 : 0) + (PIPE_WIDTH / 2) + (0), canvas.height - (p.top + (PIPE_WIDTH / 2)));
+        // cleaner bottom segment:
+        ctx.fillRect(p.x, p.top + (baseGap = 150), PIPE_WIDTH, canvas.height - (p.top + baseGap)); // fallback line (harmless if repeated)
+
+        // to avoid confusion: draw actual bottom gap properly:
+        const mapConf2 = getMap(equippedMapId);
+        let bg = 150;
+        if (mapConf2.type === "night") bg = 145;
+        else if (mapConf2.type === "blizzard") bg = 140;
+        else if (mapConf2.type === "synth") bg = 135;
+        if (score >= 25) bg -= 5;
+        if (score >= 50) bg -= 10;
+        if (score >= 100) bg -= 10;
+        const bottomStart = p.top + bg;
+        ctx.fillStyle = gradBottom;
+        ctx.fillRect(p.x, bottomStart, PIPE_WIDTH, canvas.height - bottomStart);
+        ctx.fillStyle = "#e0ffff";
         ctx.beginPath();
-        ctx.moveTo(p.x + 10, p.y + gap);
-        ctx.lineTo(p.x + 30, p.y + gap - 20);
-        ctx.lineTo(p.x + 50, p.y + gap);
+        ctx.moveTo(p.x + 10, bottomStart);
+        ctx.lineTo(p.x + PIPE_WIDTH / 2, bottomStart - 18);
+        ctx.lineTo(p.x + PIPE_WIDTH - 10, bottomStart);
         ctx.fill();
 
-        ctx.strokeStyle = "#5DBCD2";
+        // outline
+        ctx.strokeStyle = "#5dbcd2";
         ctx.lineWidth = 2;
-        ctx.strokeRect(p.x, -2, pipeWidth, p.y + 2);
-        ctx.strokeRect(p.x, p.y + gap, pipeWidth, canvas.height);
-      }
-    },
+        ctx.strokeRect(p.x, -2, PIPE_WIDTH, p.top + 4);
+        ctx.strokeRect(p.x, bottomStart - 2, PIPE_WIDTH, canvas.height - bottomStart + 4);
+      });
+    }
   };
 
+  // ==== BACKGROUND ====
   function drawBackground() {
-    const map = getEquippedMap();
+    const mapConf = getMap(equippedMapId);
     const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    grad.addColorStop(0, map.gradient[0]);
-    grad.addColorStop(1, map.gradient[1]);
+    grad.addColorStop(0, mapConf.gradient[0]);
+    grad.addColorStop(1, mapConf.gradient[1]);
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Neon grid on synth map
-    if (map.id === "synth") {
-      ctx.save();
-      ctx.strokeStyle = "rgba(255,255,255,0.12)";
-      ctx.lineWidth = 1;
-      const step = 20;
-      for (let x = 0; x < canvas.width; x += step) {
+    if (mapConf.type === "day") {
+      ctx.fillStyle = "rgba(255,255,255,0.9)";
+      snowflakes.forEach(f => {
         ctx.beginPath();
-        ctx.moveTo(x, canvas.height * 0.5);
-        ctx.lineTo(x + 80, canvas.height);
+        ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+        ctx.fill();
+        f.y += f.speed;
+        if (f.y > canvas.height) {
+          f.y = -5;
+          f.x = Math.random() * canvas.width;
+        }
+      });
+
+      // soft clouds
+      ctx.fillStyle = "rgba(255,255,255,0.65)";
+      for (let i = 0; i < 3; i++) {
+        const y = 40 + i * 30;
+        ctx.beginPath();
+        ctx.ellipse(80 + i * 90, y, 45, 18, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    } else if (mapConf.type === "night") {
+      starfield.forEach(st => {
+        const alpha = 0.3 + (Math.sin(st.tw + frames * 0.03) + 1) / 4;
+        ctx.fillStyle = "rgba(255,255,255," + alpha + ")";
+        ctx.beginPath();
+        ctx.arc(st.x, st.y, st.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      ctx.fillStyle = "rgba(42,45,80,0.8)";
+      ctx.fillRect(0, canvas.height - 70, canvas.width, 70);
+    } else if (mapConf.type === "blizzard") {
+      ctx.fillStyle = "rgba(255,255,255,0.95)";
+      blizzardFlakes.forEach(f => {
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+        ctx.fill();
+        f.y += f.speedY;
+        f.x -= f.speedX;
+        if (f.y > canvas.height) f.y = -5;
+        if (f.x < -5) f.x = canvas.width + 5;
+      });
+    } else if (mapConf.type === "synth") {
+      const stripeH = 3;
+      for (let y = canvas.height * 0.55; y < canvas.height; y += stripeH * 2) {
+        const t = (y - canvas.height * 0.55) / (canvas.height * 0.45);
+        ctx.fillStyle = "rgba(255, 255, 255," + (0.08 + t * 0.12) + ")";
+        ctx.fillRect(0, y, canvas.width, stripeH);
+      }
+
+      const cx = canvas.width / 2;
+      const cy = canvas.height * 0.55;
+      const maxR = canvas.width * 1.2;
+      for (let r = 20; r < maxR; r += 30) {
+        ctx.strokeStyle = "rgba(255,255,255,0.15)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, r, r * 0.4, 0, 0, Math.PI * 2);
         ctx.stroke();
       }
-      ctx.restore();
     }
-
-    // Clouds
-    ctx.save();
-    ctx.fillStyle = "rgba(255,255,255,0.7)";
-    clouds.forEach(c => {
-      ctx.globalAlpha = c.alpha;
-      ctx.beginPath();
-      ctx.ellipse(c.x, c.y, c.w / 2, c.h / 2, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      c.x -= c.speed;
-      if (c.x + c.w < 0) {
-        c.x = canvas.width + c.w;
-        c.y = Math.random() * (canvas.height * 0.4);
-      }
-    });
-    ctx.restore();
-
-    // Snow
-    ctx.fillStyle = "rgba(255,255,255,0.9)";
-    snowflakes.forEach(f => {
-      ctx.beginPath();
-      ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
-      ctx.fill();
-
-      f.y += f.speed;
-      f.x += Math.sin((f.y + performance.now() * 0.002)) * 0.2;
-
-      if (f.y > canvas.height) {
-        f.y = -5;
-        f.x = Math.random() * canvas.width;
-      }
-    });
   }
 
-  /* POWERUPS IN-RUN (NOT TRIGGERED IN THIS BUILD, LEFT FOR FUTURE) */
-  const activeEffects = {
-    god: 0,
-    slow: 0,
-    magnet: 0,
-    shrink: 0,
-    clone: 0,
-    autopilot: false,
-  };
+  // ==== PREVIEW LOOP (MENU) ====
+  function drawPreview() {
+    const mapConf = getMap(equippedMapId);
+    const grad = pctx.createLinearGradient(0, 0, 0, previewCanvas.height);
+    grad.addColorStop(0, mapConf.gradient[0]);
+    grad.addColorStop(1, mapConf.gradient[1]);
+    pctx.fillStyle = grad;
+    pctx.fillRect(0, 0, previewCanvas.width, previewCanvas.height);
 
-  function updatePowerupTimers(deltaSec) {
-    if (activeEffects.god > 0) activeEffects.god = Math.max(0, activeEffects.god - deltaSec);
-    if (activeEffects.slow > 0) activeEffects.slow = Math.max(0, activeEffects.slow - deltaSec);
-    if (activeEffects.magnet > 0) activeEffects.magnet = Math.max(0, activeEffects.magnet - deltaSec);
-    if (activeEffects.shrink > 0) activeEffects.shrink = Math.max(0, activeEffects.shrink - deltaSec);
-    if (activeEffects.clone > 0) activeEffects.clone = Math.max(0, activeEffects.clone - deltaSec);
-    if (activeEffects.autopilot && isGameOver) activeEffects.autopilot = false;
-    updatePowerupHud();
+    // little clouds
+    pctx.fillStyle = "rgba(255,255,255,0.7)";
+    pctx.beginPath();
+    pctx.ellipse(30, 18, 18, 8, 0, 0, Math.PI * 2);
+    pctx.fill();
+    pctx.beginPath();
+    pctx.ellipse(80, 22, 22, 10, 0, 0, Math.PI * 2);
+    pctx.fill();
+
+    // small pipes
+    pctx.fillStyle = "#4dd0e1";
+    pctx.fillRect(82, 0, 14, 20);
+    pctx.fillRect(82, 46, 14, 34);
+
+    // mini penguin hover
+    const miniY = previewCanvas.height / 2 + Math.sin(frames * 0.15) * 4;
+    pctx.save();
+    pctx.translate(40, miniY);
+    const skin = getSkin(equippedSkinId);
+    pctx.fillStyle = skin.body;
+    pctx.beginPath();
+    pctx.ellipse(0, 0, 10, 12, 0, 0, Math.PI * 2);
+    pctx.fill();
+    pctx.fillStyle = "#ffffff";
+    pctx.beginPath();
+    pctx.ellipse(-1, 1, 7, 9, 0, 0, Math.PI * 2);
+    pctx.fill();
+    pctx.fillStyle = "#ffffff";
+    pctx.beginPath();
+    pctx.arc(4, -4, 3, 0, Math.PI * 2);
+    pctx.fill();
+    pctx.fillStyle = "#000000";
+    pctx.beginPath();
+    pctx.arc(4.8, -4, 1, 0, Math.PI * 2);
+    pctx.fill();
+    pctx.fillStyle = skin.beak;
+    pctx.beginPath();
+    pctx.moveTo(6, -1);
+    pctx.lineTo(11, 1);
+    pctx.lineTo(6, 3);
+    pctx.fill();
+    pctx.restore();
   }
 
-  function updatePowerupHud() {
-    powerupHud.innerHTML = "";
-    function addIcon(label, remaining) {
-      const div = document.createElement("div");
-      div.className = "powerup-icon";
-      div.textContent = label;
-      const timer = document.createElement("div");
-      timer.className = "powerup-timer";
-      timer.textContent = remaining > 0 ? Math.ceil(remaining) : "";
-      div.appendChild(timer);
-      powerupHud.appendChild(div);
-    }
-    if (activeEffects.god > 0) addIcon("G", activeEffects.god);
-    if (activeEffects.slow > 0) addIcon("S", activeEffects.slow);
-    if (activeEffects.magnet > 0) addIcon("M", activeEffects.magnet);
-    if (activeEffects.shrink > 0) addIcon("H", activeEffects.shrink);
-    if (activeEffects.clone > 0) addIcon("C", activeEffects.clone);
-    if (activeEffects.autopilot) addIcon("A", 0);
-  }
-
+  // ==== GAME LOOP ====
   let lastFrameTime = performance.now();
 
   function loop(now) {
-    if (!isRunning) {
-      lastFrameTime = now || performance.now();
+    if (!running) {
+      frames++;
+      drawBackground();
+      penguin.draw(ctx);
+      drawPreview();
+      requestAnimationFrame(loop);
       return;
     }
+
     const dt = (now - lastFrameTime) / 1000 || 0;
     lastFrameTime = now;
-
-    const timeScale = activeEffects.slow > 0 ? 0.4 : 1.0;
-    const effectiveDt = dt * timeScale;
-    updatePowerupTimers(effectiveDt);
+    frames++;
 
     if (!startedFlight) {
-      penguin.y = canvas.height / 2 + Math.sin(frames * 0.08) * 10;
+      penguin.y = canvas.height * 0.45 + Math.sin(frames * 0.12) * 10;
       penguin.velocity = 0;
-    } else if (activeEffects.autopilot && !isGameOver) {
-      penguin.velocity = Math.sin(frames * 0.15) * -4;
-      penguin.y += penguin.velocity;
-      if (penguin.y < penguin.radius) penguin.y = penguin.radius;
-      if (penguin.y > canvas.height - penguin.radius) penguin.y = canvas.height - penguin.radius;
-      penguin.rotation = penguin.velocity * 0.1;
     } else {
       penguin.update();
-    }
-
-    if (startedFlight) {
       pipes.update();
     }
-
-    frames++;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBackground();
     pipes.draw();
+    penguin.draw(ctx);
 
-    if (activeEffects.god > 0) {
-      ctx.save();
-      ctx.globalAlpha = 0.25;
-      ctx.fillStyle = "#ffd600";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.restore();
+    if (!gameOver) {
+      requestAnimationFrame(loop);
     }
-
-    penguin.draw();
-
-    if (!isGameOver) requestAnimationFrame(loop);
   }
 
   function triggerGameOver() {
-    if (isGameOver) return;
-    if (activeEffects.god > 0) return;
-    isGameOver = true;
-    isRunning = false;
-
+    if (gameOver) return;
+    gameOver = true;
+    running = false;
     playSfx(sfxHit);
-    tryVibrate([60, 60, 60]);
+    tryVibrate([80, 80, 80]);
 
     if (!ultraLives) {
       lives = Math.max(0, lives - 1);
+      lastLifeTime = Date.now();
     }
-    lastLifeTimestamp = Date.now();
-    runsToday += 1;
-    runsTodayDate = todayStr();
     saveMeta();
-    updateLivesUI();
+    updateMetaUI();
 
     finalScoreEl.textContent = score;
     if (score > highScore) {
       highScore = score;
-      localStorage.setItem("waddleHighScore", String(highScore));
+      localStorage.setItem("ww_highScore", String(highScore));
     }
     bestScoreEl.textContent = highScore;
     livesLeftLabel.textContent = ultraLives ? "∞" : lives;
 
-    checkMissionsCompletion();
-    saveMeta();
-
-    gameOverScreen.classList.remove("hidden");
+    hideAllCards();
+    cardGameOver.classList.add("visible");
   }
 
-  function startRun() {
-    regenLives();
-    updateLivesUI();
-
-    if (!ultraLives && lives <= 0) {
-      noLivesScreen.classList.remove("hidden");
-      return;
-    }
-
-    hubOverlay.classList.add("hidden");
-    gameOverScreen.classList.add("hidden");
-    noLivesScreen.classList.add("hidden");
-    fakeAdScreen.classList.add("hidden");
-
-    isGameOver = false;
-    isRunning = true;
-    startedFlight = false;
-    score = 0;
-    frames = 0;
-    scoreEl.textContent = score;
-    penguin.reset();
-    pipes.reset();
-    initSnow();
-    initClouds();
-    ensureMusicPlaying();
-    lastFrameTime = performance.now();
-    requestAnimationFrame(loop);
-  }
-
-  function handleFlapInput(e) {
-    if (e && e.type === "keydown" && e.code === "Space") {
-      e.preventDefault();
-    }
-    if (!isRunning || isGameOver) return;
+  // ==== CONTROLS ====
+  function handleFlap(e) {
+    if (e && e.type === "keydown" && e.code !== "Space") return;
+    if (e && e.type === "keydown") e.preventDefault();
+    if (!running || gameOver) return;
 
     if (!startedFlight) {
       startedFlight = true;
@@ -2252,111 +1744,86 @@
       return;
     }
 
-    if (!activeEffects.autopilot) {
-      penguin.flap();
-      playSfx(sfxFlap);
-    }
+    penguin.flap();
+    playSfx(sfxFlap);
   }
 
-  window.addEventListener("keydown", e => {
-    if (e.code === "Space") handleFlapInput(e);
-  });
-
-  canvas.addEventListener("mousedown", handleFlapInput);
+  window.addEventListener("keydown", handleFlap);
+  canvas.addEventListener("mousedown", handleFlap);
   canvas.addEventListener("touchstart", e => {
     e.preventDefault();
-    handleFlapInput(e);
+    handleFlap(e);
   }, { passive: false });
 
-  /* HUB BUTTONS & PANELS */
-  btnPlay.addEventListener("click", () => startRun());
-  btnSkins.addEventListener("click", () => { renderSkinsPanel(); skinsPanel.classList.remove("hidden"); });
-  btnMaps.addEventListener("click", () => { renderMapsPanel(); mapsPanel.classList.remove("hidden"); });
-  btnModes.addEventListener("click", () => { renderModesPanel(); modesPanel.classList.remove("hidden"); });
-  btnStore.addEventListener("click", () => {
-    renderStoreCosmetics();
-    renderStorePremium();
-    renderStoreCurrency();
-    storePanel.classList.remove("hidden");
-  });
-  btnSettings.addEventListener("click", () => { settingsPanel.classList.remove("hidden"); });
-  btnMissions.addEventListener("click", () => {
-    checkMissionsCompletion();
-    renderMissionsPanel();
-    missionsPanel.classList.remove("hidden");
-  });
-  btnDaily.addEventListener("click", () => { updateDailyPanel(); dailyPanel.classList.remove("hidden"); });
+  // ==== START / RESTART ====
+  function startRun() {
+    updateLivesFromTime();
+    updateMetaUI();
 
-  document.querySelectorAll("[data-panel-close]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const id = btn.getAttribute("data-panel-close");
-      const panel = document.getElementById(id);
-      if (panel) panel.classList.add("hidden");
-    });
-  });
-
-  restartBtn.addEventListener("click", () => {
     if (!ultraLives && lives <= 0) {
-      gameOverScreen.classList.add("hidden");
-      noLivesScreen.classList.remove("hidden");
+      hideAllCards();
+      cardNoLives.classList.add("visible");
+      return;
+    }
+
+    hubOverlay.classList.add("hidden");
+    hideAllCards();
+
+    running = true;
+    gameOver = false;
+    startedFlight = false;
+    score = 0;
+    frames = 0;
+    scoreEl.textContent = "0";
+
+    penguin.reset();
+    pipes.reset();
+    initSnow();
+    initBlizzard();
+    initStars();
+    ensureMusic();
+    lastFrameTime = performance.now();
+    requestAnimationFrame(loop);
+  }
+
+  btnPlay.addEventListener("click", () => {
+    playSfx(sfxUi);
+    startRun();
+  });
+
+  btnRestart.addEventListener("click", () => {
+    playSfx(sfxUi);
+    if (!ultraLives && lives <= 0) {
+      hideAllCards();
+      cardNoLives.classList.add("visible");
     } else {
-      gameOverScreen.classList.add("hidden");
+      hideAllCards();
       startRun();
     }
   });
 
-  backMenuBtn.addEventListener("click", () => {
-    gameOverScreen.classList.add("hidden");
+  btnBackMenu.addEventListener("click", () => {
+    playSfx(sfxUi);
+    hideAllCards();
+    running = false;
+    gameOver = false;
     hubOverlay.classList.remove("hidden");
     stopMusic();
   });
 
-  backFromNoLivesBtn.addEventListener("click", () => {
-    noLivesScreen.classList.add("hidden");
+  btnNoLivesMenu.addEventListener("click", () => {
+    playSfx(sfxUi);
+    hideAllCards();
+    running = false;
+    gameOver = false;
     hubOverlay.classList.remove("hidden");
     stopMusic();
   });
 
-  /* AUDIO TOGGLES */
-  btnToggleMusic.addEventListener("click", () => {
-    musicOn = musicOn === "true" ? "false" : "true";
-    saveMeta();
-    updateAudioStatusUI();
-    if (musicOn === "true") ensureMusicPlaying();
-    else stopMusic();
-  });
-
-  btnToggleSfx.addEventListener("click", () => {
-    sfxOn = sfxOn === "true" ? "false" : "true";
-    saveMeta();
-    updateAudioStatusUI();
-  });
-
-  btnToggleVibrate.addEventListener("click", () => {
-    vibrateOn = vibrateOn === "true" ? "false" : "true";
-    saveMeta();
-    updateAudioStatusUI();
-  });
-
-  /* Fake rewarded ad / bonus life */
-  watchAdBtn.addEventListener("click", () => {
-    if (removeAds) {
-      lives = Math.min(MAX_LIVES, lives + 1);
-      lastLifeTimestamp = Date.now();
-      saveMeta();
-      updateLivesUI();
-      alert("Ad-free upgrade: +1 bonus life.");
-      noLivesScreen.classList.add("hidden");
-      hubOverlay.classList.remove("hidden");
-      return;
-    }
-
-    noLivesScreen.classList.add("hidden");
-    fakeAdScreen.classList.remove("hidden");
-    runFakeAd();
-  });
-
-  function runFakeAd() {
+  // ==== FAKE REWARDED AD ====
+  function runFakeAd(onComplete) {
+    hideAllCards();
+    cardFakeAd.classList.add("visible");
     let duration = 5;
     let remaining = duration;
     fakeAdBar.style.width = "0%";
@@ -2367,31 +1834,126 @@
       const pct = ((duration - remaining) / duration) * 100;
       fakeAdBar.style.width = pct + "%";
       fakeAdTimer.textContent = `${Math.max(remaining, 0)}s remaining`;
-
       if (remaining <= 0) {
         clearInterval(interval);
         setTimeout(() => {
-          fakeAdScreen.classList.add("hidden");
-          lives = Math.min(MAX_LIVES, lives + 1);
-          lastLifeTimestamp = Date.now();
-          saveMeta();
-          updateLivesUI();
-          alert("Thanks for watching! +1 life added.");
-          hubOverlay.classList.remove("hidden");
-        }, 300);
+          cardFakeAd.classList.remove("visible");
+          if (onComplete) onComplete();
+        }, 200);
       }
     }, 1000);
   }
 
-  /* FIRST RENDER */
-  updateHubView();
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  btnWatchAd.addEventListener("click", () => {
+    playSfx(sfxUi);
+    if (removeAds) {
+      lives = Math.min(MAX_LIVES, lives + 1);
+      lastLifeTime = Date.now();
+      saveMeta();
+      updateMetaUI();
+      hideAllCards();
+      showMessage("Ad-free user: +1 life bonus instantly added.");
+      return;
+    }
+    runFakeAd(() => {
+      lives = Math.min(MAX_LIVES, lives + 1);
+      lastLifeTime = Date.now();
+      saveMeta();
+      updateMetaUI();
+      showMessage("Thanks for watching! +1 life added.");
+      hideAllCards();
+      cardNoLives.classList.remove("visible");
+      hubOverlay.classList.remove("hidden");
+    });
+  });
+
+  // ==== PANELS OPEN/CLOSE ====
+  document.querySelectorAll("[data-panel-close]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-panel-close");
+      const panel = document.getElementById(id);
+      if (panel) panel.classList.remove("visible");
+      playSfx(sfxUi);
+    });
+  });
+
+  btnStore.addEventListener("click", () => {
+    playSfx(sfxUi);
+    renderStoreSkins(storeSkinsList);
+    renderStoreMaps(storeMapsList);
+    renderStoreUpgrades();
+    renderStoreCoins();
+    panelStore.classList.add("visible");
+  });
+
+  iconSettings.addEventListener("click", () => {
+    playSfx(sfxUi);
+    panelSettings.classList.add("visible");
+    btnToggleMusic.textContent = musicOn === "true" ? "ON" : "OFF";
+    btnToggleSfx.textContent = sfxOn === "true" ? "ON" : "OFF";
+    btnToggleVibrate.textContent = vibrateOn === "true" ? "ON" : "OFF";
+  });
+
+  iconMaps.addEventListener("click", () => {
+    playSfx(sfxUi);
+    renderMapsPanel();
+    panelMaps.classList.add("visible");
+  });
+
+  iconSkins.addEventListener("click", () => {
+    playSfx(sfxUi);
+    renderSkinsPanel();
+    panelSkins.classList.add("visible");
+  });
+
+  iconDaily.addEventListener("click", () => {
+    playSfx(sfxUi);
+    refreshDailyPanel();
+    panelDaily.classList.add("visible");
+  });
+
+  iconReset.addEventListener("click", () => {
+    playSfx(sfxUi);
+    showConfirm("Reset all progress, coins, cosmetics and upgrades?\nThis cannot be undone.", () => {
+      localStorage.clear();
+      location.reload();
+    });
+  });
+
+  iconRestore.addEventListener("click", () => {
+    playSfx(sfxUi);
+    showMessage("Restore Purchases\n\nIn a real build this would query Google Play Billing.\nFor this test version, purchases are already stored locally.");
+  });
+
+  // ==== SETTINGS BUTTONS ====
+  btnToggleMusic.addEventListener("click", () => {
+    musicOn = musicOn === "true" ? "false" : "true";
+    btnToggleMusic.textContent = musicOn === "true" ? "ON" : "OFF";
+    saveMeta();
+    if (musicOn === "true") ensureMusic(); else stopMusic();
+  });
+
+  btnToggleSfx.addEventListener("click", () => {
+    sfxOn = sfxOn === "true" ? "false" : "true";
+    btnToggleSfx.textContent = sfxOn === "true" ? "ON" : "OFF";
+    saveMeta();
+  });
+
+  btnToggleVibrate.addEventListener("click", () => {
+    vibrateOn = vibrateOn === "true" ? "false" : "true";
+    btnToggleVibrate.textContent = vibrateOn === "true" ? "ON" : "OFF";
+    saveMeta();
+  });
+
+  // ==== FIRST RENDER ====
   initSnow();
-  initClouds();
-  drawBackground();
+  initBlizzard();
+  initStars();
   penguin.reset();
-  penguin.draw();
-  updateAudioStatusUI();
+  drawBackground();
+  penguin.draw(ctx);
+  drawPreview();
+  updateMetaUI();
 
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
@@ -2400,4 +1962,4 @@
   }
 </script>
 </body>
-  </html>
+</html>
