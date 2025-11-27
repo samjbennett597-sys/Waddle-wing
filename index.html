@@ -1,190 +1,1140 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Waddle Wings Universe</title>
 
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
-    body {
-        margin: 0;
-        padding: 0;
-        background: radial-gradient(circle at center, #1a1a1a, #000000 80%);
-        font-family: 'Press Start 2P', cursive;
-        overflow: hidden;
-        color: #8af2ff;
-    }
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
 
-    canvas {
-        position: absolute;
-        top: 0; left: 0;
-        width: 100vw; height: 100vh;
-        z-index: 0;
-    }
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Press Start 2P', cursive;
+  background: #000;
+  overflow: hidden;
+  color: #8af2ff;
+}
 
-    /* ----- MENU ----- */
-    #ui {
-        position: absolute;
-        top: 50%; left: 50%;
-        transform: translate(-50%, -50%);
-        text-align: center;
-        z-index: 10;
-        width: 100%;
-    }
+/* Canvas */
 
-    .title {
-        font-size: 22px;
-        margin-bottom: 25px;
-        color: #8af2ff;
-        text-shadow: 0 0 10px #00eaff;
-    }
+#game {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+}
 
-    .big-btn {
-        display: block;
-        width: 70%;
-        margin: 20px auto;
-        padding: 20px;
-        border: 4px solid #8af2ff;
-        color: #8af2ff;
-        background: rgba(0, 0, 0, 0.3);
-        font-size: 22px;
-        border-radius: 8px;
-        transition: 0.2s;
-    }
+/* HUD */
 
-    .big-btn:hover {
-        background: rgba(0, 255, 255, 0.2);
-        transform: scale(1.05);
-    }
+#hud {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 5;
+  font-size: 10px;
+  text-shadow: 0 0 8px #000;
+}
 
-    .small-row {
-        margin-top: 40px;
-        display: flex;
-        justify-content: center;
-        gap: 40px;
-    }
+#hud span {
+  display: block;
+}
 
-    .small-btn {
-        width: 55px;
-        height: 55px;
-        border-radius: 10px;
-        border: 3px solid #8af2ff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(0,0,0,0.3);
-        transition: 0.2s;
-    }
+/* Main menu */
 
-    .small-btn:hover {
-        transform: scale(1.15);
-        background: rgba(0,255,255,0.2);
-    }
+#ui {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  max-width: 480px;
+  text-align: center;
+  z-index: 10;
+  pointer-events: auto;
+}
 
-    .hidden { display: none; }
+.title {
+  font-size: 18px;
+  margin-bottom: 18px;
+  color: #8af2ff;
+  text-shadow: 0 0 12px #00eaff;
+}
+
+.subtitle {
+  font-size: 8px;
+  opacity: 0.8;
+  margin-bottom: 20px;
+}
+
+.big-btn {
+  display: block;
+  width: 70%;
+  margin: 12px auto;
+  padding: 18px 10px;
+  border-radius: 10px;
+  border: 3px solid #8af2ff;
+  background: rgba(0,0,0,0.5);
+  color: #8af2ff;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(0,255,255,0.3);
+  transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+}
+
+.big-btn:active {
+  transform: translateY(2px) scale(0.98);
+  box-shadow: 0 0 4px rgba(0,255,255,0.2);
+  background: rgba(0,0,0,0.8);
+}
+
+.small-row {
+  margin-top: 22px;
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+}
+
+.icon-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  border: 2px solid #8af2ff;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(0,255,255,0.25);
+  transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+}
+
+.icon-btn:active {
+  transform: translateY(2px) scale(0.95);
+  box-shadow: 0 0 4px rgba(0,255,255,0.2);
+  background: rgba(0,0,0,0.9);
+}
+
+/* Center card (game over) */
+
+.center-card {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 220px;
+  padding: 18px 16px;
+  border-radius: 12px;
+  background: rgba(0,0,0,0.9);
+  border: 3px solid #8af2ff;
+  color: #8af2ff;
+  text-align: center;
+  z-index: 15;
+  font-size: 10px;
+}
+
+.center-card h2 {
+  margin: 0 0 10px;
+  font-size: 14px;
+}
+
+.center-card button {
+  margin: 8px 6px 0;
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 2px solid #8af2ff;
+  background: rgba(0,0,0,0.7);
+  color: #8af2ff;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 9px;
+  cursor: pointer;
+}
+
+/* Modals (store, levels, skins, settings) */
+
+.modal {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 480px;
+  max-height: 80%;
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(0,0,0,0.96);
+  border: 3px solid #8af2ff;
+  color: #8af2ff;
+  z-index: 20;
+  overflow-y: auto;
+  font-size: 9px;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.modal-title {
+  font-size: 11px;
+}
+
+.modal-close {
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.section-title {
+  margin: 10px 0 4px;
+  font-size: 9px;
+  opacity: 0.8;
+}
+
+.item {
+  border: 2px solid #8af2ff;
+  border-radius: 8px;
+  padding: 8px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.item-main {
+  text-align: left;
+}
+
+.item-name {
+  font-size: 9px;
+  margin-bottom: 3px;
+}
+
+.item-desc {
+  font-size: 8px;
+  opacity: 0.8;
+}
+
+.item-btn {
+  align-self: center;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 2px solid #8af2ff;
+  background: rgba(0,0,0,0.8);
+  color: #8af2ff;
+  font-size: 8px;
+  cursor: pointer;
+}
+
+/* Utility */
+
+.hidden {
+  display: none !important;
+}
 </style>
 </head>
 
 <body>
-
 <canvas id="game"></canvas>
 
+<div id="hud">
+  <span id="hudScore">SCORE: 0</span>
+  <span id="hudCoins">COINS: 0</span>
+  <span id="hudLevel">LEVEL: NORMAL</span>
+</div>
+
+<!-- MAIN MENU -->
 <div id="ui">
-    <div class="title">WADDLE WINGS UNIVERSE</div>
+  <div class="title">WADDLE WINGS</div>
+  <div class="subtitle">Tap to flap • Dodge the pipes • Grind coins • Flex skins</div>
 
-    <button id="playBtn" class="big-btn">PLAY</button>
-    <button id="storeBtn" class="big-btn">STORE</button>
+  <button id="playBtn" class="big-btn">PLAY</button>
+  <button id="storeBtn" class="big-btn">STORE</button>
 
-    <div class="small-row">
-        <div class="small-btn" id="levelsBtn">🗺</div>
-        <div class="small-btn" id="skinsBtn">🎨</div>
-        <div class="small-btn" id="missionsBtn">⭐</div>
-        <div class="small-btn" id="dailyBtn">🎁</div>
-        <div class="small-btn" id="settingsBtn">⚙</div>
+  <div class="small-row">
+    <button id="levelsBtn" class="icon-btn" title="Levels">🗺</button>
+    <button id="skinsBtn" class="icon-btn" title="Skins">🎨</button>
+    <button id="settingsBtn" class="icon-btn" title="Settings">⚙</button>
+  </div>
+</div>
+
+<!-- GAME OVER CARD -->
+<div id="gameOverCard" class="center-card hidden">
+  <h2>GAME OVER</h2>
+  <p id="goScore">Score: 0</p>
+  <p id="goBest">Best: 0</p>
+  <button id="goAgainBtn">PLAY AGAIN</button>
+  <button id="goMenuBtn">BACK TO MENU</button>
+</div>
+
+<!-- STORE MODAL -->
+<div id="storeModal" class="modal hidden">
+  <div class="modal-header">
+    <div class="modal-title">STORE</div>
+    <div class="modal-close" data-close="storeModal">✖</div>
+  </div>
+  <div id="storeCoinsLabel" style="margin-bottom:8px;">Coins: 0</div>
+
+  <div class="section-title">Skins</div>
+  <div id="storeSkins"></div>
+
+  <div class="section-title">Levels</div>
+  <div id="storeLevels"></div>
+
+  <div class="section-title">Coin Packs</div>
+  <div id="storeCoins"></div>
+
+  <div class="section-title">Account</div>
+  <div class="item">
+    <div class="item-main">
+      <div class="item-name">Reset Progress</div>
+      <div class="item-desc">Clear coins, unlocks and scores (no undo).</div>
     </div>
+    <button class="item-btn" id="btnResetProgress">RESET</button>
+  </div>
+  <div class="item">
+    <div class="item-main">
+      <div class="item-name">Restore Purchases</div>
+      <div class="item-desc">Placeholder – wire this to real billing later.</div>
+    </div>
+    <button class="item-btn" id="btnRestore">RESTORE</button>
+  </div>
+</div>
+
+<!-- LEVELS MODAL -->
+<div id="levelsModal" class="modal hidden">
+  <div class="modal-header">
+    <div class="modal-title">LEVELS</div>
+    <div class="modal-close" data-close="levelsModal">✖</div>
+  </div>
+  <p style="margin-bottom:8px;">Pick your vibe. Some levels need unlocking in the store.</p>
+  <div id="levelsList"></div>
+</div>
+
+<!-- SKINS MODAL -->
+<div id="skinsModal" class="modal hidden">
+  <div class="modal-header">
+    <div class="modal-title">SKINS</div>
+    <div class="modal-close" data-close="skinsModal">✖</div>
+  </div>
+  <p style="margin-bottom:8px;">Equip any skin you own. Buy more in the store.</p>
+  <div id="skinsList"></div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div id="settingsModal" class="modal hidden">
+  <div class="modal-header">
+    <div class="modal-title">SETTINGS</div>
+    <div class="modal-close" data-close="settingsModal">✖</div>
+  </div>
+  <div class="section-title">Audio</div>
+  <div class="item">
+    <div class="item-main">
+      <div class="item-name">Music</div>
+      <div class="item-desc">Retro hum during menus and runs.</div>
+    </div>
+    <button class="item-btn" id="btnMusicToggle">ON</button>
+  </div>
+  <div class="item">
+    <div class="item-main">
+      <div class="item-name">Sound FX</div>
+      <div class="item-desc">Flaps, hits and points.</div>
+    </div>
+    <button class="item-btn" id="btnSfxToggle">ON</button>
+  </div>
 </div>
 
 <script>
-/* ========= CANVAS SETUP ========= */
+/* ========== CANVAS SETUP ========== */
 
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
 function resize() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
 }
-resize();
 window.addEventListener("resize", resize);
+resize();
 
-/* ========= BACKGROUND ANIMATION ========= */
+/* ========== DOM REFS ========== */
+
+const ui = document.getElementById("ui");
+const playBtn = document.getElementById("playBtn");
+const storeBtn = document.getElementById("storeBtn");
+const levelsBtn = document.getElementById("levelsBtn");
+const skinsBtn = document.getElementById("skinsBtn");
+const settingsBtn = document.getElementById("settingsBtn");
+
+const hudScore = document.getElementById("hudScore");
+const hudCoins = document.getElementById("hudCoins");
+const hudLevel = document.getElementById("hudLevel");
+
+const gameOverCard = document.getElementById("gameOverCard");
+const goScore = document.getElementById("goScore");
+const goBest = document.getElementById("goBest");
+const goAgainBtn = document.getElementById("goAgainBtn");
+const goMenuBtn = document.getElementById("goMenuBtn");
+
+const storeModal = document.getElementById("storeModal");
+const storeCoinsLabel = document.getElementById("storeCoinsLabel");
+const storeSkinsBox = document.getElementById("storeSkins");
+const storeLevelsBox = document.getElementById("storeLevels");
+const storeCoinsBox = document.getElementById("storeCoins");
+const btnResetProgress = document.getElementById("btnResetProgress");
+const btnRestore = document.getElementById("btnRestore");
+
+const levelsModal = document.getElementById("levelsModal");
+const levelsList = document.getElementById("levelsList");
+
+const skinsModal = document.getElementById("skinsModal");
+const skinsList = document.getElementById("skinsList");
+
+const settingsModal = document.getElementById("settingsModal");
+const btnMusicToggle = document.getElementById("btnMusicToggle");
+const btnSfxToggle = document.getElementById("btnSfxToggle");
+
+/* Close buttons */
+document.querySelectorAll(".modal-close").forEach(el => {
+  el.addEventListener("click", () => {
+    const id = el.getAttribute("data-close");
+    if (id) document.getElementById(id).classList.add("hidden");
+  });
+});
+
+/* ========== AUDIO ========== */
+
+const music = new Audio("https://cdn.pixabay.com/download/audio/2023/03/24/audio_998846a51f.mp3?filename=arcade-type-loop-141064.mp3");
+music.loop = true;
+music.volume = 0.3;
+
+const flapSFX = new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
+const hitSFX  = new Audio("https://actions.google.com/sounds/v1/impacts/wood_hit_1.ogg");
+const pointSFX = new Audio("https://actions.google.com/sounds/v1/cartoon/pop.ogg");
+
+let musicOn = localStorage.getItem("ww_musicOn");
+if (musicOn === null) musicOn = "true";
+
+let sfxOn = localStorage.getItem("ww_sfxOn");
+if (sfxOn === null) sfxOn = "true";
+
+function playSfx(s) {
+  if (sfxOn !== "true") return;
+  try { s.currentTime = 0; s.play(); } catch(e) {}
+}
+
+function ensureMusic() {
+  if (musicOn === "true") {
+    music.play().catch(()=>{});
+  } else {
+    music.pause();
+  }
+}
+
+/* ========== ECONOMY / UNLOCKS ========== */
+
+let coins = parseInt(localStorage.getItem("ww_coins") || "0", 10) || 0;
+let bestScore = parseInt(localStorage.getItem("ww_bestScore") || "0", 10) || 0;
+
+const SKINS = [
+  { id:"classic", name:"Classic", desc:"Default waddle hero.", cost:0 },
+  { id:"red", name:"Red Rebel", desc:"Spicy hot penguin.", cost:80 },
+  { id:"gold", name:"Gold Waddle", desc:"Because flex.", cost:200 },
+  { id:"neon", name:"Neon Cyber", desc:"90s arcade glow.", cost:150 }
+];
+
+const LEVELS = [
+  { id:"normal", name:"Snowfield", desc:"Light clouds and chill drift.", cost:0 },
+  { id:"blizzard", name:"Blizzard", desc:"Heavy snowstorm. Visibility low.", cost:60 },
+  { id:"neon", name:"Neon Nights", desc:"Purple sky and grid floor.", cost:80 },
+  { id:"lava", name:"Lava Core", desc:"Molten sky, glowing ash.", cost:100 },
+  { id:"forest", name:"Forest Dusk", desc:"Deep green haze.", cost:80 }
+];
+
+const COIN_PACKS = [
+  { id:"pack_small", name:"Small Pack", desc:"+150 coins.", amount:150, price:"£0.99" },
+  { id:"pack_med", name:"Medium Pack", desc:"+400 coins.", amount:400, price:"£2.49" },
+  { id:"pack_big", name:"Big Pack", desc:"+1000 coins.", amount:1000, price:"£4.99" }
+];
+
+let ownedSkins = JSON.parse(localStorage.getItem("ww_ownedSkins") || '["classic"]');
+let ownedLevels = JSON.parse(localStorage.getItem("ww_ownedLevels") || '["normal"]');
+
+let equippedSkin = localStorage.getItem("ww_skin") || "classic";
+let equippedLevel = localStorage.getItem("ww_level") || "normal";
+
+function saveEconomy() {
+  localStorage.setItem("ww_coins", String(coins));
+  localStorage.setItem("ww_bestScore", String(bestScore));
+  localStorage.setItem("ww_ownedSkins", JSON.stringify(ownedSkins));
+  localStorage.setItem("ww_ownedLevels", JSON.stringify(ownedLevels));
+  localStorage.setItem("ww_skin", equippedSkin);
+  localStorage.setItem("ww_level", equippedLevel);
+  localStorage.setItem("ww_musicOn", musicOn);
+  localStorage.setItem("ww_sfxOn", sfxOn);
+}
+
+/* ========== HUD UPDATE ========== */
+
+function updateHud() {
+  hudScore.textContent = "SCORE: " + score;
+  hudCoins.textContent = "COINS: " + coins;
+  const lvl = LEVELS.find(l=>l.id===equippedLevel);
+  hudLevel.textContent = "LEVEL: " + (lvl ? lvl.name.toUpperCase() : "UNKNOWN");
+}
+
+/* ========== STORE RENDERING ========== */
+
+function renderStore() {
+  storeCoinsLabel.textContent = "Coins: " + coins;
+
+  storeSkinsBox.innerHTML = "";
+  SKINS.forEach(s => {
+    const div = document.createElement("div");
+    div.className = "item";
+    const owned = ownedSkins.includes(s.id);
+
+    const main = document.createElement("div");
+    main.className = "item-main";
+    const n = document.createElement("div");
+    n.className = "item-name";
+    n.textContent = s.name + (s.id === equippedSkin ? " (equipped)" : owned ? " (owned)" : "");
+    const d = document.createElement("div");
+    d.className = "item-desc";
+    d.textContent = owned ? s.desc : s.desc + " Cost: " + s.cost + " coins.";
+    main.appendChild(n); main.appendChild(d);
+
+    const btn = document.createElement("button");
+    btn.className = "item-btn";
+
+    if (!owned && s.cost > 0) {
+      btn.textContent = "BUY";
+      btn.onclick = () => {
+        if (coins < s.cost) {
+          alert("Not enough coins.");
+          return;
+        }
+        coins -= s.cost;
+        ownedSkins.push(s.id);
+        equippedSkin = s.id;
+        saveEconomy();
+        updateHud();
+        renderStore();
+        renderSkinsModal();
+      };
+    } else {
+      if (s.id === equippedSkin) {
+        btn.textContent = "EQUIPPED";
+        btn.disabled = true;
+      } else {
+        btn.textContent = "EQUIP";
+        btn.onclick = () => {
+          equippedSkin = s.id;
+          saveEconomy();
+          renderStore();
+          renderSkinsModal();
+        };
+      }
+    }
+
+    div.appendChild(main);
+    div.appendChild(btn);
+    storeSkinsBox.appendChild(div);
+  });
+
+  storeLevelsBox.innerHTML = "";
+  LEVELS.forEach(l => {
+    const div = document.createElement("div");
+    div.className = "item";
+    const owned = ownedLevels.includes(l.id);
+
+    const main = document.createElement("div");
+    main.className = "item-main";
+    const n = document.createElement("div");
+    n.className = "item-name";
+    n.textContent = l.name + (l.id === equippedLevel ? " (selected)" : owned ? " (unlocked)" : "");
+    const d = document.createElement("div");
+    d.className = "item-desc";
+    d.textContent = owned ? l.desc : l.desc + " Cost: " + l.cost + " coins.";
+    main.appendChild(n); main.appendChild(d);
+
+    const btn = document.createElement("button");
+    btn.className = "item-btn";
+
+    if (!owned && l.cost > 0) {
+      btn.textContent = "BUY";
+      btn.onclick = () => {
+        if (coins < l.cost) {
+          alert("Not enough coins.");
+          return;
+        }
+        coins -= l.cost;
+        ownedLevels.push(l.id);
+        equippedLevel = l.id;
+        saveEconomy();
+        updateHud();
+        renderStore();
+        renderLevelsModal();
+      };
+    } else {
+      if (l.id === equippedLevel) {
+        btn.textContent = "SELECTED";
+        btn.disabled = true;
+      } else {
+        btn.textContent = "SELECT";
+        btn.onclick = () => {
+          equippedLevel = l.id;
+          saveEconomy();
+          updateHud();
+          renderStore();
+          renderLevelsModal();
+        };
+      }
+    }
+
+    div.appendChild(main);
+    div.appendChild(btn);
+    storeLevelsBox.appendChild(div);
+  });
+
+  storeCoinsBox.innerHTML = "";
+  COIN_PACKS.forEach(p => {
+    const div = document.createElement("div");
+    div.className = "item";
+
+    const main = document.createElement("div");
+    main.className = "item-main";
+    const n = document.createElement("div");
+    n.className = "item-name";
+    n.textContent = p.name;
+    const d = document.createElement("div");
+    d.className = "item-desc";
+    d.textContent = p.desc + " " + p.price + " (fake demo).";
+    main.appendChild(n); main.appendChild(d);
+
+    const btn = document.createElement("button");
+    btn.className = "item-btn";
+    btn.textContent = p.price;
+    btn.onclick = () => {
+      // Test purchase: give coins instantly
+      coins += p.amount;
+      saveEconomy();
+      updateHud();
+      renderStore();
+      alert("Test purchase: +" + p.amount + " coins added.");
+    };
+
+    div.appendChild(main);
+    div.appendChild(btn);
+    storeCoinsBox.appendChild(div);
+  });
+}
+
+/* Levels modal list */
+
+function renderLevelsModal() {
+  levelsList.innerHTML = "";
+  LEVELS.forEach(l => {
+    const div = document.createElement("div");
+    div.className = "item";
+    const owned = ownedLevels.includes(l.id);
+
+    const main = document.createElement("div");
+    main.className = "item-main";
+    const n = document.createElement("div");
+    n.className = "item-name";
+    n.textContent = l.name + (l.id === equippedLevel ? " (selected)" : "");
+    const d = document.createElement("div");
+    d.className = "item-desc";
+    d.textContent = l.desc + (owned ? "" : " – unlock in store.");
+    main.appendChild(n); main.appendChild(d);
+
+    const btn = document.createElement("button");
+    btn.className = "item-btn";
+
+    if (!owned) {
+      btn.textContent = "LOCKED";
+      btn.disabled = true;
+    } else {
+      if (l.id === equippedLevel) {
+        btn.textContent = "SELECTED";
+        btn.disabled = true;
+      } else {
+        btn.textContent = "SELECT";
+        btn.onclick = () => {
+          equippedLevel = l.id;
+          saveEconomy();
+          updateHud();
+          renderLevelsModal();
+        };
+      }
+    }
+
+    div.appendChild(main);
+    div.appendChild(btn);
+    levelsList.appendChild(div);
+  });
+}
+
+/* Skins modal list */
+
+function renderSkinsModal() {
+  skinsList.innerHTML = "";
+  SKINS.forEach(s => {
+    const div = document.createElement("div");
+    div.className = "item";
+    const owned = ownedSkins.includes(s.id);
+
+    const main = document.createElement("div");
+    main.className = "item-main";
+    const n = document.createElement("div");
+    n.className = "item-name";
+    n.textContent = s.name + (s.id === equippedSkin ? " (equipped)" : "");
+    const d = document.createElement("div");
+    d.className = "item-desc";
+    d.textContent = s.desc + (owned ? "" : " – buy in store.");
+    main.appendChild(n); main.appendChild(d);
+
+    const btn = document.createElement("button");
+    btn.className = "item-btn";
+
+    if (!owned) {
+      btn.textContent = "LOCKED";
+      btn.disabled = true;
+    } else {
+      if (s.id === equippedSkin) {
+        btn.textContent = "EQUIPPED";
+        btn.disabled = true;
+      } else {
+        btn.textContent = "EQUIP";
+        btn.onclick = () => {
+          equippedSkin = s.id;
+          saveEconomy();
+          renderSkinsModal();
+        };
+      }
+    }
+
+    div.appendChild(main);
+    div.appendChild(btn);
+    skinsList.appendChild(div);
+  });
+}
+
+/* ========== SETTINGS UI ========== */
+
+function refreshSettingsButtons() {
+  btnMusicToggle.textContent = musicOn === "true" ? "ON" : "OFF";
+  btnSfxToggle.textContent = sfxOn === "true" ? "ON" : "OFF";
+}
+
+btnMusicToggle.onclick = () => {
+  musicOn = musicOn === "true" ? "false" : "true";
+  saveEconomy();
+  refreshSettingsButtons();
+  ensureMusic();
+};
+
+btnSfxToggle.onclick = () => {
+  sfxOn = sfxOn === "true" ? "false" : "true";
+  saveEconomy();
+  refreshSettingsButtons();
+};
+
+/* ========== RESET & RESTORE ========== */
+
+btnResetProgress.onclick = () => {
+  if (!confirm("Really reset everything?")) return;
+  localStorage.removeItem("ww_coins");
+  localStorage.removeItem("ww_bestScore");
+  localStorage.removeItem("ww_ownedSkins");
+  localStorage.removeItem("ww_ownedLevels");
+  localStorage.removeItem("ww_skin");
+  localStorage.removeItem("ww_level");
+  // keep audio prefs
+  location.reload();
+};
+
+btnRestore.onclick = () => {
+  alert("This is just a demo. When you add Play Billing, hook restore logic here.");
+};
+
+/* ========== GAMEPLAY ========== */
+
+let peng = {
+  x: 0,
+  y: 0,
+  r: 18,
+  vel: 0
+};
+
+let pipes = [];
+let score = 0;
+let frame = 0;
+let running = false;
 
 let stars = [];
-for (let i = 0; i < 60; i++) {
+let snowflakes = [];
+
+function initParticles() {
+  stars = [];
+  snowflakes = [];
+  for (let i=0;i<60;i++) {
     stars.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        s: Math.random() * 2 + 1,
-        speed: Math.random() * 0.8 + 0.2
+      x: Math.random()*canvas.width,
+      y: Math.random()*canvas.height,
+      s: Math.random()*2+0.5,
+      speed: Math.random()*0.3+0.1
     });
+  }
+  for (let i=0;i<90;i++) {
+    snowflakes.push({
+      x: Math.random()*canvas.width,
+      y: Math.random()*canvas.height,
+      s: Math.random()*2+1,
+      speed: Math.random()*1+0.4
+    });
+  }
+}
+
+initParticles();
+
+/* Difficulty ramps to make grinding & coin packs desirable */
+
+function pipeSpeed() {
+  if (score < 10) return 2.6;
+  if (score < 25) return 3.2;
+  if (score < 50) return 3.8;
+  if (score < 80) return 4.4;
+  return 5.2;
+}
+
+function pipeGap() {
+  if (score < 10) return 180;
+  if (score < 25) return 165;
+  if (score < 50) return 150;
+  if (score < 80) return 140;
+  return 130;
+}
+
+/* Background & level visuals */
+
+function getLevel() {
+  return LEVELS.find(l=>l.id===equippedLevel) || LEVELS[0];
 }
 
 function drawBackground() {
-    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    gradient.addColorStop(0, "#0c1224");
-    gradient.addColorStop(1, "#04070f");
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0,0,canvas.width,canvas.height);
+  const lvl = getLevel();
+  let top, bottom;
 
-    ctx.fillStyle = "#8af2ff";
+  switch(lvl.id) {
+    case "blizzard":
+      top = "#6ea9d6"; bottom = "#1a3a57"; break;
+    case "neon":
+      top = "#240046"; bottom = "#ff0080"; break;
+    case "lava":
+      top = "#5b0000"; bottom = "#ff6b00"; break;
+    case "forest":
+      top = "#003314"; bottom = "#00663a"; break;
+    default:
+      top = "#4aa8ff"; bottom = "#dff6ff"; break;
+  }
+
+  const g = ctx.createLinearGradient(0,0,0,canvas.height);
+  g.addColorStop(0, top);
+  g.addColorStop(1, bottom);
+  ctx.fillStyle = g;
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  // Stars for neon / lava
+  if (lvl.id === "neon" || lvl.id === "lava") {
+    ctx.fillStyle = "rgba(255,255,255,0.8)";
     stars.forEach(s=>{
-        ctx.beginPath();
-        ctx.arc(s.x,s.y,s.s,0,Math.PI*2);
-        ctx.fill();
-        s.y += s.speed;
-        if (s.y > canvas.height) s.y = -5;
+      ctx.beginPath();
+      ctx.arc(s.x,s.y,s.s,0,Math.PI*2);
+      ctx.fill();
+      s.y += s.speed;
+      if (s.y > canvas.height) {
+        s.y = -5;
+        s.x = Math.random()*canvas.width;
+      }
     });
-}
+  }
 
-/* ========= GAME STATE ========= */
+  // Snow for normal (light) and blizzard (heavy)
+  if (lvl.id === "normal" || lvl.id === "blizzard") {
+    ctx.fillStyle = "rgba(255,255,255," + (lvl.id==="blizzard" ? "0.9" : "0.6") + ")";
+    snowflakes.forEach(s=>{
+      ctx.beginPath();
+      ctx.arc(s.x,s.y,s.s,0,Math.PI*2);
+      ctx.fill();
+      s.y += s.speed * (lvl.id === "blizzard" ? 1.8 : 0.9);
+      s.x += Math.sin(s.y*0.02) * (lvl.id === "blizzard" ? 1.2 : 0.4);
+      if (s.y > canvas.height+5) {
+        s.y = -10;
+        s.x = Math.random()*canvas.width;
+      }
+    });
+  }
 
-let penguin = { x:150, y:300, vel:0 };
-let pipes = [];
-let started = false;
-let gamePlaying = false;
-
-/* ========= GAME LOOP ========= */
-
-function gameLoop() {
-    drawBackground();
-
-    if (gamePlaying) {
-        penguin.vel += 0.35;
-        penguin.y += penguin.vel;
-
-        ctx.fillStyle = "#8af2ff";
-        ctx.beginPath();
-        ctx.arc(penguin.x, penguin.y, 20, 0, Math.PI*2);
-        ctx.fill();
+  // Neon grid floor
+  if (lvl.id === "neon") {
+    ctx.strokeStyle = "rgba(0,255,255,0.7)";
+    ctx.lineWidth = 1;
+    const baseY = canvas.height*0.78;
+    ctx.beginPath();
+    ctx.moveTo(0, baseY);
+    ctx.lineTo(canvas.width, baseY);
+    ctx.stroke();
+    for (let x=0;x<canvas.width;x+=40) {
+      ctx.beginPath();
+      ctx.moveTo(x, baseY);
+      ctx.lineTo(canvas.width/2, canvas.height);
+      ctx.stroke();
     }
+  }
 
-    requestAnimationFrame(gameLoop);
+  // Lava bubbles
+  if (lvl.id === "lava") {
+    ctx.fillStyle = "rgba(255,255,255,0.15)";
+    for (let i=0;i<15;i++) {
+      const y = canvas.height*0.8 + Math.sin(frame*0.05 + i)*10;
+      ctx.beginPath();
+      ctx.arc((i*40)%canvas.width,y,6,0,Math.PI*2);
+      ctx.fill();
+    }
+  }
 }
-gameLoop();
 
-/* ========= EVENT HANDLERS ========= */
+/* Penguin drawing by skin */
+
+function drawPenguin() {
+  const skin = SKINS.find(s=>s.id===equippedSkin) || SKINS[0];
+  let body, accent;
+  switch(skin.id) {
+    case "red": body = "#ff4b4b"; accent="#ffd6d6"; break;
+    case "gold": body = "#ffd700"; accent="#fff7b3"; break;
+    case "neon": body = "#00f5ff"; accent="#ffffff"; break;
+    default: body = "#1b4a7a"; accent="#ffffff"; break;
+  }
+
+  ctx.save();
+  ctx.translate(peng.x, peng.y);
+  ctx.fillStyle = body;
+  ctx.beginPath();
+  ctx.ellipse(0,0,18,23,0,0,Math.PI*2);
+  ctx.fill();
+
+  ctx.fillStyle = accent;
+  ctx.beginPath();
+  ctx.ellipse(-2,3,12,17,0,0,Math.PI*2);
+  ctx.fill();
+
+  ctx.fillStyle = "#fff";
+  ctx.beginPath();
+  ctx.arc(6,-7,5,0,Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle = "#000";
+  ctx.beginPath();
+  ctx.arc(7,-7,2,0,Math.PI*2);
+  ctx.fill();
+
+  ctx.fillStyle = "#ffb84d";
+  ctx.beginPath();
+  ctx.moveTo(10,-2);
+  ctx.lineTo(20,1);
+  ctx.lineTo(10,4);
+  ctx.fill();
+
+  ctx.restore();
+}
+
+/* Pipes */
+
+function spawnPipe() {
+  const gap = pipeGap();
+  const minTop = 40;
+  const maxTop = canvas.height - gap - 80;
+  const top = Math.random()*(maxTop - minTop) + minTop;
+  pipes.push({
+    x: canvas.width + 40,
+    top: top,
+    bottom: top + gap,
+    passed: false
+  });
+}
+
+function drawPipes() {
+  const speed = pipeSpeed();
+  ctx.fillStyle = "rgba(0,0,0,0.35)";
+  pipes.forEach(p=>{
+    // shadow
+    ctx.fillRect(p.x+6,0,60, p.top);
+    ctx.fillRect(p.x+6,p.bottom,60, canvas.height-p.bottom);
+  });
+
+  ctx.fillStyle = "#e0f6ff";
+  ctx.strokeStyle = "#8ac7ff";
+  ctx.lineWidth = 2;
+  pipes.forEach(p=>{
+    ctx.fillRect(p.x,0,60,p.top);
+    ctx.strokeRect(p.x,0,60,p.top);
+
+    ctx.fillRect(p.x,p.bottom,60,canvas.height-p.bottom);
+    ctx.strokeRect(p.x,p.bottom,60,canvas.height-p.bottom);
+
+    p.x -= speed;
+
+    if (!p.passed && p.x+60 < peng.x) {
+      p.passed = true;
+      score++;
+      coins++;          // 1 coin per pipe
+      playSfx(pointSFX);
+      if (score > bestScore) bestScore = score;
+      saveEconomy();
+      updateHud();
+    }
+  });
+
+  pipes = pipes.filter(p => p.x > -80);
+}
+
+/* Collision */
+
+function checkCollision() {
+  if (peng.y + peng.r > canvas.height || peng.y - peng.r < 0) return true;
+  for (let p of pipes) {
+    const inX = peng.x + peng.r > p.x && peng.x - peng.r < p.x + 60;
+    if (!inX) continue;
+    if (peng.y - peng.r < p.top || peng.y + peng.r > p.bottom) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/* Loop */
+
+function resetPenguin() {
+  peng.x = canvas.width*0.25;
+  peng.y = canvas.height*0.5;
+  peng.vel = 0;
+}
 
 function startGame() {
-    document.getElementById("ui").classList.add("hidden");
-    penguin.y = canvas.height / 2;
-    penguin.vel = 0;
-    gamePlaying = true;
+  ui.classList.add("hidden");
+  gameOverCard.classList.add("hidden");
+  score = 0;
+  pipes = [];
+  frame = 0;
+  resetPenguin();
+  running = true;
+  updateHud();
+  ensureMusic();
 }
 
-document.getElementById("playBtn").onclick = startGame;
-</script>
+function endGame() {
+  running = false;
+  playSfx(hitSFX);
+  saveEconomy();
+  updateHud();
 
+  goScore.textContent = "Score: " + score;
+  goBest.textContent = "Best: " + bestScore;
+  gameOverCard.classList.remove("hidden");
+}
+
+function loop() {
+  frame++;
+
+  drawBackground();
+
+  if (running) {
+    // physics
+    peng.vel += 0.35;
+    peng.y += peng.vel;
+
+    if (frame % 95 === 0) spawnPipe();
+    drawPipes();
+    drawPenguin();
+
+    if (checkCollision()) {
+      endGame();
+    }
+  } else {
+    // idle bob on menu
+    if (!ui.classList.contains("hidden")) {
+      peng.y = canvas.height*0.5 + Math.sin(frame*0.06)*10;
+      drawPenguin();
+    } else {
+      drawPenguin();
+    }
+  }
+
+  requestAnimationFrame(loop);
+}
+resetPenguin();
+updateHud();
+ensureMusic();
+refreshSettingsButtons();
+renderStore();
+renderLevelsModal();
+renderSkinsModal();
+loop();
+
+/* ========== INPUTS ========== */
+
+playBtn.onclick = startGame;
+
+storeBtn.onclick = () => {
+  renderStore();
+  storeModal.classList.remove("hidden");
+};
+
+levelsBtn.onclick = () => {
+  renderLevelsModal();
+  levelsModal.classList.remove("hidden");
+};
+
+skinsBtn.onclick = () => {
+  renderSkinsModal();
+  skinsModal.classList.remove("hidden");
+};
+
+settingsBtn.onclick = () => {
+  refreshSettingsButtons();
+  settingsModal.classList.remove("hidden");
+};
+
+goAgainBtn.onclick = () => {
+  startGame();
+};
+
+goMenuBtn.onclick = () => {
+  gameOverCard.classList.add("hidden");
+  ui.classList.remove("hidden");
+};
+
+/* Tap / click to flap */
+
+function flap() {
+  if (!running) return;
+  peng.vel = -6.2;
+  playSfx(flapSFX);
+}
+
+canvas.addEventListener("pointerdown", flap);
+window.addEventListener("keydown", e => {
+  if (e.code === "Space") {
+    e.preventDefault();
+    flap();
+  }
+});
+</script>
 </body>
 </html>
