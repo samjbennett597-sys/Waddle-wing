@@ -3,596 +3,188 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Waddle Wings – Arcade Edition</title>
-
-<!-- 90s pixel font -->
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<title>Waddle Wings Universe</title>
 
 <style>
-*{box-sizing:border-box;}
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
-body{
-  margin:0;
-  overflow:hidden;
-  background:#000;
-  font-family:"Press Start 2P", cursive;
-  color:#fff;
-}
+    body {
+        margin: 0;
+        padding: 0;
+        background: radial-gradient(circle at center, #1a1a1a, #000000 80%);
+        font-family: 'Press Start 2P', cursive;
+        overflow: hidden;
+        color: #8af2ff;
+    }
 
-/* -------------------- GAME CANVAS -------------------- */
-#gameCanvas{
-  display:block;
-  margin:0 auto;
-  background:#000;
-}
+    canvas {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100vw; height: 100vh;
+        z-index: 0;
+    }
 
-/* -------------------- UI LAYER -------------------- */
-#ui-layer{
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-}
+    /* ----- MENU ----- */
+    #ui {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        z-index: 10;
+        width: 100%;
+    }
 
-#top-icons{
-  position:absolute;
-  top:10px;
-  right:10px;
-  display:flex;
-  gap:12px;
-  pointer-events:auto;
-}
+    .title {
+        font-size: 22px;
+        margin-bottom: 25px;
+        color: #8af2ff;
+        text-shadow: 0 0 10px #00eaff;
+    }
 
-.icon-btn{
-  width:38px;
-  height:38px;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  background:rgba(0,0,0,0.55);
-  border:2px solid #fff;
-  border-radius:50%;
-  cursor:pointer;
-  font-size:18px;
-}
+    .big-btn {
+        display: block;
+        width: 70%;
+        margin: 20px auto;
+        padding: 20px;
+        border: 4px solid #8af2ff;
+        color: #8af2ff;
+        background: rgba(0, 0, 0, 0.3);
+        font-size: 22px;
+        border-radius: 8px;
+        transition: 0.2s;
+    }
 
-#score{
-  position:absolute;
-  top:10px;
-  left:10px;
-  font-size:22px;
-  text-shadow:0 0 5px #000;
-}
+    .big-btn:hover {
+        background: rgba(0, 255, 255, 0.2);
+        transform: scale(1.05);
+    }
 
-/* -------------------- MAIN MENU -------------------- */
-#main-menu{
-  position:absolute;
-  inset:0;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  background:rgba(0,0,0,0.4);
-  backdrop-filter:blur(3px);
-  pointer-events:auto;
-}
+    .small-row {
+        margin-top: 40px;
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+    }
 
-.menu-btn{
-  width:70%;
-  max-width:290px;
-  padding:20px;
-  margin:12px 0;
-  text-align:center;
-  font-size:20px;
-  color:#fff;
-  border:3px solid #fff;
-  background:#000;
-  cursor:pointer;
-  letter-spacing:2px;
-  text-shadow:0 0 6px #00f2ff;
-}
+    .small-btn {
+        width: 55px;
+        height: 55px;
+        border-radius: 10px;
+        border: 3px solid #8af2ff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0,0,0,0.3);
+        transition: 0.2s;
+    }
 
-.menu-btn:active{
-  transform:scale(0.95);
-}
+    .small-btn:hover {
+        transform: scale(1.15);
+        background: rgba(0,255,255,0.2);
+    }
 
-/* small icon row under buttons */
-#menu-icons{
-  margin-top:20px;
-  display:flex;
-  gap:18px;
-}
-
-.small-icon{
-  width:42px;
-  height:42px;
-  border:2px solid #fff;
-  border-radius:10px;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-size:20px;
-  cursor:pointer;
-}
-
-/* -------------------- STORE PANEL -------------------- */
-#store-panel{
-  position:absolute;
-  inset:0;
-  background:rgba(0,0,0,0.85);
-  display:none;
-  flex-direction:column;
-  padding:20px;
-  pointer-events:auto;
-}
-
-.store-title{
-  text-align:center;
-  font-size:18px;
-  margin-bottom:20px;
-}
-
-.store-item{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:14px 0;
-  border-bottom:1px solid #444;
-}
-
-.toggle{
-  width:55px;
-  height:28px;
-  border-radius:20px;
-  background:#333;
-  border:2px solid #777;
-  position:relative;
-  cursor:pointer;
-}
-
-.toggle-circle{
-  position:absolute;
-  top:2px;
-  left:2px;
-  width:22px;
-  height:22px;
-  border-radius:50%;
-  background:#fff;
-  transition:0.2s;
-}
-
-/* active = purchased + equipped */
-.toggle.active{
-  background:#00ff00;
-  border-color:#00ff00;
-}
-
-.toggle.active .toggle-circle{
-  left:29px;
-}
-
-#close-store{
-  margin-top:20px;
-  text-align:center;
-  padding:10px;
-  border:2px solid #fff;
-  cursor:pointer;
-}
-
-/* -------------------- GAME OVER -------------------- */
-#game-over{
-  position:absolute;
-  inset:0;
-  background:rgba(0,0,0,0.75);
-  display:none;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  pointer-events:auto;
-  text-align:center;
-}
-
-#game-over button{
-  width:60%;
-  max-width:280px;
-  padding:18px;
-  margin:10px 0;
-  font-family:"Press Start 2P";
-  border:3px solid #fff;
-  background:#000;
-  color:#fff;
-  cursor:pointer;
-}
+    .hidden { display: none; }
 </style>
 </head>
 
 <body>
 
-<canvas id="gameCanvas"></canvas>
+<canvas id="game"></canvas>
 
-<div id="ui-layer">
+<div id="ui">
+    <div class="title">WADDLE WINGS UNIVERSE</div>
 
-  <div id="score">0</div>
+    <button id="playBtn" class="big-btn">PLAY</button>
+    <button id="storeBtn" class="big-btn">STORE</button>
 
-  <div id="top-icons">
-    <div id="sound-btn" class="icon-btn">🔊</div>
-    <div id="vibrate-btn" class="icon-btn">📳</div>
-  </div>
-
-</div>
-
-<!-- -------------------- MENU -------------------- -->
-<div id="main-menu">
-  <div id="btn-play" class="menu-btn">PLAY</div>
-  <div id="btn-store" class="menu-btn">STORE</div>
-
-  <div id="menu-icons">
-    <div id="btn-reset" class="small-icon">♻️</div>
-    <div id="btn-restore" class="small-icon">💾</div>
-    <div id="btn-settings" class="small-icon">⚙️</div>
-  </div>
-</div>
-
-<!-- -------------------- STORE -------------------- -->
-<div id="store-panel">
-  <div class="store-title">STORE</div>
-
-  <div class="store-item">
-    <span>No Ads – £4.99</span>
-    <div class="toggle" id="tog-noads"><div class="toggle-circle"></div></div>
-  </div>
-
-  <div class="store-item">
-    <span>Unlimited Lives – £19.99</span>
-    <div class="toggle" id="tog-ulives"><div class="toggle-circle"></div></div>
-  </div>
-
-  <div class="store-item">
-    <span>Hard Mode Unlock – £1.99</span>
-    <div class="toggle" id="tog-hard"><div class="toggle-circle"></div></div>
-  </div>
-
-  <div id="close-store">CLOSE</div>
-</div>
-
-<!-- -------------------- GAME OVER -------------------- -->
-<div id="game-over">
-  <h2>GAME OVER</h2>
-  <p>Score: <span id="final-score">0</span></p>
-  <button id="retry-btn">RETRY</button>
-  <button id="menu-btn">MENU</button>
+    <div class="small-row">
+        <div class="small-btn" id="levelsBtn">🗺</div>
+        <div class="small-btn" id="skinsBtn">🎨</div>
+        <div class="small-btn" id="missionsBtn">⭐</div>
+        <div class="small-btn" id="dailyBtn">🎁</div>
+        <div class="small-btn" id="settingsBtn">⚙</div>
+    </div>
 </div>
 
 <script>
-/* FULL GAME SCRIPT (Optimised + 90s Arcade Edition)
-   ------------------------------------------------- 
-   This contains:
-   • moving clouds
-   • retro snow per map
-   • progressive difficulty
-   • real audio system
-   • store toggles (buy + equip)
-   • reset + restore
-   • hover start
-*/
+/* ========= CANVAS SETUP ========= */
 
-/* -------------- CANVAS SETUP -------------- */
-const canvas = document.getElementById("gameCanvas");
+const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
-function resize(){
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 }
 resize();
 window.addEventListener("resize", resize);
 
-/* -------------- AUDIO SYSTEM -------------- */
-let musicMenu = new Audio("music/arcade_menu.wav");
-let musicRun = new Audio("music/arcade_run.wav");
-let musicSnow = new Audio("music/blizzard_ambience.wav");
-let musicNeon = new Audio("music/neon_map.wav");
-let musicHard = new Audio("music/hard_mode.wav");
+/* ========= BACKGROUND ANIMATION ========= */
 
-[musicMenu, musicRun, musicSnow, musicNeon, musicHard].forEach(m=>{
-  m.loop = true;
-  m.volume = 0.6;
-});
+let stars = [];
+for (let i = 0; i < 60; i++) {
+    stars.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        s: Math.random() * 2 + 1,
+        speed: Math.random() * 0.8 + 0.2
+    });
+}
 
-let soundEnabled = true;
+function drawBackground() {
+    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    gradient.addColorStop(0, "#0c1224");
+    gradient.addColorStop(1, "#04070f");
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0,0,canvas.width,canvas.height);
 
-/* -------------- GAME VARIABLES -------------- */
-let penguin = {
-  x: 120,
-  y: 200,
-  v: 0
-};
+    ctx.fillStyle = "#8af2ff";
+    stars.forEach(s=>{
+        ctx.beginPath();
+        ctx.arc(s.x,s.y,s.s,0,Math.PI*2);
+        ctx.fill();
+        s.y += s.speed;
+        if (s.y > canvas.height) s.y = -5;
+    });
+}
 
-let gravity = 0.4;
-let flap = -7;
+/* ========= GAME STATE ========= */
 
+let penguin = { x:150, y:300, vel:0 };
 let pipes = [];
-let frames = 0;
-let score = 0;
+let started = false;
+let gamePlaying = false;
 
-let running = false;
-let hovering = true;
+/* ========= GAME LOOP ========= */
 
-let bgMode = "normal";  // normal | blizzard | neon | hard
+function gameLoop() {
+    drawBackground();
 
-/* ------------------ STORE STATE ------------------ */
-let unlock_noads = localStorage.getItem("noads") === "1";
-let unlock_ulives = localStorage.getItem("ulives") === "1";
-let unlock_hard = localStorage.getItem("hard") === "1";
+    if (gamePlaying) {
+        penguin.vel += 0.35;
+        penguin.y += penguin.vel;
 
-/* update toggles */
-function updateToggles(){
-  document.getElementById("tog-noads").classList.toggle("active", unlock_noads);
-  document.getElementById("tog-ulives").classList.toggle("active", unlock_ulives);
-  document.getElementById("tog-hard").classList.toggle("active", unlock_hard);
-}
-updateToggles();
-
-/* -------------- DRAW CLOUDS -------------- */
-let clouds = [];
-for(let i=0;i<7;i++){
-  clouds.push({
-    x: Math.random()*canvas.width,
-    y: Math.random()*canvas.height*0.5,
-    s: Math.random()*1 + 0.5
-  });
-}
-
-function drawClouds(){
-  ctx.fillStyle="rgba(255,255,255,0.7)";
-  clouds.forEach(c=>{
-    ctx.beginPath();
-    ctx.ellipse(c.x,c.y,40*c.s,20*c.s,0,0,Math.PI*2);
-    ctx.fill();
-    c.x -= 0.3*c.s;
-    if(c.x < -100){
-      c.x = canvas.width + 50;
-      c.y = Math.random()*canvas.height*0.5;
+        ctx.fillStyle = "#8af2ff";
+        ctx.beginPath();
+        ctx.arc(penguin.x, penguin.y, 20, 0, Math.PI*2);
+        ctx.fill();
     }
-  });
+
+    requestAnimationFrame(gameLoop);
+}
+gameLoop();
+
+/* ========= EVENT HANDLERS ========= */
+
+function startGame() {
+    document.getElementById("ui").classList.add("hidden");
+    penguin.y = canvas.height / 2;
+    penguin.vel = 0;
+    gamePlaying = true;
 }
 
-/* -------------- SNOW (blizzard mode) -------------- */
-let snow = [];
-for(let i=0;i<120;i++){
-  snow.push({
-    x:Math.random()*canvas.width,
-    y:Math.random()*canvas.height,
-    s:Math.random()*2+1
-  });
-}
-
-function drawSnow(){
-  ctx.fillStyle="white";
-  snow.forEach(s=>{
-    ctx.fillRect(s.x,s.y,s.s,s.s);
-    s.y+=s.s;
-    if(s.y>canvas.height){
-      s.y=-5;
-      s.x=Math.random()*canvas.width;
-    }
-  });
-}
-
-/* -------------- DRAW BACKGROUND -------------- */
-function drawBackground(){
-  if(bgMode==="normal"){
-    ctx.fillStyle="#6ecbff";
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-    drawClouds();
-  }
-  if(bgMode==="blizzard"){
-    ctx.fillStyle="#b8c6d3";
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-    drawClouds();
-    drawSnow();
-  }
-  if(bgMode==="neon"){
-    let g = ctx.createLinearGradient(0,0,0,canvas.height);
-    g.addColorStop(0,"#ff00e6");
-    g.addColorStop(1,"#0500ff");
-    ctx.fillStyle=g;
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-  }
-  if(bgMode==="hard"){
-    ctx.fillStyle="#330000";
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-    drawSnow();
-  }
-}
-
-/* -------------- DRAW PENGUIN -------------- */
-function drawPenguin(){
-  ctx.fillStyle="white";
-  ctx.beginPath();
-  ctx.arc(penguin.x, penguin.y, 18, 0, Math.PI*2);
-  ctx.fill();
-  ctx.fillStyle="orange";
-  ctx.fillRect(penguin.x-5, penguin.y+12, 10,5);
-}
-
-/* -------------- PIPES -------------- */
-function addPipe(){
-  let gap = 180 - (score*0.3); // progressive difficulty
-  if(gap<110) gap=110;
-
-  let top = Math.random()*(canvas.height-gap-80)+40;
-
-  pipes.push({
-    x:canvas.width,
-    top:top,
-    gap:gap
-  });
-}
-
-function drawPipes(){
-  ctx.fillStyle="#00ff00";
-  pipes.forEach(p=>{
-    ctx.fillRect(p.x,0,60,p.top);
-    ctx.fillRect(p.x,p.top+p.gap,60,canvas.height);
-  });
-}
-
-/* -------------- GAME LOOP -------------- */
-function loop(){
-  if(!running) return;
-
-  frames++;
-  drawBackground();
-
-  // pipes
-  if(frames%90===0) addPipe();
-  pipes.forEach(p=> p.x -= 3 + score*0.01);
-
-  drawPipes();
-
-  // penguin
-  penguin.v += gravity;
-  penguin.y += penguin.v;
-
-  if(penguin.y > canvas.height-30) endGame();
-  if(penguin.y < 20) penguin.y = 20;
-
-  drawPenguin();
-
-  // collisions
-  pipes.forEach(p=>{
-    if(p.x < penguin.x+18 && p.x+60 > penguin.x-18){
-      if(penguin.y < p.top || penguin.y > p.top+p.gap){
-        endGame();
-      }
-    }
-    if(p.x+60 < penguin.x && !p.scored){
-      p.scored=true;
-      score++;
-      document.getElementById("score").textContent = score;
-    }
-  });
-
-  requestAnimationFrame(loop);
-}
-
-/* -------------- START GAME -------------- */
-function startGame(){
-  document.getElementById("main-menu").style.display="none";
-  document.getElementById("score").textContent="0";
-
-  // start music
-  if(soundEnabled){
-    musicMenu.pause();
-    musicRun.currentTime=0;
-    musicRun.play();
-  }
-
-  hovering=true;
-  running=true;
-  score=0;
-  penguin.y=canvas.height/2;
-  penguin.v=0;
-  pipes=[];
-  frames=0;
-
-  drawBackground();
-  drawPenguin();
-}
-
-/* ----------------- INPUT ----------------- */
-canvas.addEventListener("mousedown", ()=>{
-  if(!running) return;
-  penguin.v = flap;
-  hovering=false;
-});
-
-/* -------------- END GAME -------------- */
-function endGame(){
-  running=false;
-
-  // music swap
-  if(soundEnabled){
-    musicRun.pause();
-    musicMenu.currentTime=0;
-    musicMenu.play();
-  }
-
-  document.getElementById("final-score").textContent = score;
-  document.getElementById("game-over").style.display="flex";
-}
-
-/* -------------- UI BUTTONS -------------- */
-document.getElementById("btn-play").onclick = ()=>{
-  bgMode="normal";
-  musicMenu.currentTime=0;
-  if(soundEnabled) musicMenu.play();
-  startGame();
-};
-
-document.getElementById("btn-store").onclick = ()=>{
-  document.getElementById("store-panel").style.display="flex";
-};
-
-document.getElementById("close-store").onclick = ()=>{
-  document.getElementById("store-panel").style.display="none";
-};
-
-/* --- Toggles (purchase + equip) --- */
-function togglePurchase(id, variable){
-  window[variable] = !window[variable];
-  localStorage.setItem(id, window[variable] ? "1":"0");
-  updateToggles();
-}
-
-document.getElementById("tog-noads").onclick = ()=> togglePurchase("noads","unlock_noads");
-document.getElementById("tog-ulives").onclick = ()=> togglePurchase("ulives","unlock_ulives");
-document.getElementById("tog-hard").onclick = ()=> togglePurchase("hard","unlock_hard");
-
-document.getElementById("retry-btn").onclick = ()=>{
-  document.getElementById("game-over").style.display="none";
-  startGame();
-};
-
-document.getElementById("menu-btn").onclick = ()=>{
-  document.getElementById("game-over").style.display="none";
-  document.getElementById("main-menu").style.display="flex";
-};
-
-/* ----- Reset progress ----- */
-document.getElementById("btn-reset").onclick = ()=>{
-  localStorage.clear();
-  alert("Progress reset.");
-  unlock_noads=false;
-  unlock_ulives=false;
-  unlock_hard=false;
-  updateToggles();
-};
-
-/* ----- Restore purchases (just re-loads toggles) ----- */
-document.getElementById("btn-restore").onclick = ()=>{
-  unlock_noads = localStorage.getItem("noads")==="1";
-  unlock_ulives = localStorage.getItem("ulives")==="1";
-  unlock_hard = localStorage.getItem("hard")==="1";
-  updateToggles();
-  alert("Purchases restored.");
-};
-
-/* ----- Sound toggle ----- */
-document.getElementById("sound-btn").onclick = ()=>{
-  soundEnabled = !soundEnabled;
-  if(!soundEnabled){
-    musicMenu.pause();
-    musicRun.pause();
-  } else {
-    musicMenu.play();
-  }
-};
-
-/* vibrate button placeholder */
-document.getElementById("vibrate-btn").onclick = ()=>{
-  if(navigator.vibrate) navigator.vibrate(100);
-};
+document.getElementById("playBtn").onclick = startGame;
 </script>
+
 </body>
 </html>
